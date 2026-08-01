@@ -71,7 +71,6 @@ scripts/illustrator/docs/README.md
 脚本开发：
 
 遵循：
-
 简单功能
 ↓
 测试
@@ -93,7 +92,6 @@ scripts/illustrator/docs/README.md
 
 
 使用：
-
 英文小写
 +
 下划线
@@ -110,14 +108,12 @@ scripts/illustrator/docs/README.md
 
 
 正确：
-
 create_layer.jsx
 export_png.jsx
 batch_resize.jsx
 
 
 错误：
-
 新建图层.jsx
 test.jsx
 abc.jsx
@@ -131,24 +127,20 @@ abc.jsx
 所有脚本：
 
 存放：
-
 scripts/
 
 
 例如：
 
 Photoshop：
-
 scripts/photoshop/
 
 
 Illustrator：
-
 scripts/illustrator/
 
 
 公共代码：
-
 scripts/common/
 
 
@@ -171,6 +163,7 @@ scripts/common/
 // Version:
 // Date:
 // =================================
+
 示例：
 // =================================
 // Script: export_png.jsx
@@ -180,7 +173,7 @@ scripts/common/
 // Version: 1.0
 // =================================
 
-# 六、代码结构规范
+六、代码结构规范
 推荐结构：
 文件说明
 
@@ -220,7 +213,6 @@ catch(error)
 使用中文。
 例如：
 alert("执行失败：" + error.message);
-
 八、文件操作规范
 涉及文件：
 必须检查：
@@ -230,7 +222,6 @@ alert("执行失败：" + error.message);
 禁止：
 未确认覆盖源文件
 删除用户文件
-
 九、版本管理规范
 重要修改：
 保留版本。
@@ -239,7 +230,6 @@ export_png_v1.jsx
 
 export_png_v2.jsx
 不要直接覆盖重要脚本。
-
 十、测试规范
 新脚本：
 必须：
@@ -251,11 +241,15 @@ export_png_v2.jsx
 使用方法
 注意事项
 已知问题
-
 十一、Git规范
 提交信息：
 使用明确描述。
 推荐：
+Add Photoshop export script
+
+Add Illustrator shape generator
+
+Update automation rules
 Add Photoshop export script
 
 Add Illustrator shape generator
@@ -267,7 +261,6 @@ test
 update
 
 修改
-
 十二、Codex执行规范
 Codex生成脚本时：
 遵循：
