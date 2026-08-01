@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "adobe.extendscript-debug",
+        "adobe.extend-script",
+        "eamodio.gitlens",
+        "ms-vscode.vscode-js-debug",
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint"
+    ]
+}
