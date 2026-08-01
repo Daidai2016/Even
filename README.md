@@ -1,119 +1,33 @@
-# Codex Design Workspace
+# Codex_Design
 
 
-## 项目简介
+## AI + Adobe Creative Cloud 自动化设计工作平台
 
 
-Codex Design Workspace 是一个：
+Codex_Design 是一个：
 
-AI + Adobe Creative Cloud 自动化设计工作平台。
-
-
-项目目标：
-
-通过 OpenAI Codex 辅助设计师建立：
-
-- Photoshop 自动化流程
-- Illustrator 自动化流程
-- Adobe 软件协同工作流
-- AI辅助设计生产体系
-
-
----
-
-# 核心方向
-
-
-## 1. Photoshop 自动化
-
-
-方向：
-
-- 图像处理自动化
-- 批量生产
-- 图层管理
-- AI素材后处理
-- 自动输出
-
-
-目录：
-scripts/photoshop/
-
-
----
-
-## 2. Illustrator 自动化
-
-
-方向：
-
-- 矢量图形生成
-- 参数化设计
-- 自动排版
-- SVG/PDF输出
-- MCP实验
-
-
-目录：
-scripts/illustrator/
-
-
----
-
-## 3. Adobe 工作流整合
-
-
-支持：
-
-- Photoshop
-- Illustrator
-- InDesign
-- Bridge
-- Acrobat
+基于 OpenAI Codex 的 Adobe 自动化设计开发项目。
 
 
 目标：
 
-建立跨 Adobe 软件的自动化设计流程。
+通过 AI 辅助设计师建立：
+
+- Photoshop 自动化工作流
+- Illustrator 自动化工作流
+- Adobe 软件协同流程
+- AI辅助设计生产体系
+
 
 
 ---
 
-# 项目结构
+# 项目目标
 
 
-```text
-Codex_Design/
+本项目致力于建立：
 
-├── adobe/
-│   Adobe相关资源
-│
-├── scripts/
-│   自动化脚本
-│
-├── workflows/
-│   工作流程记录
-│
-├── prompts/
-│   AI提示词
-│
-├── assets/
-│   设计资源
-│
-├── docs/
-│   项目文档
-│
-├── presentation/
-│   汇报演示文件
-│
-├── mindmaps/
-│   思维导图
-│
-└── experiments/
-    实验项目
-
-自动化架构
-设计需求
+自然语言需求
 
 ↓
 
@@ -121,11 +35,11 @@ OpenAI Codex
 
 ↓
 
-Adobe自动化脚本
+自动化脚本
 
 ↓
 
-Photoshop / Illustrator执行
+Adobe Creative Cloud执行
 
 ↓
 
@@ -133,59 +47,322 @@ Photoshop / Illustrator执行
 
 ↓
 
+版本管理
+
+
+形成：
+
+稳定、可维护、可扩展的设计自动化体系。
+
+
+
+---
+
+# 支持软件
+
+
+当前规划支持：
+
+
+## Adobe Photoshop
+
+
+主要方向：
+
+- 图像创作
+- 照片修饰
+- 图像调整
+- 图像合成
+- AIGC素材处理
+- 批量生产
+- 印刷输出
+
+
+
+## Adobe Illustrator
+
+
+主要方向：
+
+- 矢量图形创作
+- 矢量插画
+- 品牌视觉设计
+- 自动排版
+- 图形系统生成
+- SVG/PDF输出
+
+
+
+## Adobe InDesign
+
+
+规划方向：
+
+- 多页面排版
+- 出版物自动化
+- 文档生产流程
+
+
+
+## Adobe Bridge
+
+
+规划方向：
+
+- 素材管理
+- 文件整理
+- 元数据处理
+
+
+
+## Adobe Acrobat
+
+
+规划方向：
+
+- PDF处理
+- PDF检查
+- 文档自动化
+
+
+
+---
+
+# 项目结构
+
+Codex_Design
+│
+├── AGENTS.md
+│
+├── CODING_RULES.md
+│
+├── scripts/
+│   │
+│   ├── photoshop/
+│   │
+│   ├── illustrator/
+│   │
+│   ├── indesign/
+│   │
+│   ├── bridge/
+│   │
+│   ├── acrobat/
+│   │
+│   └── common/
+│
+├── workflows/
+│
+├── prompts/
+│
+├── assets/
+│
+├── docs/
+│
+├── presentation/
+│
+└── mindmaps/
+
+
+---
+
+# 文档体系
+
+
+## 项目规则
+
+
+### AGENTS.md
+
+定义：
+
+Codex工作方式和项目行为规则。
+
+
+
+### CODING_RULES.md
+
+定义：
+
+通用脚本开发规范。
+
+
+
+### ADOBE_AUTOMATION_GUIDE.md
+
+位置：
+
+scripts/common/docs/
+
+
+定义：
+
+Adobe自动化共同规则。
+
+
+
+---
+
+# 软件专项文档
+
+
+## Photoshop
+
+
+位置：
+
+scripts/photoshop/docs/README.md
+
+
+包含：
+
+- Photoshop自动化方向
+- 图像生产流程
+- PS脚本目录说明
+
+
+
+---
+
+## Illustrator
+
+
+位置：
+
+scripts/illustrator/docs/README.md
+
+
+包含：
+
+- Illustrator自动化方向
+- 矢量创作流程
+- AI脚本目录说明
+
+
+
+---
+
+# 自动化开发流程
+
+
+标准流程：
+
+
+需求分析
+
+↓
+
+确定Adobe应用
+
+↓
+
+检查项目规范
+
+↓
+
+Codex生成或优化脚本
+
+↓
+
+Adobe软件执行
+
+↓
+
+验证结果
+
+↓
+
 Git版本管理
 
-文档体系
-项目规则：
-AGENTS.md
+
+
+---
+
+# 当前重点建设方向
+
+
+## 1. Photoshop自动化
+
+
+重点：
+
+- 图像批处理
+- TIFF生产流程
+- 图层自动管理
+- AIGC后处理
+
+
+---
+
+## 2. Illustrator自动化
+
+
+重点：
+
+- 参数化图形生成
+- 矢量插画
+- 自动排版
+- 品牌视觉系统
+
+
+---
+
+## 3. Adobe协同流程
+
+
+目标：
+
+建立：
+
+Illustrator
 
 ↓
 
-scripts/common/docs/CODING_RULES.md
+Photoshop
 
 ↓
 
-Adobe专项文档
-Adobe专项：
-scripts/photoshop/docs/
+最终交付
 
-scripts/illustrator/docs/
 
-当前阶段
-已完成：
-Git项目初始化
-Codex规则体系建立
-Adobe脚本目录规划
-Photoshop自动化框架
-Illustrator自动化框架
-Git LFS配置
+的自动化生产链。
 
-后续规划
-阶段1
-建立 Adobe JSX 模板。
-阶段2
-开发 Photoshop 自动化脚本。
-阶段3
-开发 Illustrator 自动化脚本。
-阶段4
-建立 Codex + Adobe 自动化生产流程。
 
-技术环境
+
+---
+
+# 开发环境
+
+
 主要工具：
-OpenAI Codex
-Git / GitHub
-Git LFS
-Adobe Creative Cloud
-ExtendScript / JSX
 
-项目目标
-最终实现：
-自然语言需求
-↓
-Codex
-↓
-Adobe自动化
-↓
-设计生产
-↓
-版本管理
+
+- OpenAI Codex
+- Visual Studio Code
+- Git
+- Adobe Creative Cloud
+
+
+
+---
+
+# 项目维护原则
+
+
+本项目中的：
+
+- 脚本
+- 文档
+- 工作流程
+
+
+均作为长期生产资产管理。
+
+
+修改时：
+
+优先保证：
+
+- 稳定性
+- 可维护性
+- 可扩展性
+
