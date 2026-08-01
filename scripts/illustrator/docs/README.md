@@ -6,46 +6,174 @@
 
 本文档用于说明：
 
-Adobe Illustrator 自动化开发特点。
+Adobe Illustrator 自动化方向、
+创作应用场景、
+脚本目录结构和工作流程。
 
 
-通用脚本规范：
+Adobe通用自动化规范：
 
 参考：
-scripts/common/docs/CODING_RULES.md
+
+scripts/common/docs/ADOBE_AUTOMATION_GUIDE.md
+
+
+通用脚本开发规范：
+
+参考：
+
+CODING_RULES.md
+
 
 
 ---
 
-# 二、Illustrator 自动化方向
+# 二、Illustrator自动化定位
 
 
-本目录主要用于：
+Illustrator是主要的：
+
+矢量创作与矢量自动化平台。
 
 
-- 矢量图形生成
+自动化主要服务于：
+
+
+- 矢量图形创作
+- 矢量插画绘制
+- 品牌视觉设计
+- 图形系统生成
+- 文字设计
 - 自动排版
-- 图形系统创建
-- SVG/PDF输出
-- MCP实验
+- SVG/PDF生产
 
-
-主要技术：
-
-- ExtendScript
-- JSX
-- Illustrator MCP
 
 
 ---
 
-# 三、目录说明
+# 三、Illustrator主要应用方向
+
+
+## 1. 矢量图形创作自动化
+
+
+用于：
+
+
+- 图形绘制
+- 路径创建
+- 图形组合
+- 参数化设计
+- 图案生成
+
+
+
+---
+
+## 2. 矢量插画自动化
+
+
+用于：
+
+
+- 插画元素生成
+- 图形系统建立
+- 系列化视觉创作
+- 自动绘制流程
+
+
+
+---
+
+## 3. 品牌视觉自动化
+
+
+用于：
+
+
+- Logo元素
+- 品牌组件
+- 视觉规范元素
+- 模板化设计
+
+
+
+---
+
+## 4. 文字与版式自动化
+
+
+用于：
+
+
+- 创建文字
+- 字体处理
+- 自动排版
+- 网格系统
+
+
+
+---
+
+# 四、大画面矢量制作规则
+
+
+针对超大尺寸制作：
+
+
+Illustrator中的1:10比例：
+
+仅适用于：
+
+
+- 矢量图形
+- 路径对象
+- 文字对象
+- 版式结构
+
+
+
+不适用于：
+
+
+- 照片
+- 位图图片
+- AIGC图片素材
+
+
+
+位图内容进入Photoshop流程。
+
+
+
+典型流程：
+
+
+Illustrator
+
+↓
+
+矢量/文字/版式 1:10制作
+
+↓
+
+高倍率输出
+
+↓
+
+Photoshop处理
+
+
+
+---
+
+# 五、目录说明
 
 
 ## jsx/
 
 
-基础 Illustrator 脚本。
+基础Illustrator脚本。
 
 
 用于：
@@ -53,11 +181,8 @@ scripts/common/docs/CODING_RULES.md
 - 创建文档
 - 操作对象
 - 修改属性
+- 执行自动化流程
 
-
-示例：
-create_document.jsx
-create_object.jsx
 
 
 ---
@@ -65,19 +190,17 @@ create_object.jsx
 ## artwork/
 
 
-图形生成。
+图形创作。
 
 
-应用：
+用于：
+
 
 - 基础图形
+- 矢量插画
 - 图案生成
-- 自动绘制
+- 参数化绘制
 
-
-示例：
-create_circle.jsx
-generate_pattern.jsx
 
 
 ---
@@ -88,11 +211,13 @@ generate_pattern.jsx
 文字自动化。
 
 
-包括：
+用于：
 
-- 创建文字
-- 文字排版
-- 字体处理
+
+- 文字创建
+- 排版处理
+- 字体管理
+
 
 
 ---
@@ -103,11 +228,13 @@ generate_pattern.jsx
 版式自动化。
 
 
-应用：
+用于：
+
 
 - 海报布局
 - 网格系统
 - 页面结构
+
 
 
 ---
@@ -120,9 +247,12 @@ generate_pattern.jsx
 
 支持：
 
-- SVG
+
+- AI
 - PDF
+- SVG
 - PNG
+
 
 
 ---
@@ -131,6 +261,7 @@ generate_pattern.jsx
 
 
 矢量资源管理。
+
 
 
 ---
@@ -143,19 +274,31 @@ Illustrator MCP实验目录。
 
 用途：
 
+
 测试：
+
 Codex
+
 ↓
+
 MCP
+
 ↓
+
 Illustrator
+
 
 
 说明：
 
-MCP作为辅助方式。
 
-不是唯一自动化方案。
+MCP为辅助自动化方式。
+
+
+复杂生产任务：
+
+优先使用JSX。
+
 
 
 ---
@@ -163,7 +306,8 @@ MCP作为辅助方式。
 ## templates/
 
 
-AI模板文件相关自动化。
+AI模板相关自动化。
+
 
 
 ---
@@ -174,45 +318,89 @@ AI模板文件相关自动化。
 测试案例。
 
 
+用于：
+
+- 功能验证
+- 脚本测试
+
+
+
 ---
 
 ## docs/
 
 
-Illustrator相关说明文档。
+Illustrator专项说明。
 
-
----
-
-# 四、开发方向
-
-
-优先建设：
-
-
-1. 参数化图形生成
-
-2. 自动排版系统
-
-3. SVG生产流程
-
-4. 品牌视觉自动化
-
-5. MCP辅助实验
 
 
 ---
 
-# 五、与Codex协作
+# 六、Illustrator与Photoshop协作
 
 
-流程：
+Illustrator负责：
+
+
+- 矢量创作
+- 插画
+- 图形
+- 文字
+- 版式
+
+
+Photoshop负责：
+
+
+- 照片
+- 图像处理
+- AIGC
+- 位图输出
+
+
+
+协作流程：
+
+
+Illustrator矢量创作
+
+↓
+
+Photoshop图像处理
+
+↓
+
+自动输出
+
+↓
+
+生产交付
+
+
+
+---
+
+# 七、与Codex协作流程
+
+
 设计需求
+
 ↓
-Codex生成JSX
+
+Codex分析
+
 ↓
+
+生成或优化JSX
+
+↓
+
 Illustrator执行
+
 ↓
-验证结果
+
+视觉验证
+
 ↓
+
 保存脚本版本
