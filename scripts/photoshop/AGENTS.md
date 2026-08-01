@@ -137,3 +137,33 @@ git diff
 未经用户明确确认：
 
 不得自动提交或推送 Git。
+
+# 文件命名规则
+
+Photoshop JSX文件：
+
+使用：
+
+功能_对象_动作_版本号
+
+格式：
+
+lowercase_english_with_underscore.jsx
+
+
+示例：
+
+large_format_batch_output_v27.jsx
+
+large_format_single_file_process_v19.jsx
+
+
+禁止：
+
+中文文件名
+
+测试.jsx
+
+最终版.jsx
+
+new.jsx
