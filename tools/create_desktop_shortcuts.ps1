@@ -1,137 +1,158 @@
 ﻿# =============================================
-# Even Codex Design 桌面工作台生成器
-# Version: 2.0
+# Even Codex Design Desktop Workspace Generator
+#
+# Version: 2.1.1
 #
 # 功能：
-# 1. 自动识别当前 Git 项目路径
-# 2. 创建 Even Codex Design 桌面工作台
-# 3. 分类创建 11 个快捷方式
-# 4. 自动调用仓库中的 ICO 图标
-# 5. 自动检测 Photoshop Beta 和 Illustrator Beta
-# 6. 生成快捷方式安装日志
+# 1. 自动识别当前项目根目录
+# 2. 读取 tools/config/shortcut_config.json
+# 3. 根据 JSON 配置创建桌面快捷方式
+# 4. 自动检测 Photoshop Beta 与 Illustrator Beta
+# 5. 自动匹配仓库中的 ICO 图标
+# 6. 创建 Even Codex Design 桌面工作台
+# 7. 生成详细安装日志
 #
-# 兼容：
+# 兼容环境：
 # Windows 10
 # Windows PowerShell 5.1
+#
+# 文件编码：
+# UTF-8 with BOM
 # =============================================
 
 
 $ErrorActionPreference = "Stop"
 
-$ToolVersion = "2.0"
+$ToolVersion = "2.1.1"
 
 
 # =============================================
-# 一、获取基础路径
+# 一、项目基础路径
 # =============================================
 
 
-# tools 文件夹的上一级为项目根目录
+# 当前脚本位于 tools 目录
+# tools 的上一级为项目根目录
+
 $ProjectPath = Join-Path $PSScriptRoot ".."
 
 $ProjectPath = (Resolve-Path $ProjectPath).Path
 
 
-# Windows 桌面路径
-$DesktopPath = [Environment]::GetFolderPath("Desktop")
+$ToolsPath = Join-Path $ProjectPath "tools"
+
+$ConfigPath = Join-Path $ToolsPath "config"
+
+$ToolsDocsPath = Join-Path $ToolsPath "docs"
+
+$IconPath = Join-Path $ProjectPath "assets\icons\ico"
+
+$LogsPath = Join-Path $ProjectPath "logs"
+
+$ScriptsPath = Join-Path $ProjectPath "scripts"
 
 
-# 桌面工作台根目录
-$WorkspacePath = Join-Path $DesktopPath "Even Codex Design"
+# =============================================
+# 二、项目文件路径
+# =============================================
 
 
-# 工作台分类目录
-$DevelopmentFolder = Join-Path $WorkspacePath "01_开发工具"
-
-$AdobeFolder = Join-Path $WorkspacePath "02_Adobe脚本"
-
-$ManagementFolder = Join-Path $WorkspacePath "03_项目管理"
-
-
-# 项目资源目录
-$IconDirectory = Join-Path $ProjectPath "assets\icons\ico"
-
-$LogsDirectory = Join-Path $ProjectPath "logs"
-
-$ToolsDirectory = Join-Path $ProjectPath "tools"
-
-$ToolsDocsDirectory = Join-Path $ProjectPath "tools\docs"
-
-
-# 项目文件
 $AgentsFile = Join-Path $ProjectPath "AGENTS.md"
 
 $CodingRulesFile = Join-Path $ProjectPath "CODING_RULES.md"
 
-$EnvironmentFile = Join-Path $ToolsDocsDirectory "ENVIRONMENT.md"
+$EnvironmentFile = Join-Path $ToolsDocsPath "ENVIRONMENT.md"
 
-
-# 工具脚本
-$GitStatusScript = Join-Path $ToolsDirectory "git_status.ps1"
-
-$GitPublishScript = Join-Path $ToolsDirectory "git_publish.ps1"
-
-$BackupScript = Join-Path $ToolsDirectory "backup_project.ps1"
-
-
-# 项目脚本目录
-$PhotoshopJsxDirectory = Join-Path $ProjectPath "scripts\photoshop\jsx"
-
-$IllustratorJsxDirectory = Join-Path $ProjectPath "scripts\illustrator\jsx"
-
-
-# Windows 程序
-$PowerShellExe = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
-
-$ExplorerExe = Join-Path $env:SystemRoot "explorer.exe"
-
-$NotepadExe = Join-Path $env:SystemRoot "System32\notepad.exe"
+$ShortcutConfigFile = Join-Path `
+    $ConfigPath `
+    "shortcut_config.json"
 
 
 # =============================================
-# 二、创建日志目录
+# 三、工具脚本路径
 # =============================================
 
 
-if (-not (Test-Path -LiteralPath $LogsDirectory -PathType Container)) {
+$GitStatusScript = Join-Path `
+    $ToolsPath `
+    "git_status.ps1"
+
+
+$GitPublishScript = Join-Path `
+    $ToolsPath `
+    "git_publish.ps1"
+
+
+$BackupScript = Join-Path `
+    $ToolsPath `
+    "backup_project.ps1"
+
+
+# =============================================
+# 四、项目脚本目录
+# =============================================
+
+
+$PhotoshopJsxPath = Join-Path `
+    $ProjectPath `
+    "scripts\photoshop\jsx"
+
+
+$IllustratorJsxPath = Join-Path `
+    $ProjectPath `
+    "scripts\illustrator\jsx"
+
+
+# =============================================
+# 五、Windows 系统程序
+# =============================================
+
+
+$PowerShellExe = Join-Path `
+    $env:SystemRoot `
+    "System32\WindowsPowerShell\v1.0\powershell.exe"
+
+
+$ExplorerExe = Join-Path `
+    $env:SystemRoot `
+    "explorer.exe"
+
+
+$NotepadExe = Join-Path `
+    $env:SystemRoot `
+    "System32\notepad.exe"
+
+
+# =============================================
+# 六、桌面路径
+# =============================================
+
+
+$DesktopPath = [Environment]::GetFolderPath("Desktop")
+
+
+# =============================================
+# 七、创建日志目录
+# =============================================
+
+
+if (-not (Test-Path -LiteralPath $LogsPath -PathType Container)) {
 
     New-Item `
         -ItemType Directory `
-        -Path $LogsDirectory `
-        -Force | Out-Null
+        -Path $LogsPath `
+        -Force |
+        Out-Null
 }
 
 
-$LogFile = Join-Path $LogsDirectory "shortcut_install.log"
-
-
-# 记录每次运行的分隔信息
-Add-Content `
-    -LiteralPath $LogFile `
-    -Encoding UTF8 `
-    -Value ""
-
-
-Add-Content `
-    -LiteralPath $LogFile `
-    -Encoding UTF8 `
-    -Value "=================================================="
-
-
-Add-Content `
-    -LiteralPath $LogFile `
-    -Encoding UTF8 `
-    -Value "Even Codex Design Desktop Setup V$ToolVersion"
-
-
-Add-Content `
-    -LiteralPath $LogFile `
-    -Encoding UTF8 `
-    -Value "运行时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+$LogFile = Join-Path `
+    $LogsPath `
+    "shortcut_install.log"
 
 
 # =============================================
-# 三、运行状态统计
+# 八、运行统计
 # =============================================
 
 
@@ -143,16 +164,22 @@ $script:WarningCount = 0
 
 
 # =============================================
-# 四、日志输出函数
+# 九、日志函数
 # =============================================
 
 
 function Write-SetupLog {
 
     param(
+
         [string]$Message,
 
-        [ValidateSet("INFO", "SUCCESS", "WARNING", "ERROR")]
+        [ValidateSet(
+            "INFO",
+            "SUCCESS",
+            "WARNING",
+            "ERROR"
+        )]
         [string]$Level = "INFO"
     )
 
@@ -162,23 +189,35 @@ function Write-SetupLog {
     $LogLine = "[$Time] [$Level] $Message"
 
 
+    Add-Content `
+        -LiteralPath $LogFile `
+        -Value $LogLine `
+        -Encoding UTF8
+
+
     switch ($Level) {
 
         "SUCCESS" {
 
-            Write-Host $Message -ForegroundColor Green
+            Write-Host `
+                $Message `
+                -ForegroundColor Green
         }
 
         "WARNING" {
 
-            Write-Host $Message -ForegroundColor Yellow
+            Write-Host `
+                $Message `
+                -ForegroundColor Yellow
 
             $script:WarningCount++
         }
 
         "ERROR" {
 
-            Write-Host $Message -ForegroundColor Red
+            Write-Host `
+                $Message `
+                -ForegroundColor Red
         }
 
         default {
@@ -186,17 +225,11 @@ function Write-SetupLog {
             Write-Host $Message
         }
     }
-
-
-    Add-Content `
-        -LiteralPath $LogFile `
-        -Encoding UTF8 `
-        -Value $LogLine
 }
 
 
 # =============================================
-# 五、退出前暂停函数
+# 十、暂停退出函数
 # =============================================
 
 
@@ -209,46 +242,116 @@ function Wait-BeforeExit {
 
 
 # =============================================
-# 六、项目环境验证
+# 十一、参数加引号函数
+# =============================================
+
+
+function Quote-Argument {
+
+    param(
+        [string]$Value
+    )
+
+
+    return '"' + $Value + '"'
+}
+
+
+# =============================================
+# 十二、写入本次运行日志头
+# =============================================
+
+
+Add-Content `
+    -LiteralPath $LogFile `
+    -Value "" `
+    -Encoding UTF8
+
+
+Add-Content `
+    -LiteralPath $LogFile `
+    -Value "==================================================" `
+    -Encoding UTF8
+
+
+Add-Content `
+    -LiteralPath $LogFile `
+    -Value "Even Codex Design Desktop Setup V$ToolVersion" `
+    -Encoding UTF8
+
+
+Add-Content `
+    -LiteralPath $LogFile `
+    -Value "运行时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" `
+    -Encoding UTF8
+
+
+# =============================================
+# 十三、启动界面
 # =============================================
 
 
 Write-Host ""
+
 Write-Host "============================================="
-Write-Host " Even Codex Design Desktop Setup V$ToolVersion"
+
+Write-Host " Even Codex Design Desktop Setup"
+
+Write-Host " Version $ToolVersion"
+
 Write-Host "============================================="
+
 Write-Host ""
 
 
-Write-SetupLog "项目目录：$ProjectPath"
+Write-SetupLog "项目路径：$ProjectPath"
 
-Write-SetupLog "桌面目录：$DesktopPath"
+Write-SetupLog "桌面路径：$DesktopPath"
 
-Write-SetupLog "工作台目录：$WorkspacePath"
+
+# =============================================
+# 十四、验证项目结构
+# =============================================
 
 
 $MissingProjectItems = @()
 
 
-if (-not (Test-Path -LiteralPath $AgentsFile -PathType Leaf)) {
+if (-not (
+    Test-Path `
+        -LiteralPath $AgentsFile `
+        -PathType Leaf
+)) {
 
     $MissingProjectItems += "AGENTS.md"
 }
 
 
-if (-not (Test-Path -LiteralPath $CodingRulesFile -PathType Leaf)) {
+if (-not (
+    Test-Path `
+        -LiteralPath $CodingRulesFile `
+        -PathType Leaf
+)) {
 
     $MissingProjectItems += "CODING_RULES.md"
 }
 
 
-if (-not (Test-Path -LiteralPath $ToolsDirectory -PathType Container)) {
+if (-not (
+    Test-Path `
+        -LiteralPath $ToolsPath `
+        -PathType Container
+)) {
 
     $MissingProjectItems += "tools"
 }
 
 
-if (-not (Test-Path -LiteralPath (Join-Path $ProjectPath "scripts") -PathType Container)) {
+if (-not (
+    Test-Path `
+        -LiteralPath $ScriptsPath `
+        -PathType Container
+)) {
 
     $MissingProjectItems += "scripts"
 }
@@ -256,20 +359,26 @@ if (-not (Test-Path -LiteralPath (Join-Path $ProjectPath "scripts") -PathType Co
 
 if ($MissingProjectItems.Count -gt 0) {
 
-    Write-SetupLog "当前目录不是完整的 Even Codex Design 项目。" "ERROR"
+    Write-SetupLog `
+        "当前目录不是完整的 Even Codex Design 项目。" `
+        "ERROR"
+
 
     Write-Host ""
+
     Write-Host "缺少以下项目内容：" -ForegroundColor Red
 
 
-    foreach ($Item in $MissingProjectItems) {
+    foreach ($MissingItem in $MissingProjectItems) {
 
-        Write-Host "  - $Item" -ForegroundColor Red
+        Write-Host `
+            "  - $MissingItem" `
+            -ForegroundColor Red
 
-        Add-Content `
-            -LiteralPath $LogFile `
-            -Encoding UTF8 `
-            -Value "缺少项目内容：$Item"
+
+        Write-SetupLog `
+            "缺少项目内容：$MissingItem" `
+            "ERROR"
     }
 
 
@@ -279,68 +388,252 @@ if ($MissingProjectItems.Count -gt 0) {
 }
 
 
-Write-SetupLog "项目结构验证通过。" "SUCCESS"
+Write-SetupLog `
+    "项目结构验证通过。" `
+    "SUCCESS"
 
 
-# 检查环境说明文件
-if (Test-Path -LiteralPath $EnvironmentFile -PathType Leaf) {
+# =============================================
+# 十五、检查环境说明文件
+# =============================================
 
-    Write-SetupLog "已找到环境说明：tools\docs\ENVIRONMENT.md" "SUCCESS"
+
+if (
+    Test-Path `
+        -LiteralPath $EnvironmentFile `
+        -PathType Leaf
+) {
+
+    Write-SetupLog `
+        "已找到环境说明：tools\docs\ENVIRONMENT.md" `
+        "SUCCESS"
 }
 else {
 
-    Write-SetupLog "未找到 tools\docs\ENVIRONMENT.md，文档快捷方式仍会打开 tools\docs。" "WARNING"
+    Write-SetupLog `
+        "未找到 tools\docs\ENVIRONMENT.md。" `
+        "WARNING"
 }
 
 
 # =============================================
-# 七、创建工作台分类目录
+# 十六、读取快捷方式配置
 # =============================================
 
 
-$WorkspaceFolders = @(
+if (-not (
+    Test-Path `
+        -LiteralPath $ShortcutConfigFile `
+        -PathType Leaf
+)) {
 
-    $WorkspacePath,
-
-    $DevelopmentFolder,
-
-    $AdobeFolder,
-
-    $ManagementFolder
-)
+    Write-SetupLog `
+        "缺少快捷方式配置文件：tools\config\shortcut_config.json" `
+        "ERROR"
 
 
-foreach ($Folder in $WorkspaceFolders) {
+    Wait-BeforeExit
 
-    if (-not (Test-Path -LiteralPath $Folder -PathType Container)) {
+    exit 1
+}
+
+
+try {
+
+    $ShortcutConfigText = Get-Content `
+        -LiteralPath $ShortcutConfigFile `
+        -Raw `
+        -Encoding UTF8
+
+
+    $ShortcutConfig = $ShortcutConfigText |
+        ConvertFrom-Json
+
+
+    Write-SetupLog `
+        "shortcut_config.json 读取成功。" `
+        "SUCCESS"
+}
+catch {
+
+    Write-SetupLog `
+        "shortcut_config.json 解析失败：$($_.Exception.Message)" `
+        "ERROR"
+
+
+    Wait-BeforeExit
+
+    exit 1
+}
+
+
+# =============================================
+# 十七、验证快捷方式配置
+# =============================================
+
+
+$WorkspaceName = [string]$ShortcutConfig.workspace.name
+
+
+if ([string]::IsNullOrWhiteSpace($WorkspaceName)) {
+
+    $WorkspaceName = "Even Codex Design"
+
+    Write-SetupLog `
+        "配置中未设置工作台名称，使用默认名称：$WorkspaceName" `
+        "WARNING"
+}
+
+
+$ShortcutGroups = @($ShortcutConfig.groups)
+
+$ShortcutItems = @($ShortcutConfig.shortcuts)
+
+
+if ($ShortcutGroups.Count -eq 0) {
+
+    Write-SetupLog `
+        "shortcut_config.json 中没有 groups 配置。" `
+        "ERROR"
+
+
+    Wait-BeforeExit
+
+    exit 1
+}
+
+
+if ($ShortcutItems.Count -eq 0) {
+
+    Write-SetupLog `
+        "shortcut_config.json 中没有 shortcuts 配置。" `
+        "ERROR"
+
+
+    Wait-BeforeExit
+
+    exit 1
+}
+
+
+Write-SetupLog `
+    "配置版本：$($ShortcutConfig.version)"
+
+
+Write-SetupLog `
+    "工作台名称：$WorkspaceName"
+
+
+Write-SetupLog `
+    "快捷方式配置数量：$($ShortcutItems.Count)"
+
+
+# =============================================
+# 十八、工作台路径
+# =============================================
+
+
+$WorkspacePath = Join-Path `
+    $DesktopPath `
+    $WorkspaceName
+
+
+Write-SetupLog `
+    "工作台路径：$WorkspacePath"
+
+
+# =============================================
+# 十九、创建工作台根目录
+# =============================================
+
+
+if (-not (
+    Test-Path `
+        -LiteralPath $WorkspacePath `
+        -PathType Container
+)) {
+
+    New-Item `
+        -ItemType Directory `
+        -Path $WorkspacePath `
+        -Force |
+        Out-Null
+
+
+    Write-SetupLog `
+        "创建工作台目录：$WorkspacePath" `
+        "SUCCESS"
+}
+else {
+
+    Write-SetupLog `
+        "工作台目录已经存在：$WorkspacePath"
+}
+
+
+# =============================================
+# 二十、创建工作台分类目录
+# =============================================
+
+
+foreach ($GroupConfigItem in $ShortcutGroups) {
+
+    $GroupName = [string]$GroupConfigItem.name
+
+
+    if ([string]::IsNullOrWhiteSpace($GroupName)) {
+
+        Write-SetupLog `
+            "发现没有名称的工作台分类，已经跳过。" `
+            "WARNING"
+
+        continue
+    }
+
+
+    $GroupPath = Join-Path `
+        $WorkspacePath `
+        $GroupName
+
+
+    if (-not (
+        Test-Path `
+            -LiteralPath $GroupPath `
+            -PathType Container
+    )) {
 
         New-Item `
             -ItemType Directory `
-            -Path $Folder `
-            -Force | Out-Null
+            -Path $GroupPath `
+            -Force |
+            Out-Null
 
-        Write-SetupLog "创建目录：$Folder" "SUCCESS"
+
+        Write-SetupLog `
+            "创建工作台分类：$GroupName" `
+            "SUCCESS"
     }
     else {
 
-        Write-SetupLog "目录已经存在：$Folder"
+        Write-SetupLog `
+            "工作台分类已经存在：$GroupName"
     }
 }
 
 
 # =============================================
-# 八、查找 VS Code
+# 二十一、查找 VS Code
 # =============================================
 
 
 function Find-VSCode {
 
-    $Candidates = @()
+    $VSCodeCandidates = @()
 
 
     if ($env:LOCALAPPDATA) {
 
-        $Candidates += Join-Path `
+        $VSCodeCandidates += Join-Path `
             $env:LOCALAPPDATA `
             "Programs\Microsoft VS Code\Code.exe"
     }
@@ -348,29 +641,46 @@ function Find-VSCode {
 
     if ($env:ProgramFiles) {
 
-        $Candidates += Join-Path `
+        $VSCodeCandidates += Join-Path `
             $env:ProgramFiles `
             "Microsoft VS Code\Code.exe"
     }
 
 
-    $ProgramFilesX86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)")
+    $ProgramFilesX86 = [Environment]::GetEnvironmentVariable(
+        "ProgramFiles(x86)"
+    )
 
 
     if ($ProgramFilesX86) {
 
-        $Candidates += Join-Path `
+        $VSCodeCandidates += Join-Path `
             $ProgramFilesX86 `
             "Microsoft VS Code\Code.exe"
     }
 
 
-    foreach ($Candidate in $Candidates) {
+    foreach ($VSCodeCandidate in $VSCodeCandidates) {
 
-        if (Test-Path -LiteralPath $Candidate -PathType Leaf) {
+        if (
+            Test-Path `
+                -LiteralPath $VSCodeCandidate `
+                -PathType Leaf
+        ) {
 
-            return $Candidate
+            return $VSCodeCandidate
         }
+    }
+
+
+    $VSCodeCommand = Get-Command `
+        "code.exe" `
+        -ErrorAction SilentlyContinue
+
+
+    if ($VSCodeCommand -and $VSCodeCommand.Source) {
+
+        return $VSCodeCommand.Source
     }
 
 
@@ -383,60 +693,33 @@ $VSCodeExe = Find-VSCode
 
 if ($VSCodeExe) {
 
-    Write-SetupLog "已找到 VS Code：$VSCodeExe" "SUCCESS"
+    Write-SetupLog `
+        "已找到 VS Code：$VSCodeExe" `
+        "SUCCESS"
 }
 else {
 
-    Write-SetupLog "未找到 VS Code，VS Code快捷方式将无法创建。" "WARNING"
+    Write-SetupLog `
+        "未找到 VS Code。相关快捷方式将被跳过或使用记事本。" `
+        "WARNING"
 }
 
 
 # =============================================
-# 九、图标检测函数
+# 二十二、Adobe Beta 环境检测
 # =============================================
 
 
-function Get-ShortcutIcon {
-
-    param(
-        [string]$IconFileName
-    )
+$AdobeRoot = Join-Path `
+    $env:ProgramFiles `
+    "Adobe"
 
 
-    $IconFile = Join-Path $IconDirectory $IconFileName
-
-
-    if (Test-Path -LiteralPath $IconFile -PathType Leaf) {
-
-        return "$IconFile,0"
-    }
-
-
-    Write-SetupLog "缺少图标：$IconFileName，将使用系统默认图标。" "WARNING"
-
-    return $null
-}
-
-
-if (Test-Path -LiteralPath $IconDirectory -PathType Container) {
-
-    Write-SetupLog "图标目录检测通过：$IconDirectory" "SUCCESS"
-}
-else {
-
-    Write-SetupLog "未找到图标目录：assets\icons\ico，所有快捷方式将使用默认图标。" "WARNING"
-}
-
-
-# =============================================
-# 十、检测 Adobe Beta 路径
-# =============================================
-
-
-$AdobeRoot = Join-Path $env:ProgramFiles "Adobe"
-
-
+# ---------------------------------------------
 # Photoshop Beta
+# ---------------------------------------------
+
+
 $PhotoshopBetaRoot = Join-Path `
     $AdobeRoot `
     "Adobe Photoshop (Beta)"
@@ -444,22 +727,32 @@ $PhotoshopBetaRoot = Join-Path `
 
 $PhotoshopScriptCandidates = @(
 
-    (Join-Path $PhotoshopBetaRoot "Presets\Scripts"),
+    (Join-Path `
+        $PhotoshopBetaRoot `
+        "Presets\Scripts"),
 
-    (Join-Path $PhotoshopBetaRoot "Presets\zh_CN\Scripts"),
+    (Join-Path `
+        $PhotoshopBetaRoot `
+        "Presets\zh_CN\Scripts"),
 
-    (Join-Path $PhotoshopBetaRoot "Presets\zh_CN\脚本")
+    (Join-Path `
+        $PhotoshopBetaRoot `
+        "Presets\zh_CN\脚本")
 )
 
 
 $PhotoshopBetaScriptPath = $null
 
 
-foreach ($Candidate in $PhotoshopScriptCandidates) {
+foreach ($PhotoshopCandidate in $PhotoshopScriptCandidates) {
 
-    if (Test-Path -LiteralPath $Candidate -PathType Container) {
+    if (
+        Test-Path `
+            -LiteralPath $PhotoshopCandidate `
+            -PathType Container
+    ) {
 
-        $PhotoshopBetaScriptPath = $Candidate
+        $PhotoshopBetaScriptPath = $PhotoshopCandidate
 
         break
     }
@@ -468,29 +761,52 @@ foreach ($Candidate in $PhotoshopScriptCandidates) {
 
 if ($PhotoshopBetaScriptPath) {
 
-    Write-SetupLog "已找到 Photoshop Beta 脚本目录：$PhotoshopBetaScriptPath" "SUCCESS"
+    Write-SetupLog `
+        "Photoshop Beta脚本目录：$PhotoshopBetaScriptPath" `
+        "SUCCESS"
 }
-elseif (Test-Path -LiteralPath $PhotoshopBetaRoot -PathType Container) {
+elseif (
+    Test-Path `
+        -LiteralPath $PhotoshopBetaRoot `
+        -PathType Container
+) {
 
     $PhotoshopBetaScriptPath = $PhotoshopBetaRoot
 
-    Write-SetupLog "已找到 Photoshop Beta，但未找到 Presets\Scripts；快捷方式将打开 Photoshop Beta 安装目录。" "WARNING"
+
+    Write-SetupLog `
+        "找到 Photoshop Beta，但未找到 Presets\Scripts；将打开安装目录。" `
+        "WARNING"
 }
-elseif (Test-Path -LiteralPath $AdobeRoot -PathType Container) {
+elseif (
+    Test-Path `
+        -LiteralPath $AdobeRoot `
+        -PathType Container
+) {
 
     $PhotoshopBetaScriptPath = $AdobeRoot
 
-    Write-SetupLog "未找到 Photoshop Beta；快捷方式将打开 Adobe 安装目录。" "WARNING"
+
+    Write-SetupLog `
+        "未找到 Photoshop Beta；将打开 Adobe 安装目录。" `
+        "WARNING"
 }
 else {
 
     $PhotoshopBetaScriptPath = $env:ProgramFiles
 
-    Write-SetupLog "未找到 Adobe 安装目录；Photoshop快捷方式将打开 Program Files。" "WARNING"
+
+    Write-SetupLog `
+        "未找到 Adobe 安装目录；将打开 Program Files。" `
+        "WARNING"
 }
 
 
+# ---------------------------------------------
 # Illustrator Beta
+# ---------------------------------------------
+
+
 $IllustratorBetaRoot = Join-Path `
     $AdobeRoot `
     "Adobe Illustrator (Beta)"
@@ -498,24 +814,36 @@ $IllustratorBetaRoot = Join-Path `
 
 $IllustratorScriptCandidates = @(
 
-    (Join-Path $IllustratorBetaRoot "Presets\zh_CN\脚本"),
+    (Join-Path `
+        $IllustratorBetaRoot `
+        "Presets\zh_CN\脚本"),
 
-    (Join-Path $IllustratorBetaRoot "Presets\zh_CN\Scripts"),
+    (Join-Path `
+        $IllustratorBetaRoot `
+        "Presets\zh_CN\Scripts"),
 
-    (Join-Path $IllustratorBetaRoot "Presets\en_US\Scripts"),
+    (Join-Path `
+        $IllustratorBetaRoot `
+        "Presets\en_US\Scripts"),
 
-    (Join-Path $IllustratorBetaRoot "Presets\Scripts")
+    (Join-Path `
+        $IllustratorBetaRoot `
+        "Presets\Scripts")
 )
 
 
 $IllustratorBetaScriptPath = $null
 
 
-foreach ($Candidate in $IllustratorScriptCandidates) {
+foreach ($IllustratorCandidate in $IllustratorScriptCandidates) {
 
-    if (Test-Path -LiteralPath $Candidate -PathType Container) {
+    if (
+        Test-Path `
+            -LiteralPath $IllustratorCandidate `
+            -PathType Container
+    ) {
 
-        $IllustratorBetaScriptPath = $Candidate
+        $IllustratorBetaScriptPath = $IllustratorCandidate
 
         break
     }
@@ -524,43 +852,127 @@ foreach ($Candidate in $IllustratorScriptCandidates) {
 
 if ($IllustratorBetaScriptPath) {
 
-    Write-SetupLog "已找到 Illustrator Beta 脚本目录：$IllustratorBetaScriptPath" "SUCCESS"
+    Write-SetupLog `
+        "Illustrator Beta脚本目录：$IllustratorBetaScriptPath" `
+        "SUCCESS"
 }
-elseif (Test-Path -LiteralPath $IllustratorBetaRoot -PathType Container) {
+elseif (
+    Test-Path `
+        -LiteralPath $IllustratorBetaRoot `
+        -PathType Container
+) {
 
     $IllustratorBetaScriptPath = $IllustratorBetaRoot
 
-    Write-SetupLog "已找到 Illustrator Beta，但未找到语言脚本目录；快捷方式将打开 Illustrator Beta 安装目录。" "WARNING"
+
+    Write-SetupLog `
+        "找到 Illustrator Beta，但未找到语言脚本目录；将打开安装目录。" `
+        "WARNING"
 }
-elseif (Test-Path -LiteralPath $AdobeRoot -PathType Container) {
+elseif (
+    Test-Path `
+        -LiteralPath $AdobeRoot `
+        -PathType Container
+) {
 
     $IllustratorBetaScriptPath = $AdobeRoot
 
-    Write-SetupLog "未找到 Illustrator Beta；快捷方式将打开 Adobe 安装目录。" "WARNING"
+
+    Write-SetupLog `
+        "未找到 Illustrator Beta；将打开 Adobe 安装目录。" `
+        "WARNING"
 }
 else {
 
     $IllustratorBetaScriptPath = $env:ProgramFiles
 
-    Write-SetupLog "未找到 Adobe 安装目录；Illustrator快捷方式将打开 Program Files。" "WARNING"
+
+    Write-SetupLog `
+        "未找到 Adobe 安装目录；将打开 Program Files。" `
+        "WARNING"
 }
 
 
 # =============================================
-# 十一、创建快捷方式函数
+# 二十三、图标检测函数
 # =============================================
 
 
-$WScriptShell = New-Object -ComObject WScript.Shell
+function Get-IconLocation {
+
+    param(
+        [string]$IconFileName
+    )
+
+
+    if ([string]::IsNullOrWhiteSpace($IconFileName)) {
+
+        return $null
+    }
+
+
+    $IconFile = Join-Path `
+        $IconPath `
+        $IconFileName
+
+
+    if (
+        Test-Path `
+            -LiteralPath $IconFile `
+            -PathType Leaf
+    ) {
+
+        return "$IconFile,0"
+    }
+
+
+    Write-SetupLog `
+        "缺少图标：$IconFileName，将使用系统默认图标。" `
+        "WARNING"
+
+
+    return $null
+}
+
+
+if (
+    Test-Path `
+        -LiteralPath $IconPath `
+        -PathType Container
+) {
+
+    Write-SetupLog `
+        "图标目录检测通过：$IconPath" `
+        "SUCCESS"
+}
+else {
+
+    Write-SetupLog `
+        "未找到 assets\icons\ico，快捷方式将使用系统默认图标。" `
+        "WARNING"
+}
+
+
+# =============================================
+# 二十四、创建快捷方式函数
+# =============================================
+
+
+$WScriptShell = New-Object `
+    -ComObject WScript.Shell
 
 
 function New-EvenShortcut {
 
     param(
+
+        [Parameter(Mandatory = $true)]
         [string]$ShortcutFolder,
 
+        [Parameter(Mandatory = $true)]
         [string]$ShortcutName,
 
+        [Parameter(Mandatory = $true)]
         [string]$TargetPath,
 
         [string]$Arguments = "",
@@ -575,12 +987,39 @@ function New-EvenShortcut {
 
     try {
 
-        if (-not (Test-Path -LiteralPath $ShortcutFolder -PathType Container)) {
+        if ([string]::IsNullOrWhiteSpace($ShortcutName)) {
+
+            throw "快捷方式名称为空。"
+        }
+
+
+        if ([string]::IsNullOrWhiteSpace($TargetPath)) {
+
+            throw "快捷方式目标路径为空。"
+        }
+
+
+        if (-not (
+            Test-Path `
+                -LiteralPath $TargetPath `
+                -PathType Leaf
+        )) {
+
+            throw "目标程序不存在：$TargetPath"
+        }
+
+
+        if (-not (
+            Test-Path `
+                -LiteralPath $ShortcutFolder `
+                -PathType Container
+        )) {
 
             New-Item `
                 -ItemType Directory `
                 -Path $ShortcutFolder `
-                -Force | Out-Null
+                -Force |
+                Out-Null
         }
 
 
@@ -589,329 +1028,558 @@ function New-EvenShortcut {
             "$ShortcutName.lnk"
 
 
-        $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+        # 使用 $LinkObject，避免与 JSON 循环变量重名
+
+        $LinkObject = $WScriptShell.CreateShortcut(
+            $ShortcutFile
+        )
 
 
-        $Shortcut.TargetPath = $TargetPath
+        $LinkObject.TargetPath = $TargetPath
 
 
-        if ($Arguments) {
+        if (-not [string]::IsNullOrWhiteSpace($Arguments)) {
 
-            $Shortcut.Arguments = $Arguments
+            $LinkObject.Arguments = $Arguments
         }
 
 
-        if ($WorkingDirectory) {
+        if (
+            -not [string]::IsNullOrWhiteSpace(
+                $WorkingDirectory
+            ) -and
+            (
+                Test-Path `
+                    -LiteralPath $WorkingDirectory `
+                    -PathType Container
+            )
+        ) {
 
-            $Shortcut.WorkingDirectory = $WorkingDirectory
+            $LinkObject.WorkingDirectory = $WorkingDirectory
         }
         else {
 
-            $Shortcut.WorkingDirectory = $ProjectPath
+            $LinkObject.WorkingDirectory = $ProjectPath
         }
 
 
-        if ($Description) {
+        if (-not [string]::IsNullOrWhiteSpace($Description)) {
 
-            $Shortcut.Description = $Description
+            $LinkObject.Description = $Description
         }
 
 
-        if ($IconFileName) {
+        $IconLocation = Get-IconLocation `
+            $IconFileName
 
-            $IconLocation = Get-ShortcutIcon $IconFileName
 
+        if ($IconLocation) {
 
-            if ($IconLocation) {
-
-                $Shortcut.IconLocation = $IconLocation
-            }
+            $LinkObject.IconLocation = $IconLocation
         }
 
 
-        $Shortcut.WindowStyle = 1
+        $LinkObject.WindowStyle = 1
 
-        $Shortcut.Save()
+        $LinkObject.Save()
 
 
         $script:ShortcutSuccessCount++
 
 
-        Write-SetupLog "快捷方式创建成功：$ShortcutName" "SUCCESS"
+        Write-SetupLog `
+            "快捷方式创建成功：$ShortcutName" `
+            "SUCCESS"
     }
     catch {
 
         $script:ShortcutFailureCount++
 
 
+        $ErrorMessage = $_.Exception.Message
+
+
         Write-SetupLog `
-            "快捷方式创建失败：$ShortcutName；原因：$($_.Exception.Message)" `
+            "快捷方式创建失败：$ShortcutName；原因：$ErrorMessage" `
             "ERROR"
     }
 }
 
 
 # =============================================
-# 十二、准备快捷方式参数
+# 二十五、创建 PowerShell 脚本快捷方式函数
 # =============================================
 
 
-$QuotedProjectPath = '"' + $ProjectPath + '"'
+function New-PowerShellScriptShortcut {
 
-$QuotedPhotoshopJsx = '"' + $PhotoshopJsxDirectory + '"'
+    param(
 
-$QuotedIllustratorJsx = '"' + $IllustratorJsxDirectory + '"'
+        [string]$ShortcutFolder,
 
-$QuotedPhotoshopBetaScripts = '"' + $PhotoshopBetaScriptPath + '"'
+        [string]$ShortcutName,
 
-$QuotedIllustratorBetaScripts = '"' + $IllustratorBetaScriptPath + '"'
+        [string]$ScriptFile,
 
-$QuotedToolsDocs = '"' + $ToolsDocsDirectory + '"'
+        [string]$IconFileName,
 
-$QuotedAgentsFile = '"' + $AgentsFile + '"'
-
-
-$GitStatusArguments = `
-    '-NoProfile -ExecutionPolicy Bypass -File "' +
-    $GitStatusScript +
-    '"'
+        [string]$Description
+    )
 
 
-$GitPublishArguments = `
-    '-NoProfile -ExecutionPolicy Bypass -File "' +
-    $GitPublishScript +
-    '"'
+    if (-not (
+        Test-Path `
+            -LiteralPath $ScriptFile `
+            -PathType Leaf
+    )) {
+
+        Write-SetupLog `
+            "未找到脚本：$ScriptFile，跳过快捷方式：$ShortcutName" `
+            "WARNING"
+
+        return
+    }
 
 
-$BackupArguments = `
-    '-NoProfile -ExecutionPolicy Bypass -File "' +
-    $BackupScript +
-    '"'
+    $PowerShellArguments = `
+        '-NoProfile -ExecutionPolicy Bypass -File "' +
+        $ScriptFile +
+        '"'
 
-
-$EscapedProjectPath = $ProjectPath.Replace("'", "''")
-
-
-$TerminalArguments = `
-    '-NoExit -NoProfile -Command "Set-Location -LiteralPath ''' +
-    $EscapedProjectPath +
-    '''"'
-
-
-# =============================================
-# 十三、创建 01_开发工具
-# =============================================
-
-
-if ($VSCodeExe) {
 
     New-EvenShortcut `
-        -ShortcutFolder $DevelopmentFolder `
-        -ShortcutName "Codex Design VS Code" `
-        -TargetPath $VSCodeExe `
-        -Arguments $QuotedProjectPath `
-        -WorkingDirectory $ProjectPath `
-        -IconFileName "codex_workspace.ico" `
-        -Description "使用 VS Code 打开 Even Codex Design 项目"
-}
-
-
-if (Test-Path -LiteralPath $GitStatusScript -PathType Leaf) {
-
-    New-EvenShortcut `
-        -ShortcutFolder $DevelopmentFolder `
-        -ShortcutName "Codex Design 状态检查" `
+        -ShortcutFolder $ShortcutFolder `
+        -ShortcutName $ShortcutName `
         -TargetPath $PowerShellExe `
-        -Arguments $GitStatusArguments `
+        -Arguments $PowerShellArguments `
         -WorkingDirectory $ProjectPath `
-        -IconFileName "git_status.ico" `
-        -Description "查看 Even Codex Design Git 状态"
-}
-else {
-
-    Write-SetupLog "未找到 tools\git_status.ps1，跳过状态检查快捷方式。" "WARNING"
-}
-
-
-if (Test-Path -LiteralPath $GitPublishScript -PathType Leaf) {
-
-    New-EvenShortcut `
-        -ShortcutFolder $DevelopmentFolder `
-        -ShortcutName "Codex Design 发布GitHub" `
-        -TargetPath $PowerShellExe `
-        -Arguments $GitPublishArguments `
-        -WorkingDirectory $ProjectPath `
-        -IconFileName "git_publish.ico" `
-        -Description "提交并同步 Even Codex Design 到 GitHub"
-}
-else {
-
-    Write-SetupLog "未找到 tools\git_publish.ps1，跳过 GitHub 发布快捷方式。" "WARNING"
-}
-
-
-New-EvenShortcut `
-    -ShortcutFolder $DevelopmentFolder `
-    -ShortcutName "Codex Design 终端" `
-    -TargetPath $PowerShellExe `
-    -Arguments $TerminalArguments `
-    -WorkingDirectory $ProjectPath `
-    -IconFileName "codex_terminal.ico" `
-    -Description "在 Even Codex Design 项目目录打开 PowerShell"
-
-
-# =============================================
-# 十四、创建 02_Adobe脚本
-# =============================================
-
-
-New-EvenShortcut `
-    -ShortcutFolder $AdobeFolder `
-    -ShortcutName "Photoshop JSX脚本" `
-    -TargetPath $ExplorerExe `
-    -Arguments $QuotedPhotoshopJsx `
-    -WorkingDirectory $PhotoshopJsxDirectory `
-    -IconFileName "photoshop_jsx.ico" `
-    -Description "打开仓库中的 Photoshop JSX 正式脚本目录"
-
-
-New-EvenShortcut `
-    -ShortcutFolder $AdobeFolder `
-    -ShortcutName "Illustrator JSX脚本" `
-    -TargetPath $ExplorerExe `
-    -Arguments $QuotedIllustratorJsx `
-    -WorkingDirectory $IllustratorJsxDirectory `
-    -IconFileName "illustrator_jsx.ico" `
-    -Description "打开仓库中的 Illustrator JSX 正式脚本目录"
-
-
-New-EvenShortcut `
-    -ShortcutFolder $AdobeFolder `
-    -ShortcutName "Photoshop Beta安装脚本目录" `
-    -TargetPath $ExplorerExe `
-    -Arguments $QuotedPhotoshopBetaScripts `
-    -WorkingDirectory $PhotoshopBetaScriptPath `
-    -IconFileName "photoshop_beta_scripts.ico" `
-    -Description "打开 Photoshop Beta 安装脚本目录"
-
-
-New-EvenShortcut `
-    -ShortcutFolder $AdobeFolder `
-    -ShortcutName "Illustrator Beta安装脚本目录" `
-    -TargetPath $ExplorerExe `
-    -Arguments $QuotedIllustratorBetaScripts `
-    -WorkingDirectory $IllustratorBetaScriptPath `
-    -IconFileName "illustrator_beta_scripts.ico" `
-    -Description "打开 Illustrator Beta 安装脚本目录"
-
-
-# =============================================
-# 十五、创建 03_项目管理
-# =============================================
-
-
-New-EvenShortcut `
-    -ShortcutFolder $ManagementFolder `
-    -ShortcutName "Codex Design 文档" `
-    -TargetPath $ExplorerExe `
-    -Arguments $QuotedToolsDocs `
-    -WorkingDirectory $ToolsDocsDirectory `
-    -IconFileName "codex_docs.ico" `
-    -Description "打开 Even Codex Design 工具和环境文档目录"
-
-
-if ($VSCodeExe) {
-
-    New-EvenShortcut `
-        -ShortcutFolder $ManagementFolder `
-        -ShortcutName "Codex Design 规则" `
-        -TargetPath $VSCodeExe `
-        -Arguments $QuotedAgentsFile `
-        -WorkingDirectory $ProjectPath `
-        -IconFileName "codex_rules.ico" `
-        -Description "使用 VS Code 打开 AGENTS.md"
-}
-else {
-
-    New-EvenShortcut `
-        -ShortcutFolder $ManagementFolder `
-        -ShortcutName "Codex Design 规则" `
-        -TargetPath $NotepadExe `
-        -Arguments $QuotedAgentsFile `
-        -WorkingDirectory $ProjectPath `
-        -IconFileName "codex_rules.ico" `
-        -Description "打开 AGENTS.md"
-}
-
-
-if (Test-Path -LiteralPath $BackupScript -PathType Leaf) {
-
-    New-EvenShortcut `
-        -ShortcutFolder $ManagementFolder `
-        -ShortcutName "Codex Design 项目备份" `
-        -TargetPath $PowerShellExe `
-        -Arguments $BackupArguments `
-        -WorkingDirectory $ProjectPath `
-        -IconFileName "project_backup.ico" `
-        -Description "备份 Even Codex Design 项目"
-}
-else {
-
-    Write-SetupLog "未找到 tools\backup_project.ps1，跳过项目备份快捷方式。" "WARNING"
+        -IconFileName $IconFileName `
+        -Description $Description
 }
 
 
 # =============================================
-# 十六、完成信息
+# 二十六、根据 JSON 配置创建快捷方式
+# =============================================
+
+
+$EscapedProjectPath = $ProjectPath.Replace(
+    "'",
+    "''"
+)
+
+
+foreach ($ShortcutConfigItem in $ShortcutItems) {
+
+    $ShortcutName = [string]$ShortcutConfigItem.name
+
+    $ShortcutGroup = [string]$ShortcutConfigItem.group
+
+    $ShortcutType = [string]$ShortcutConfigItem.type
+
+    $ShortcutIcon = [string]$ShortcutConfigItem.icon
+
+    $ShortcutDescription = [string]$ShortcutConfigItem.description
+
+
+    Write-SetupLog `
+        "处理快捷方式：$ShortcutName"
+
+
+    if ([string]::IsNullOrWhiteSpace($ShortcutName)) {
+
+        Write-SetupLog `
+            "发现没有名称的快捷方式配置，已经跳过。" `
+            "WARNING"
+
+        continue
+    }
+
+
+    if ([string]::IsNullOrWhiteSpace($ShortcutGroup)) {
+
+        Write-SetupLog `
+            "快捷方式缺少 group：$ShortcutName" `
+            "WARNING"
+
+        continue
+    }
+
+
+    if ([string]::IsNullOrWhiteSpace($ShortcutType)) {
+
+        Write-SetupLog `
+            "快捷方式缺少 type：$ShortcutName" `
+            "WARNING"
+
+        continue
+    }
+
+
+    $ShortcutFolder = Join-Path `
+        $WorkspacePath `
+        $ShortcutGroup
+
+
+    if (-not (
+        Test-Path `
+            -LiteralPath $ShortcutFolder `
+            -PathType Container
+    )) {
+
+        New-Item `
+            -ItemType Directory `
+            -Path $ShortcutFolder `
+            -Force |
+            Out-Null
+
+
+        Write-SetupLog `
+            "配置中的分类不存在，已经自动创建：$ShortcutGroup" `
+            "WARNING"
+    }
+
+
+    switch ($ShortcutType.ToLower()) {
+
+        "vscode" {
+
+            if (-not $VSCodeExe) {
+
+                Write-SetupLog `
+                    "未找到 VS Code，跳过快捷方式：$ShortcutName" `
+                    "WARNING"
+
+                break
+            }
+
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $VSCodeExe `
+                -Arguments (Quote-Argument $ProjectPath) `
+                -WorkingDirectory $ProjectPath `
+                -IconFileName $ShortcutIcon `
+                -Description "使用 VS Code 打开 Even Codex Design 项目"
+
+
+            break
+        }
+
+
+        "git_status" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $GitStatusScript `
+                -IconFileName $ShortcutIcon `
+                -Description "查看 Even Codex Design Git 状态"
+
+
+            break
+        }
+
+
+        "git_publish" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $GitPublishScript `
+                -IconFileName $ShortcutIcon `
+                -Description "提交并同步 Even Codex Design 到 GitHub"
+
+
+            break
+        }
+
+
+        "terminal" {
+
+            $TerminalArguments = `
+                '-NoExit -NoProfile -Command ' +
+                '"Set-Location -LiteralPath ''' +
+                $EscapedProjectPath +
+                '''"'
+
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $PowerShellExe `
+                -Arguments $TerminalArguments `
+                -WorkingDirectory $ProjectPath `
+                -IconFileName $ShortcutIcon `
+                -Description "在 Even Codex Design 项目目录打开 PowerShell"
+
+
+            break
+        }
+
+
+        "folder" {
+
+            $RelativeTarget = [string]$ShortcutConfigItem.target
+
+
+            if ([string]::IsNullOrWhiteSpace($RelativeTarget)) {
+
+                Write-SetupLog `
+                    "folder 类型缺少 target：$ShortcutName" `
+                    "WARNING"
+
+                break
+            }
+
+
+            $RelativeTarget = $RelativeTarget.Replace(
+                "/",
+                "\"
+            )
+
+
+            $FolderTarget = Join-Path `
+                $ProjectPath `
+                $RelativeTarget
+
+
+            if (-not (
+                Test-Path `
+                    -LiteralPath $FolderTarget `
+                    -PathType Container
+            )) {
+
+                Write-SetupLog `
+                    "目标文件夹不存在：$FolderTarget；快捷方式仍将创建。" `
+                    "WARNING"
+            }
+
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $ExplorerExe `
+                -Arguments (Quote-Argument $FolderTarget) `
+                -WorkingDirectory $ProjectPath `
+                -IconFileName $ShortcutIcon `
+                -Description "打开 Even Codex Design 项目目录"
+
+
+            break
+        }
+
+
+        "photoshop_beta" {
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $ExplorerExe `
+                -Arguments (
+                    Quote-Argument $PhotoshopBetaScriptPath
+                ) `
+                -WorkingDirectory $PhotoshopBetaScriptPath `
+                -IconFileName $ShortcutIcon `
+                -Description "打开 Photoshop Beta 安装脚本目录"
+
+
+            break
+        }
+
+
+        "illustrator_beta" {
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $ExplorerExe `
+                -Arguments (
+                    Quote-Argument $IllustratorBetaScriptPath
+                ) `
+                -WorkingDirectory $IllustratorBetaScriptPath `
+                -IconFileName $ShortcutIcon `
+                -Description "打开 Illustrator Beta 安装脚本目录"
+
+
+            break
+        }
+
+
+        "docs" {
+
+            if (-not (
+                Test-Path `
+                    -LiteralPath $ToolsDocsPath `
+                    -PathType Container
+            )) {
+
+                New-Item `
+                    -ItemType Directory `
+                    -Path $ToolsDocsPath `
+                    -Force |
+                    Out-Null
+            }
+
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $ExplorerExe `
+                -Arguments (Quote-Argument $ToolsDocsPath) `
+                -WorkingDirectory $ToolsDocsPath `
+                -IconFileName $ShortcutIcon `
+                -Description "打开 Even Codex Design 项目文档"
+
+
+            break
+        }
+
+
+        "rules" {
+
+            if ($VSCodeExe) {
+
+                New-EvenShortcut `
+                    -ShortcutFolder $ShortcutFolder `
+                    -ShortcutName $ShortcutName `
+                    -TargetPath $VSCodeExe `
+                    -Arguments (Quote-Argument $AgentsFile) `
+                    -WorkingDirectory $ProjectPath `
+                    -IconFileName $ShortcutIcon `
+                    -Description "使用 VS Code 打开 AGENTS.md"
+            }
+            else {
+
+                New-EvenShortcut `
+                    -ShortcutFolder $ShortcutFolder `
+                    -ShortcutName $ShortcutName `
+                    -TargetPath $NotepadExe `
+                    -Arguments (Quote-Argument $AgentsFile) `
+                    -WorkingDirectory $ProjectPath `
+                    -IconFileName $ShortcutIcon `
+                    -Description "打开 AGENTS.md"
+            }
+
+
+            break
+        }
+
+
+        "backup" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $BackupScript `
+                -IconFileName $ShortcutIcon `
+                -Description "备份 Even Codex Design 项目"
+
+
+            break
+        }
+
+
+        default {
+
+            Write-SetupLog `
+                "未知快捷方式类型：$ShortcutType；快捷方式：$ShortcutName" `
+                "WARNING"
+        }
+    }
+}
+
+
+# =============================================
+# 二十七、完成统计
 # =============================================
 
 
 Write-Host ""
+
 Write-Host "============================================="
-Write-Host " 桌面工作台创建完成"
+
+Write-Host " Even Codex Design 工作台创建完成"
+
 Write-Host "============================================="
+
 Write-Host ""
 
 
 Write-Host "工作台位置："
+
 Write-Host $WorkspacePath
+
 Write-Host ""
 
 
-Write-Host "成功创建：$ShortcutSuccessCount 个快捷方式"
+Write-Host "成功创建：$ShortcutSuccessCount 个"
 
-Write-Host "创建失败：$ShortcutFailureCount 个快捷方式"
+Write-Host "创建失败：$ShortcutFailureCount 个"
 
-Write-Host "警告数量：$WarningCount"
+Write-Host "警告数量：$WarningCount 个"
 
 Write-Host ""
 
 
 Write-Host "日志文件："
+
 Write-Host $LogFile
+
 Write-Host ""
 
 
-Write-SetupLog "快捷方式成功数量：$ShortcutSuccessCount"
-
-Write-SetupLog "快捷方式失败数量：$ShortcutFailureCount"
-
-Write-SetupLog "警告数量：$WarningCount"
-
-Write-SetupLog "桌面工作台生成完成。" "SUCCESS"
+Write-SetupLog `
+    "快捷方式成功数量：$ShortcutSuccessCount"
 
 
-# 打开生成后的桌面工作台
+Write-SetupLog `
+    "快捷方式失败数量：$ShortcutFailureCount"
+
+
+Write-SetupLog `
+    "警告数量：$WarningCount"
+
+
+if ($ShortcutFailureCount -eq 0) {
+
+    Write-SetupLog `
+        "桌面工作台生成完成。" `
+        "SUCCESS"
+}
+else {
+
+    Write-SetupLog `
+        "桌面工作台生成结束，但存在创建失败的快捷方式。" `
+        "WARNING"
+}
+
+
+# =============================================
+# 二十八、打开生成后的工作台
+# =============================================
+
+
 try {
 
     Start-Process `
         -FilePath $ExplorerExe `
-        -ArgumentList ('"' + $WorkspacePath + '"')
+        -ArgumentList (
+            Quote-Argument $WorkspacePath
+        )
 }
 catch {
 
-    Write-SetupLog "无法自动打开桌面工作台：$($_.Exception.Message)" "WARNING"
+    Write-SetupLog `
+        "无法自动打开桌面工作台：$($_.Exception.Message)" `
+        "WARNING"
 }
+
+
+# =============================================
+# 二十九、结束
+# =============================================
 
 
 Wait-BeforeExit

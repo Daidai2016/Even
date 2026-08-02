@@ -1,0 +1,100 @@
+{
+    "version": "2.1",
+
+    "workspace": {
+        "name": "Even Codex Design"
+    },
+
+    "groups": [
+        {
+            "name": "01_开发工具"
+        },
+        {
+            "name": "02_Adobe脚本"
+        },
+        {
+            "name": "03_项目管理"
+        }
+    ],
+
+    "shortcuts": [
+        {
+            "name": "Codex Design VS Code",
+            "group": "01_开发工具",
+            "type": "vscode",
+            "icon": "codex_workspace.ico"
+        },
+
+        {
+            "name": "Codex Design 状态检查",
+            "group": "01_开发工具",
+            "type": "git_status",
+            "icon": "git_status.ico"
+        },
+
+        {
+            "name": "Codex Design 发布GitHub",
+            "group": "01_开发工具",
+            "type": "git_publish",
+            "icon": "git_publish.ico"
+        },
+
+        {
+            "name": "Codex Design 终端",
+            "group": "01_开发工具",
+            "type": "terminal",
+            "icon": "codex_terminal.ico"
+        },
+
+        {
+            "name": "Photoshop JSX脚本",
+            "group": "02_Adobe脚本",
+            "type": "folder",
+            "target": "scripts/photoshop/jsx",
+            "icon": "photoshop_jsx.ico"
+        },
+
+        {
+            "name": "Illustrator JSX脚本",
+            "group": "02_Adobe脚本",
+            "type": "folder",
+            "target": "scripts/illustrator/jsx",
+            "icon": "illustrator_jsx.ico"
+        },
+
+        {
+            "name": "Photoshop Beta安装脚本目录",
+            "group": "02_Adobe脚本",
+            "type": "photoshop_beta",
+            "icon": "photoshop_beta_scripts.ico"
+        },
+
+        {
+            "name": "Illustrator Beta安装脚本目录",
+            "group": "02_Adobe脚本",
+            "type": "illustrator_beta",
+            "icon": "illustrator_beta_scripts.ico"
+        },
+
+        {
+            "name": "Codex Design 文档",
+            "group": "03_项目管理",
+            "type": "docs",
+            "icon": "codex_docs.ico"
+        },
+
+        {
+            "name": "Codex Design 规则",
+            "group": "03_项目管理",
+            "type": "rules",
+            "icon": "codex_rules.ico"
+        },
+
+        {
+            "name": "Codex Design 项目备份",
+            "group": "03_项目管理",
+            "type": "backup",
+            "icon": "project_backup.ico"
+        }
+    ]
+}
