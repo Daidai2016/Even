@@ -58,3 +58,7 @@ node_modules/
 Thumbs.db
 *.tmp
 *.bak
+
+
+# Runtime logs
+logs/*.log
