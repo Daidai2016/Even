@@ -69,6 +69,46 @@ AI + Adobe Creative Cloud 自动化设计生产工作平台。
 ---
 
 
+# 桌面工作台
+
+
+运行 `tools/create_desktop_shortcuts.ps1` 后，会在 Windows 桌面创建：
+
+- `Even Codex Design` 工作台根文件夹
+- `01_开发工具`、`02_Adobe脚本`、`03_项目管理` 三个分类文件夹
+- 12 个工作快捷方式，其中 11 个沿用原有生产逻辑
+- `Codex Design 本地项目` 快捷方式，用资源管理器打开当前仓库根目录
+
+
+`Codex Design 终端` 会优先使用 Windows Terminal，并明确以 Windows PowerShell 作为命令行环境，默认进入当前仓库根目录。如果电脑没有安装或无法找到 Windows Terminal，快捷方式会自动回退为直接打开 Windows PowerShell。
+
+
+工作台根目录和三个分类目录均使用自定义文件夹图标：
+
+```text
+folder_workspace.ico
+folder_development_tools.ico
+folder_adobe_scripts.ico
+folder_project_management.ico
+```
+
+
+本地项目快捷方式使用：
+
+```text
+codex_local_project.ico
+```
+
+整套图标采用明亮的 Codex 流动新拟态语言：有机云团或文件夹轮廓结合多组径向色场、局部柔光、轻微厚度和半透明表面光泽，不使用闭合白色外描边。Photoshop Beta 与 Illustrator Beta 安装脚本目录分别保留 Adobe 蓝青和金橙品牌主色。
+
+
+仓库路径由脚本所在位置动态推导，不写死盘符或绝对路径。因此同一份仓库可在例如 `D:\Codex_Design`、`E:\AI_Workspace\Codex_Design` 等不同位置运行。仓库移动后重新运行脚本，即可刷新快捷方式、文件夹图标路径和资源管理器图标缓存。
+
+
+
+---
+
+
 # 项目结构
 
 

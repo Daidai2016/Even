@@ -1,19 +1,23 @@
 {
-    "version": "2.1",
+    "version": "2.2",
 
     "workspace": {
-        "name": "Even Codex Design"
+        "name": "Even Codex Design",
+        "icon": "folder_workspace.ico"
     },
 
     "groups": [
         {
-            "name": "01_开发工具"
+            "name": "01_开发工具",
+            "icon": "folder_development_tools.ico"
         },
         {
-            "name": "02_Adobe脚本"
+            "name": "02_Adobe脚本",
+            "icon": "folder_adobe_scripts.ico"
         },
         {
-            "name": "03_项目管理"
+            "name": "03_项目管理",
+            "icon": "folder_project_management.ico"
         }
     ],
 
@@ -95,6 +99,13 @@
             "group": "03_项目管理",
             "type": "backup",
             "icon": "project_backup.ico"
+        },
+
+        {
+            "name": "Codex Design 本地项目",
+            "group": "03_项目管理",
+            "type": "repository",
+            "icon": "codex_local_project.ico"
         }
     ]
 }

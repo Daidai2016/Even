@@ -1,7 +1,7 @@
 ﻿# =============================================
 # Even Codex Design Desktop Workspace Generator
 #
-# Version: 2.1.1
+# Version: 2.2.1
 #
 # 功能：
 # 1. 自动识别当前项目根目录
@@ -11,6 +11,9 @@
 # 5. 自动匹配仓库中的 ICO 图标
 # 6. 创建 Even Codex Design 桌面工作台
 # 7. 生成详细安装日志
+# 8. 为工作台和分类目录设置自定义文件夹图标
+# 9. 创建动态指向当前仓库根目录的本地项目快捷方式
+# 10. 优先使用 Windows Terminal 打开 PowerShell 项目终端
 #
 # 兼容环境：
 # Windows 10
@@ -23,7 +26,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$ToolVersion = "2.1.1"
+$ToolVersion = "2.2.1"
 
 
 # =============================================
@@ -161,6 +164,10 @@ $script:ShortcutSuccessCount = 0
 $script:ShortcutFailureCount = 0
 
 $script:WarningCount = 0
+
+$script:FolderIconSuccessCount = 0
+
+$script:FolderIconFailureCount = 0
 
 
 # =============================================
@@ -474,6 +481,8 @@ catch {
 
 $WorkspaceName = [string]$ShortcutConfig.workspace.name
 
+$WorkspaceIcon = [string]$ShortcutConfig.workspace.icon
+
 
 if ([string]::IsNullOrWhiteSpace($WorkspaceName)) {
 
@@ -622,8 +631,13 @@ foreach ($GroupConfigItem in $ShortcutGroups) {
 
 
 # =============================================
-# 二十一、查找 VS Code
+# 二十一、查找桌面应用
 # =============================================
+
+
+# ---------------------------------------------
+# VS Code
+# ---------------------------------------------
 
 
 function Find-VSCode {
@@ -701,6 +715,71 @@ else {
 
     Write-SetupLog `
         "未找到 VS Code。相关快捷方式将被跳过或使用记事本。" `
+        "WARNING"
+}
+
+
+# ---------------------------------------------
+# Windows Terminal
+# ---------------------------------------------
+
+
+function Find-WindowsTerminal {
+
+    $WindowsTerminalCommand = Get-Command `
+        "wt.exe" `
+        -ErrorAction SilentlyContinue
+
+
+    if (
+        $WindowsTerminalCommand -and
+        $WindowsTerminalCommand.Source -and
+        (
+            Test-Path `
+                -LiteralPath $WindowsTerminalCommand.Source `
+                -PathType Leaf
+        )
+    ) {
+
+        return $WindowsTerminalCommand.Source
+    }
+
+
+    if ($env:LOCALAPPDATA) {
+
+        $WindowsTerminalAlias = Join-Path `
+            $env:LOCALAPPDATA `
+            "Microsoft\WindowsApps\wt.exe"
+
+
+        if (
+            Test-Path `
+                -LiteralPath $WindowsTerminalAlias `
+                -PathType Leaf
+        ) {
+
+            return $WindowsTerminalAlias
+        }
+    }
+
+
+    return $null
+}
+
+
+$WindowsTerminalExe = Find-WindowsTerminal
+
+
+if ($WindowsTerminalExe) {
+
+    Write-SetupLog `
+        "已找到 Windows Terminal：$WindowsTerminalExe" `
+        "SUCCESS"
+}
+else {
+
+    Write-SetupLog `
+        "未找到 Windows Terminal；项目终端将使用 Windows PowerShell 直接打开。" `
         "WARNING"
 }
 
@@ -954,7 +1033,199 @@ else {
 
 
 # =============================================
-# 二十四、创建快捷方式函数
+# 二十四、设置工作台文件夹图标
+# =============================================
+
+
+function Set-EvenFolderIcon {
+
+    param(
+
+        [Parameter(Mandatory = $true)]
+        [string]$FolderPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$IconFileName
+    )
+
+
+    try {
+
+        if (-not (
+            Test-Path `
+                -LiteralPath $FolderPath `
+                -PathType Container
+        )) {
+
+            throw "目标文件夹不存在：$FolderPath"
+        }
+
+
+        if ([string]::IsNullOrWhiteSpace($IconFileName)) {
+
+            throw "文件夹图标名称为空：$FolderPath"
+        }
+
+
+        $FolderIconFile = Join-Path `
+            $IconPath `
+            $IconFileName
+
+
+        if (-not (
+            Test-Path `
+                -LiteralPath $FolderIconFile `
+                -PathType Leaf
+        )) {
+
+            throw "缺少文件夹图标：$IconFileName"
+        }
+
+
+        $DesktopIniFile = Join-Path `
+            $FolderPath `
+            "desktop.ini"
+
+
+        if (
+            Test-Path `
+                -LiteralPath $DesktopIniFile `
+                -PathType Leaf
+        ) {
+
+            $ExistingDesktopIniItem = Get-Item `
+                -LiteralPath $DesktopIniFile `
+                -Force
+
+
+            $ExistingDesktopIniItem.Attributes = `
+                $ExistingDesktopIniItem.Attributes -band `
+                (-bnot [IO.FileAttributes]::ReadOnly)
+        }
+
+
+        $DesktopIniContent = @(
+            "[.ShellClassInfo]",
+            "IconResource=`"$FolderIconFile`",0",
+            "ConfirmFileOp=0"
+        )
+
+
+        # desktop.ini 使用 UTF-16 LE，确保 Windows 资源管理器稳定读取路径。
+
+        [IO.File]::WriteAllLines(
+            $DesktopIniFile,
+            $DesktopIniContent,
+            [Text.Encoding]::Unicode
+        )
+
+
+        $DesktopIniItem = Get-Item `
+            -LiteralPath $DesktopIniFile `
+            -Force
+
+
+        $DesktopIniItem.Attributes = `
+            $DesktopIniItem.Attributes -bor `
+            [IO.FileAttributes]::Hidden -bor `
+            [IO.FileAttributes]::System
+
+
+        $FolderItem = Get-Item `
+            -LiteralPath $FolderPath `
+            -Force
+
+
+        # Windows 需要文件夹带有只读属性，才会应用 desktop.ini 自定义设置。
+
+        $FolderItem.Attributes = `
+            $FolderItem.Attributes -bor `
+            [IO.FileAttributes]::ReadOnly
+
+
+        $script:FolderIconSuccessCount++
+
+
+        Write-SetupLog `
+            "文件夹图标设置成功：$FolderPath -> $IconFileName" `
+            "SUCCESS"
+    }
+    catch {
+
+        $script:FolderIconFailureCount++
+
+
+        Write-SetupLog `
+            "文件夹图标设置失败：$FolderPath；原因：$($_.Exception.Message)" `
+            "WARNING"
+    }
+}
+
+
+Set-EvenFolderIcon `
+    -FolderPath $WorkspacePath `
+    -IconFileName $WorkspaceIcon
+
+
+foreach ($GroupConfigItem in $ShortcutGroups) {
+
+    $GroupName = [string]$GroupConfigItem.name
+
+    $GroupIcon = [string]$GroupConfigItem.icon
+
+
+    if ([string]::IsNullOrWhiteSpace($GroupName)) {
+
+        continue
+    }
+
+
+    $GroupPath = Join-Path `
+        $WorkspacePath `
+        $GroupName
+
+
+    Set-EvenFolderIcon `
+        -FolderPath $GroupPath `
+        -IconFileName $GroupIcon
+}
+
+
+$IconRefreshExe = Join-Path `
+    $env:SystemRoot `
+    "System32\ie4uinit.exe"
+
+
+if (
+    Test-Path `
+        -LiteralPath $IconRefreshExe `
+        -PathType Leaf
+) {
+
+    try {
+
+        Start-Process `
+            -FilePath $IconRefreshExe `
+            -ArgumentList "-show" `
+            -WindowStyle Hidden `
+            -Wait
+
+
+        Write-SetupLog `
+            "已请求 Windows 资源管理器刷新图标缓存。" `
+            "SUCCESS"
+    }
+    catch {
+
+        Write-SetupLog `
+            "无法自动刷新图标缓存：$($_.Exception.Message)" `
+            "WARNING"
+    }
+}
+
+
+# =============================================
+# 二十五、创建快捷方式函数
 # =============================================
 
 
@@ -1107,7 +1378,7 @@ function New-EvenShortcut {
 
 
 # =============================================
-# 二十五、创建 PowerShell 脚本快捷方式函数
+# 二十六、创建 PowerShell 脚本快捷方式函数
 # =============================================
 
 
@@ -1159,7 +1430,7 @@ function New-PowerShellScriptShortcut {
 
 
 # =============================================
-# 二十六、根据 JSON 配置创建快捷方式
+# 二十七、根据 JSON 配置创建快捷方式
 # =============================================
 
 
@@ -1298,21 +1569,43 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
 
         "terminal" {
 
-            $TerminalArguments = `
-                '-NoExit -NoProfile -Command ' +
-                '"Set-Location -LiteralPath ''' +
-                $EscapedProjectPath +
-                '''"'
+            if ($WindowsTerminalExe) {
+
+                $TerminalTarget = $WindowsTerminalExe
+
+                $TerminalArguments = `
+                    'new-tab -d ' +
+                    (Quote-Argument $ProjectPath) +
+                    ' ' +
+                    (Quote-Argument $PowerShellExe) +
+                    ' -NoExit -NoProfile'
+
+                $TerminalDescription = `
+                    "使用 Windows Terminal 和 Windows PowerShell 打开 Even Codex Design 项目终端"
+            }
+            else {
+
+                $TerminalTarget = $PowerShellExe
+
+                $TerminalArguments = `
+                    '-NoExit -NoProfile -Command ' +
+                    '"Set-Location -LiteralPath ''' +
+                    $EscapedProjectPath +
+                    '''"'
+
+                $TerminalDescription = `
+                    "在 Even Codex Design 项目目录打开 Windows PowerShell"
+            }
 
 
             New-EvenShortcut `
                 -ShortcutFolder $ShortcutFolder `
                 -ShortcutName $ShortcutName `
-                -TargetPath $PowerShellExe `
+                -TargetPath $TerminalTarget `
                 -Arguments $TerminalArguments `
                 -WorkingDirectory $ProjectPath `
                 -IconFileName $ShortcutIcon `
-                -Description "在 Even Codex Design 项目目录打开 PowerShell"
+                -Description $TerminalDescription
 
 
             break
@@ -1365,6 +1658,22 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -WorkingDirectory $ProjectPath `
                 -IconFileName $ShortcutIcon `
                 -Description "打开 Even Codex Design 项目目录"
+
+
+            break
+        }
+
+
+        "repository" {
+
+            New-EvenShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -TargetPath $ExplorerExe `
+                -Arguments (Quote-Argument $ProjectPath) `
+                -WorkingDirectory $ProjectPath `
+                -IconFileName $ShortcutIcon `
+                -Description "在资源管理器中打开当前 Codex Design 仓库"
 
 
             break
@@ -1492,7 +1801,7 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
 
 
 # =============================================
-# 二十七、完成统计
+# 二十八、完成统计
 # =============================================
 
 
@@ -1520,6 +1829,10 @@ Write-Host "创建失败：$ShortcutFailureCount 个"
 
 Write-Host "警告数量：$WarningCount 个"
 
+Write-Host "文件夹图标成功：$FolderIconSuccessCount 个"
+
+Write-Host "文件夹图标失败：$FolderIconFailureCount 个"
+
 Write-Host ""
 
 
@@ -1542,7 +1855,18 @@ Write-SetupLog `
     "警告数量：$WarningCount"
 
 
-if ($ShortcutFailureCount -eq 0) {
+Write-SetupLog `
+    "文件夹图标成功数量：$FolderIconSuccessCount"
+
+
+Write-SetupLog `
+    "文件夹图标失败数量：$FolderIconFailureCount"
+
+
+if (
+    ($ShortcutFailureCount -eq 0) -and
+    ($FolderIconFailureCount -eq 0)
+) {
 
     Write-SetupLog `
         "桌面工作台生成完成。" `
@@ -1557,7 +1881,7 @@ else {
 
 
 # =============================================
-# 二十八、打开生成后的工作台
+# 二十九、打开生成后的工作台
 # =============================================
 
 
@@ -1578,7 +1902,7 @@ catch {
 
 
 # =============================================
-# 二十九、结束
+# 三十、结束
 # =============================================
 
 

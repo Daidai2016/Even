@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <path id="cloud" d="M176 815C94 781 49 698 62 612C73 537 119 480 184 450C184 365 247 300 333 285C363 196 450 143 544 156C625 168 687 220 714 291C791 262 878 284 929 347C976 405 984 484 952 548C1011 596 1033 676 1006 750C976 832 901 885 818 892H247C207 892 175 860 175 820C175 818 175 817 176 815Z"/>
+    <clipPath id="clip"><use xlink:href="#cloud"/></clipPath>
+    <radialGradient id="base" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(365 255) rotate(48) scale(690 625)">
+      <stop offset="0" stop-color="#c8bdff"/><stop offset=".28" stop-color="#9194ff"/><stop offset=".58" stop-color="#647bff"/><stop offset=".82" stop-color="#4d45ff"/><stop offset="1" stop-color="#2a20d9"/>
+    </radialGradient>
+    <radialGradient id="cyanFlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(205 524) rotate(10) scale(535 400)">
+      <stop offset="0" stop-color="#6ee8ff" stop-opacity=".92"/><stop offset=".38" stop-color="#59b8ff" stop-opacity=".58"/><stop offset="1" stop-color="#4d60ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="violetFlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(708 752) rotate(-28) scale(500 330)">
+      <stop offset="0" stop-color="#6a17ff" stop-opacity=".98"/><stop offset=".38" stop-color="#4331ff" stop-opacity=".74"/><stop offset="1" stop-color="#3f32f8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(717 284) rotate(130) scale(330 440)">
+      <stop offset="0" stop-color="#d8bfff" stop-opacity=".78"/><stop offset=".5" stop-color="#b885ff" stop-opacity=".25"/><stop offset="1" stop-color="#8e62ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glass" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(374 134) rotate(70) scale(285 610)">
+      <stop offset="0" stop-color="#fff" stop-opacity=".78"/><stop offset=".32" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="symbol" x1="304" y1="363" x2="693" y2="770" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/><stop offset=".58" stop-color="#f5f7ff"/><stop offset="1" stop-color="#dbe4ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="28" stdDeviation="27" flood-color="#17115e" flood-opacity=".42"/></filter>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="34"/></filter>
+    <filter id="symbolShadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="13" stdDeviation="10" flood-color="#2016a9" flood-opacity=".38"/></filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <use xlink:href="#cloud" transform="translate(0 18)" fill="#2817bc" opacity=".9"/>
+    <use xlink:href="#cloud" fill="url(#base)"/>
+    <g clip-path="url(#clip)">
+      <rect width="1024" height="1024" fill="url(#cyanFlow)"/>
+      <rect width="1024" height="1024" fill="url(#warmGlow)"/>
+      <rect width="1024" height="1024" fill="url(#violetFlow)"/>
+      <ellipse cx="332" cy="304" rx="298" ry="122" transform="rotate(-21 332 304)" fill="#fff" opacity=".18" filter="url(#soft)"/>
+      <ellipse cx="708" cy="683" rx="244" ry="130" transform="rotate(-34 708 683)" fill="#2714ff" opacity=".28" filter="url(#soft)"/>
+      <rect width="1024" height="1024" fill="url(#glass)"/>
+      <path d="M168 377C208 222 354 126 509 128C629 129 714 171 776 235" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="22" stroke-linecap="round" filter="url(#soft)"/>
+      <path d="M166 566C166 730 296 846 454 858" fill="none" stroke="#8ef0ff" stroke-opacity=".18" stroke-width="20" stroke-linecap="round"/>
+    </g>
+    <g filter="url(#symbolShadow)">
+      <path d="M344 411C335 363 348 321 370 291C425 298 462 323 485 343C503 339 521 339 539 343C562 323 599 298 654 291C676 321 689 363 680 411C724 448 745 499 740 559C733 647 676 692 585 707C606 733 616 764 616 803V892H548V759C548 735 534 718 512 718C490 718 476 735 476 759V892H408V803C408 764 418 733 439 707C348 692 291 647 284 559C279 499 300 448 344 411Z" fill="url(#symbol)"/>
+      <path d="M420 673C363 726 299 724 263 678C244 654 225 639 199 630" fill="none" stroke="url(#symbol)" stroke-width="60" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
