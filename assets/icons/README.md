@@ -23,6 +23,8 @@ Windows快捷方式图标
 | Codex Design VS Code | source/01_codex_workspace.svg | png/01_codex_workspace.png | ico/codex_workspace.ico |
 | Codex Design 状态检查 | source/02_git_status.svg | png/02_git_status.png | ico/git_status.ico |
 | Codex Design 发布GitHub | source/03_git_publish.svg | png/03_git_publish.png | ico/git_publish.ico |
+| Codex Design 同步GitHub | source/17_git_sync.svg | png/17_git_sync.png | ico/git_sync.ico |
+| Codex Design 环境检查 | source/18_environment_check.svg | png/18_environment_check.png | ico/environment_check.ico |
 | Codex Design 终端 | source/04_codex_terminal.svg | png/04_codex_terminal.png | ico/codex_terminal.ico |
 | Photoshop JSX脚本 | source/05_photoshop_jsx.svg | png/05_photoshop_jsx.png | ico/photoshop_jsx.ico |
 | Illustrator JSX脚本 | source/06_illustrator_jsx.svg | png/06_illustrator_jsx.png | ico/illustrator_jsx.ico |
@@ -60,6 +62,8 @@ Photoshop Beta 与 Illustrator Beta 安装脚本目录分别采用 Adobe Photosh
 - `Codex Design 终端` 使用经典矩形终端窗口造型。
 - `Codex Design 项目备份` 使用两层硬盘叠加造型，不使用箭头；每层硬盘采用参考 Codex 图标的柔和云团胶囊轮廓。
 - `Codex Design 状态检查` 以粗线放大镜为主体，镜片内保留检查标记。
+- `Codex Design 同步GitHub` 使用两枚首尾衔接的圆头快进箭头，表达只允许安全快进同步。
+- `Codex Design 环境检查` 使用齿轮、圆环和检查标记，表达本机工具链健康检查。
 - Photoshop Beta 安装脚本图标沿用原设计的深海军蓝背景与高亮青色符号组合。
 - 功能符号统一采用面状造型或圆头粗线条，确保 Windows 小尺寸显示清晰。
 - `Even Codex Design` 文件夹中央使用重绘的 Codex 云团 `>_` 标记；工作区、开发工具、Adobe 脚本和项目管理四个文件夹符号均以文件夹下半部矩形面板为基准进行垂直居中，不以包含顶部标签的总高度计算。

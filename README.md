@@ -76,8 +76,14 @@ AI + Adobe Creative Cloud 自动化设计生产工作平台。
 
 - `Even Codex Design` 工作台根文件夹
 - `01_开发工具`、`02_Adobe脚本`、`03_项目管理` 三个分类文件夹
-- 12 个工作快捷方式，其中 11 个沿用原有生产逻辑
+- 14 个工作快捷方式，其中 13 个沿用原有生产逻辑
 - `Codex Design 本地项目` 快捷方式，用资源管理器打开当前仓库根目录
+
+
+`Codex Design 同步GitHub` 会从脚本所在位置自动确定仓库。它只在 `main` 工作区干净、代理可用、本地仅落后 `origin/main` 时执行 `pull --ff-only`。检测到未提交修改、本地领先或分支分叉时只报告并停止，不会自动 reset、clean、stash、commit 或 force。
+
+
+`Codex Design 环境检查` 会检查 Windows、PowerShell、Git、Node.js、npm、Python、Codex、VS Code、Photoshop Beta、Illustrator Beta 和 MCP 配置概况，并在 `logs/` 中生成带时间的环境报告。报告不记录密钥、令牌或代理凭据。
 
 
 `Codex Design 终端` 会优先使用 Windows Terminal，并明确以 Windows PowerShell 作为命令行环境，默认进入当前仓库根目录。如果电脑没有安装或无法找到 Windows Terminal，快捷方式会自动回退为直接打开 Windows PowerShell。

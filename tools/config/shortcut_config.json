@@ -37,6 +37,13 @@
         },
 
         {
+            "name": "Codex Design 同步GitHub",
+            "group": "01_开发工具",
+            "type": "git_sync",
+            "icon": "git_sync.ico"
+        },
+
+        {
             "name": "Codex Design 发布GitHub",
             "group": "01_开发工具",
             "type": "git_publish",
@@ -48,6 +55,13 @@
             "group": "01_开发工具",
             "type": "terminal",
             "icon": "codex_terminal.ico"
+        },
+
+        {
+            "name": "Codex Design 环境检查",
+            "group": "01_开发工具",
+            "type": "environment_check",
+            "icon": "environment_check.ico"
         },
 
         {

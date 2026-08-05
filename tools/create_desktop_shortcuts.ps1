@@ -23,6 +23,11 @@
 # UTF-8 with BOM
 # =============================================
 
+param(
+    [string]$OutputRoot = "",
+    [switch]$ValidationMode
+)
+
 
 $ErrorActionPreference = "Stop"
 
@@ -81,9 +86,19 @@ $GitStatusScript = Join-Path `
     "git_status.ps1"
 
 
+$GitSyncScript = Join-Path `
+    $ToolsPath `
+    "git_sync.ps1"
+
+
 $GitPublishScript = Join-Path `
     $ToolsPath `
     "git_publish.ps1"
+
+
+$EnvironmentCheckScript = Join-Path `
+    $ToolsPath `
+    "environment_check.ps1"
 
 
 $BackupScript = Join-Path `
@@ -131,7 +146,12 @@ $NotepadExe = Join-Path `
 # =============================================
 
 
-$DesktopPath = [Environment]::GetFolderPath("Desktop")
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
+    $DesktopPath = [Environment]::GetFolderPath("Desktop")
+}
+else {
+    $DesktopPath = [IO.Path]::GetFullPath($OutputRoot)
+}
 
 
 # =============================================
@@ -241,6 +261,10 @@ function Write-SetupLog {
 
 
 function Wait-BeforeExit {
+
+    if ($ValidationMode) {
+        return
+    }
 
     Write-Host ""
 
@@ -1197,9 +1221,12 @@ $IconRefreshExe = Join-Path `
 
 
 if (
-    Test-Path `
-        -LiteralPath $IconRefreshExe `
-        -PathType Leaf
+    (-not $ValidationMode) -and
+    (
+        Test-Path `
+            -LiteralPath $IconRefreshExe `
+            -PathType Leaf
+    )
 ) {
 
     try {
@@ -1553,6 +1580,20 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
         }
 
 
+        "git_sync" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $GitSyncScript `
+                -IconFileName $ShortcutIcon `
+                -Description "安全同步 Even Codex Design 的 origin/main"
+
+
+            break
+        }
+
+
         "git_publish" {
 
             New-PowerShellScriptShortcut `
@@ -1606,6 +1647,20 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -WorkingDirectory $ProjectPath `
                 -IconFileName $ShortcutIcon `
                 -Description $TerminalDescription
+
+
+            break
+        }
+
+
+        "environment_check" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $EnvironmentCheckScript `
+                -IconFileName $ShortcutIcon `
+                -Description "检查 Even Codex Design 本机开发与 Adobe 环境"
 
 
             break
@@ -1885,6 +1940,8 @@ else {
 # =============================================
 
 
+if (-not $ValidationMode) {
+
 try {
 
     Start-Process `
@@ -1898,6 +1955,8 @@ catch {
     Write-SetupLog `
         "无法自动打开桌面工作台：$($_.Exception.Message)" `
         "WARNING"
+}
+
 }
 
 

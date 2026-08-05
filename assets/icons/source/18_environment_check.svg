@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <path id="cloud" d="M512 82C584 79 645 112 688 164C760 143 836 162 884 217C930 271 935 341 903 401C959 440 987 509 971 577C956 643 906 694 842 713C843 786 801 853 736 886C672 919 599 913 546 873C488 930 398 945 325 909C263 878 226 820 220 758C148 742 93 689 77 617C61 548 88 478 142 435C104 373 111 294 158 239C199 191 259 169 319 178C344 112 424 67 512 82Z"/>
+    <clipPath id="clip"><use xlink:href="#cloud"/></clipPath>
+    <radialGradient id="base" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(365 255) rotate(48) scale(690 625)"><stop offset="0" stop-color="#c8bdff"/><stop offset=".28" stop-color="#9194ff"/><stop offset=".58" stop-color="#647bff"/><stop offset=".82" stop-color="#4d45ff"/><stop offset="1" stop-color="#2a20d9"/></radialGradient>
+    <radialGradient id="cyan" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(205 524) rotate(10) scale(535 400)"><stop offset="0" stop-color="#6ee8ff" stop-opacity=".92"/><stop offset=".45" stop-color="#59b8ff" stop-opacity=".55"/><stop offset="1" stop-color="#4d60ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="violet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(708 752) rotate(-28) scale(500 330)"><stop offset="0" stop-color="#6a17ff"/><stop offset=".45" stop-color="#4331ff" stop-opacity=".7"/><stop offset="1" stop-color="#3f32f8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="symbol" x1="330" y1="330" x2="700" y2="730" gradientUnits="userSpaceOnUse"><stop stop-color="#fff"/><stop offset=".6" stop-color="#f5f7ff"/><stop offset="1" stop-color="#dbe4ff"/></linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="28" stdDeviation="27" flood-color="#17115e" flood-opacity=".42"/></filter>
+    <filter id="symbolShadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="13" stdDeviation="10" flood-color="#2016a9" flood-opacity=".38"/></filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <use xlink:href="#cloud" transform="translate(0 18)" fill="#2817bc" opacity=".9"/><use xlink:href="#cloud" fill="url(#base)"/>
+    <g clip-path="url(#clip)"><rect width="1024" height="1024" fill="url(#cyan)"/><rect width="1024" height="1024" fill="url(#violet)"/><ellipse cx="340" cy="270" rx="300" ry="120" transform="rotate(-20 340 270)" fill="#fff" opacity=".2"/></g>
+    <g filter="url(#symbolShadow)" fill="none" stroke="url(#symbol)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M512 283L554 332L618 318L634 382L697 403L676 466L721 512L676 558L697 621L634 642L618 706L554 692L512 741L470 692L406 706L390 642L327 621L348 558L303 512L348 466L327 403L390 382L406 318L470 332Z"/>
+      <circle cx="512" cy="512" r="112"/>
+      <path d="M462 514L498 550L570 474"/>
+    </g>
+  </g>
+</svg>
