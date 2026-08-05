@@ -1,4 +1,4 @@
-#target photoshop
+﻿//@target photoshop
 
 
 app.bringToFront();
@@ -6,23 +6,22 @@ app.bringToFront();
 
 
 // ==================================================
-// 大画面输出助手 V27.0.0
+// 大画面批量输出助手 V28.0.0
 //
-// Photoshop 27.10
+// 兼容范围：
+// 1. Adobe Photoshop 2022-2026（23.x-27.x）
+// 2. Adobe Photoshop Beta
+// 3. Windows 与 macOS（Intel / Apple Silicon）
+// 多版本共存时，请从目标Photoshop的“文件 > 脚本 > 浏览”运行。
 //
-// 更新：
-//
-// 1. DPI智能检测
-// 2. 尺寸智能检测
-// 3. ICC智能检测
-// 4. 色彩模式检测
-// 5. ICC读取函数独立化
-// 6. 输入/输出色彩模式分离
-// 7. 增加高PPI异常提醒
-// 8. 增加运行耗时
-// 9. 优化运行日志
-// 10. 批处理不中断
-// 11. TIFF LZW输出
+// V28更新：
+// 1. 使用JavaScript兼容形式声明Photoshop目标，消除“应为 ;”误报
+// 2. 增加Photoshop版本、发布通道、操作系统和处理器环境识别
+// 3. 修复取消文件夹选择时的异常终止
+// 4. 改进跨平台Unicode路径与macOS桌面写入回退
+// 5. 固定TIFF字节序，保持Windows与macOS输出一致
+// 6. 过滤macOS AppleDouble伴生文件
+// 7. 保持原有像素、尺寸、DPI、ICC、LZW和JPG质量参数不变
 //
 // ==================================================
 
@@ -162,7 +161,7 @@ function decodeFileName(file) {
     try {
 
 
-        return decodeURIComponent(
+        return File.decode(
             file.name
         );
 
@@ -1614,39 +1613,7 @@ function safeCloseDocuments() {
 
 
 function selectFolder(title) {
-
-
-    var folder =
-
-        Folder.selectDialog(
-
-            title
-
-        );
-
-
-
-
-
-    if (
-
-        folder == null
-
-    ) {
-
-
-        exit();
-
-
-    }
-
-
-
-
-
-    return folder;
-
-
+    return Folder.selectDialog(title);
 }
 
 
@@ -1911,27 +1878,11 @@ function updateProgress(current, total, name) {
 
 
 
-        app.updateStatusBarMessage(
-
-
-            "正在处理：" +
-
-            current +
-
-            " / " +
-
-            total +
-
-            "\n" +
-
-            name
-
-
-        );
-
-
-
     } catch (e) {}
+
+    v28SetProgressText(
+        "正在处理：" + current + " / " + total + "\n" + name
+    );
 
 
 
@@ -2044,7 +1995,7 @@ if (
     );
 
 
-    exit();
+    return;
 
 
 }
@@ -4052,8 +4003,233 @@ try {
 
 
 // ==================================================
-// V27 稳定增强主流程
+// V28 跨版本与跨平台兼容层
 // ==================================================
+
+var V28_MIN_PHOTOSHOP_MAJOR = 23;
+var V28_MAX_PHOTOSHOP_MAJOR = 27;
+
+
+function v28SingleLine(value) {
+    return String(value || "").replace(/[\r\n]+/g, " ");
+}
+
+
+function v28SetProgressText(message) {
+    try {
+        app.changeProgressText(message);
+        return;
+    } catch (changeProgressError) {}
+
+    try {
+        app.updateStatusBarMessage(message);
+    } catch (statusBarError) {}
+}
+
+
+function v28JoinPath(parent, leafName) {
+    var base = "";
+    var encodedLeaf = String(leafName);
+
+    try {
+        base = parent.absoluteURI;
+    } catch (absoluteURIError) {}
+
+    if (!base) {
+        base = String(parent);
+    }
+
+    try {
+        encodedLeaf = File.encode(encodedLeaf);
+    } catch (encodeError) {
+        try {
+            encodedLeaf = encodeURIComponent(encodedLeaf);
+        } catch (fallbackEncodeError) {}
+    }
+
+    if (base.charAt(base.length - 1) != "/") {
+        base += "/";
+    }
+
+    return base + encodedLeaf;
+}
+
+
+function v28PhotoshopLabel(major, isBeta) {
+    if (isBeta) {
+        return "Adobe Photoshop Beta";
+    }
+
+    switch (major) {
+        case 23:
+            return "Adobe Photoshop 2022";
+        case 24:
+            return "Adobe Photoshop 2023";
+        case 25:
+            return "Adobe Photoshop 2024";
+        case 26:
+            return "Adobe Photoshop 2025";
+        case 27:
+            return "Adobe Photoshop 2026";
+        default:
+            return "Adobe Photoshop";
+    }
+}
+
+
+function v28ProcessorLabel(isMac, osText) {
+    if (!isMac) {
+        return "由Photoshop运行时管理";
+    }
+
+    var systemInformation = osText || "";
+
+    try {
+        if (app.systemInformation !== undefined) {
+            systemInformation += " " + String(app.systemInformation);
+        }
+    } catch (systemInformationError) {}
+
+    if (/apple\s*m\d|apple silicon|arm64|aarch64/i.test(systemInformation)) {
+        return "Apple Silicon";
+    }
+
+    if (/intel/i.test(systemInformation)) {
+        return "Intel";
+    }
+
+    if (/x86_64|x64/i.test(systemInformation)) {
+        return "Intel / Rosetta";
+    }
+
+    return "Intel / Apple Silicon通用（未识别具体架构）";
+}
+
+
+function v28InspectEnvironment() {
+    var appName = "";
+    var appPath = "";
+    var version = "";
+    var osText = "";
+    var fileSystem = "";
+
+    try {
+        appName = String(app.name);
+    } catch (appNameError) {}
+
+    try {
+        appPath = String(app.path.fsName);
+    } catch (appPathError) {}
+
+    try {
+        version = String(app.version);
+    } catch (versionError) {}
+
+    try {
+        osText = String($.os);
+    } catch (osError) {}
+
+    try {
+        fileSystem = String(File.fs);
+    } catch (fileSystemError) {}
+
+    var major = parseInt(version.split(".")[0], 10);
+
+    if (isNaN(major)) {
+        major = 0;
+    }
+
+    var identity = appName + " " + appPath;
+    var isPhotoshop = /photoshop/i.test(identity);
+    var isBeta = /beta/i.test(identity);
+    var isMac = /mac/i.test(osText) || /mac/i.test(fileSystem);
+    var isWindows = /win/i.test(osText) || /win/i.test(fileSystem);
+    var canRun = isPhotoshop && !(major > 0 && major < V28_MIN_PHOTOSHOP_MAJOR);
+    var warning = "";
+    var compatibilityStatus = "已纳入兼容范围";
+
+    if (!isPhotoshop) {
+        warning = "当前宿主不是Adobe Photoshop。";
+        compatibilityStatus = "不支持";
+    } else if (major > 0 && major < V28_MIN_PHOTOSHOP_MAJOR) {
+        warning = "Photoshop版本低于2022（23.x）。";
+        compatibilityStatus = "不支持";
+    } else if (major === 0) {
+        warning = "无法识别Photoshop版本，将按兼容模式继续。";
+        compatibilityStatus = "版本未识别";
+    } else if (major > V28_MAX_PHOTOSHOP_MAJOR) {
+        warning = isBeta ?
+            "当前Photoshop Beta主版本高于2026范围，将按兼容模式继续。" :
+            "当前Photoshop版本高于已验证范围，将按兼容模式继续。";
+        compatibilityStatus = isBeta ?
+            "Beta兼容模式" : "新版本兼容模式";
+    }
+
+    if (!isMac && !isWindows) {
+        warning += (warning ? " " : "") +
+            "无法识别操作系统，将使用Adobe跨平台文件接口。";
+        compatibilityStatus = compatibilityStatus == "已纳入兼容范围" ?
+            "平台未识别" : compatibilityStatus;
+    }
+
+    return {
+        appName: appName || "Adobe Photoshop",
+        appVersion: version || "未知",
+        productLabel: v28PhotoshopLabel(major, isBeta),
+        major: major,
+        isBeta: isBeta,
+        isMac: isMac,
+        isWindows: isWindows,
+        osLabel: isMac ? "macOS" : (isWindows ? "Windows" : "未知系统"),
+        osText: v28SingleLine(osText),
+        processorLabel: v28ProcessorLabel(isMac, osText),
+        compatibilityStatus: compatibilityStatus,
+        warning: warning,
+        canRun: canRun
+    };
+}
+
+
+function v28ValidateEnvironment(environment) {
+    if (environment.canRun) {
+        return true;
+    }
+
+    alert(
+        "当前运行环境不受支持，批处理尚未开始。\n\n" +
+        "支持范围：Adobe Photoshop 2022-2026及Photoshop Beta\n" +
+        "当前环境：" + environment.appName + " " +
+        environment.appVersion + "\n\n" +
+        environment.warning
+    );
+
+    return false;
+}
+
+
+function v28BuildEnvironmentText(environment) {
+    if (!environment) {
+        return "运行环境：\n  未记录\n\n";
+    }
+
+    var text = "运行环境：\n";
+    text += "  应用：" + environment.productLabel + "\n";
+    text += "  版本：" + environment.appVersion + "\n";
+    text += "  系统：" + environment.osLabel;
+
+    if (environment.osText) {
+        text += "（" + environment.osText + "）";
+    }
+
+    text += "\n";
+    text += "  处理器：" + environment.processorLabel + "\n";
+    text += "  兼容状态：" + environment.compatibilityStatus + "\n\n";
+
+    return text;
+}
+
+
+// V27生产核心保留，由V28兼容层调用。
 
 function v27ErrorText(e) {
     var text = "未知错误";
@@ -4103,9 +4279,13 @@ function v27AddAnomaly(list, type, fileName, reason) {
 
 function v27DecodeName(value) {
     try {
-        return decodeURIComponent(value);
-    } catch (e) {
-        return value;
+        return File.decode(String(value));
+    } catch (fileDecodeError) {
+        try {
+            return decodeURIComponent(value);
+        } catch (uriDecodeError) {
+            return value;
+        }
     }
 }
 
@@ -4129,11 +4309,16 @@ function v27SanitizeFilePart(text) {
 function v27ProjectName(folder) {
     var original = v27DecodeName(folder.name);
     var name = original;
+    var previous = "";
 
     name = name.replace(/^\s*\d{8}[\s_\-]*/, "");
-    name = name.replace(/[\s_\-]+(?:制作文件|输出文件|交付文件|转曲|定稿)$/i, "");
-    name = name.replace(/[\s_\-]+v\d+(?:\.\d+)*$/i, "");
-    name = name.replace(/^\s+|\s+$/g, "");
+
+    do {
+        previous = name;
+        name = name.replace(/[\s_\-]+v\d+(?:\.\d+)*$/i, "");
+        name = name.replace(/[\s_\-]+(?:制作文件|输出文件|交付文件|转曲|定稿)$/i, "");
+        name = name.replace(/^\s+|\s+$/g, "");
+    } while (name != previous);
 
     if (!name) {
         name = original;
@@ -4144,7 +4329,9 @@ function v27ProjectName(folder) {
 
 
 function v27BaseName(file) {
-    return decodeFileName(file).replace(/\.(?:tif|tiff|jpg|jpeg)$/i, "");
+    return v27SanitizeFilePart(
+        decodeFileName(file).replace(/\.(?:tif|tiff|jpg|jpeg)$/i, "")
+    );
 }
 
 
@@ -4155,8 +4342,22 @@ function v27OutputExtension(file) {
 
 function v27GetProductionFiles(folder) {
     var files = folder.getFiles(function(f) {
-        return f instanceof File && /\.(?:tif|tiff|jpg|jpeg)$/i.test(f.name);
+        if (!(f instanceof File)) {
+            return false;
+        }
+
+        var decodedName = decodeFileName(f);
+
+        if (/^\._/.test(decodedName)) {
+            return false;
+        }
+
+        return /\.(?:tif|tiff|jpg|jpeg)$/i.test(decodedName);
     });
+
+    if (!files) {
+        return [];
+    }
 
     files.sort(function(a, b) {
         var an = decodeFileName(a).toLowerCase();
@@ -4169,7 +4370,9 @@ function v27GetProductionFiles(folder) {
 
 
 function v27VersionedOutputFile(folder, baseName, extension) {
-    var first = new File(folder + "/" + baseName + "_定稿" + extension);
+    var first = new File(
+        v28JoinPath(folder, baseName + "_定稿" + extension)
+    );
 
     if (!first.exists) {
         return first;
@@ -4180,9 +4383,10 @@ function v27VersionedOutputFile(folder, baseName, extension) {
 
     do {
         var versionText = version < 10 ? "0" + version : String(version);
-        candidate = new File(
-            folder + "/" + baseName + "_定稿_v" + versionText + extension
-        );
+        candidate = new File(v28JoinPath(
+            folder,
+            baseName + "_定稿_v" + versionText + extension
+        ));
         version++;
     } while (candidate.exists);
 
@@ -4192,21 +4396,47 @@ function v27VersionedOutputFile(folder, baseName, extension) {
 
 function v27PrepareOpenDocuments() {
     var previousDialogs = app.displayDialogs;
+    var existingDocuments = [];
+    var i;
 
     try {
         app.displayDialogs = DialogModes.ALL;
 
-        while (app.documents.length > 0) {
-            var existingDoc = app.activeDocument;
+        for (i = 0; i < app.documents.length; i++) {
+            existingDocuments.push(app.documents[i]);
+        }
+
+        // 先保存全部文档；任一保存失败时，不关闭其余文档。
+        for (i = 0; i < existingDocuments.length; i++) {
+            var documentToSave = existingDocuments[i];
 
             try {
-                existingDoc.close(SaveOptions.SAVECHANGES);
-            } catch (e) {
+                app.activeDocument = documentToSave;
+                documentToSave.save();
+            } catch (saveError) {
                 alert(
-                    "无法保存并关闭文档：\n" +
-                    existingDoc.name +
+                    "无法保存文档：\n" +
+                    documentToSave.name +
                     "\n\n原因：" +
-                    v27ErrorText(e) +
+                    v27ErrorText(saveError) +
+                    "\n\n批处理尚未开始。"
+                );
+                return false;
+            }
+        }
+
+        // 全部保存成功后再关闭，避免保存阶段出现部分关闭。
+        for (i = existingDocuments.length - 1; i >= 0; i--) {
+            var documentToClose = existingDocuments[i];
+
+            try {
+                documentToClose.close(SaveOptions.DONOTSAVECHANGES);
+            } catch (closeError) {
+                alert(
+                    "无法关闭文档：\n" +
+                    documentToClose.name +
+                    "\n\n原因：" +
+                    v27ErrorText(closeError) +
                     "\n\n批处理尚未开始。"
                 );
                 return false;
@@ -4222,35 +4452,46 @@ function v27PrepareOpenDocuments() {
 
 function v27CheckWritableFolder(folder) {
     var probe = new File(
-        folder + "/.__even_v27_write_test_" + new Date().getTime() + ".tmp"
+        v28JoinPath(
+            folder,
+            "_even_v28_write_test_" + new Date().getTime() + ".tmp"
+        )
     );
+
+    var opened = false;
+    var wrote = false;
+    var closed = true;
+    var removed = true;
 
     try {
         probe.encoding = "UTF-8";
 
-        if (!probe.open("w")) {
-            return false;
-        }
+        opened = probe.open("w");
 
-        probe.write("write-test");
-        probe.close();
-        probe.remove();
-        return true;
+        if (opened) {
+            wrote = probe.write("write-test") !== false;
+        }
     } catch (e) {
+        wrote = false;
+    } finally {
         try {
             if (probe.opened) {
-                probe.close();
+                closed = probe.close() !== false;
             }
-        } catch (ignore) {}
+        } catch (ignore) {
+            closed = false;
+        }
 
         try {
             if (probe.exists) {
-                probe.remove();
+                removed = probe.remove() !== false && !probe.exists;
             }
-        } catch (ignoreRemove) {}
-
-        return false;
+        } catch (ignoreRemove) {
+            removed = false;
+        }
     }
+
+    return opened && wrote && closed && removed && !probe.exists;
 }
 
 
@@ -4341,39 +4582,74 @@ function v27NormalizeICC(icc) {
 
 
 function v27SaveProductionFile(doc, outputFile, extension) {
-    if (extension == ".jpg") {
-        var jpgOptions = new JPEGSaveOptions();
-        jpgOptions.quality = 12;
-        jpgOptions.embedColorProfile = true;
-        jpgOptions.formatOptions = FormatOptions.STANDARDBASELINE;
-
-        doc.saveAs(
-            outputFile,
-            jpgOptions,
-            true,
-            Extension.LOWERCASE
-        );
-    } else {
-        var tifOptions = new TiffSaveOptions();
-        tifOptions.imageCompression = TIFFEncoding.TIFFLZW;
-        tifOptions.embedColorProfile = true;
-
-        doc.saveAs(
-            outputFile,
-            tifOptions,
-            true,
-            Extension.LOWERCASE
-        );
+    if (outputFile.exists) {
+        throw new Error("目标文件已存在，未执行覆盖");
     }
 
-    if (!outputFile.exists) {
-        throw new Error("Photoshop未生成目标文件");
+    try {
+        if (extension == ".jpg") {
+            var jpgOptions = new JPEGSaveOptions();
+            jpgOptions.quality = 12;
+            jpgOptions.embedColorProfile = true;
+            jpgOptions.formatOptions = FormatOptions.STANDARDBASELINE;
+
+            doc.saveAs(
+                outputFile,
+                jpgOptions,
+                true,
+                Extension.LOWERCASE
+            );
+        } else {
+            var tifOptions = new TiffSaveOptions();
+            tifOptions.imageCompression = TIFFEncoding.TIFFLZW;
+            tifOptions.embedColorProfile = true;
+            // 固定为Windows既有字节序，避免macOS使用不同默认值。
+            tifOptions.byteOrder = ByteOrder.IBM;
+
+            doc.saveAs(
+                outputFile,
+                tifOptions,
+                true,
+                Extension.LOWERCASE
+            );
+        }
+
+        if (!outputFile.exists || outputFile.length <= 0) {
+            throw new Error("Photoshop未生成有效目标文件");
+        }
+    } catch (saveError) {
+        var partialCleanupError = "";
+
+        try {
+            if (outputFile.exists) {
+                if (outputFile.remove() === false || outputFile.exists) {
+                    partialCleanupError = "删除返回失败";
+                }
+            }
+        } catch (removePartialError) {
+            partialCleanupError = v27ErrorText(removePartialError);
+        }
+
+        if (partialCleanupError) {
+            throw new Error(
+                v27ErrorText(saveError) +
+                "；同时无法删除半成品：" + outputFile.fsName +
+                "（" + partialCleanupError + "）"
+            );
+        }
+
+        throw saveError;
     }
 }
 
 
 function v27SafeWriteUTF8(file, text) {
     var opened = false;
+    var existedBefore = file.exists;
+
+    if (existedBefore) {
+        throw new Error("目标文本文件已存在，未执行覆盖");
+    }
 
     try {
         file.encoding = "UTF-8";
@@ -4386,9 +4662,58 @@ function v27SafeWriteUTF8(file, text) {
         if (!file.write("\uFEFF" + text)) {
             throw new Error("文本内容写入失败");
         }
+
+        if (file.close() === false) {
+            throw new Error("文本文件关闭失败");
+        }
+
+        opened = false;
+
+        if (!file.exists || file.length <= 0) {
+            throw new Error("未生成有效文本文件");
+        }
+    } catch (writeError) {
+        var cleanupErrorText = "";
+
+        try {
+            if (opened && file.opened) {
+                if (file.close() === false) {
+                    cleanupErrorText = "关闭失败";
+                }
+            }
+        } catch (closeError) {
+            cleanupErrorText = v27ErrorText(closeError);
+        }
+
+        opened = false;
+
+        try {
+            if (!existedBefore && file.exists) {
+                if (file.remove() === false || file.exists) {
+                    cleanupErrorText += (cleanupErrorText ? "；" : "") +
+                        "删除失败";
+                }
+            }
+        } catch (removeError) {
+            cleanupErrorText += (cleanupErrorText ? "；" : "") +
+                v27ErrorText(removeError);
+        }
+
+        if (cleanupErrorText) {
+            throw new Error(
+                v27ErrorText(writeError) +
+                "；同时无法清理未完成文本：" + file.fsName +
+                "（" + cleanupErrorText + "）"
+            );
+        }
+
+        throw writeError;
     } finally {
-        if (opened) {
-            file.close();
+        try {
+            if (opened && file.opened) {
+                file.close();
+            }
+        } catch (finalCloseError) {
         }
     }
 }
@@ -4431,6 +4756,43 @@ function v27GroupRecords(records, keyFunction, labelFunction) {
 }
 
 
+function v28HasSizeDifference(records) {
+    if (records.length <= 1) {
+        return false;
+    }
+
+    var base = records[0];
+
+    for (var i = 1; i < records.length; i++) {
+        if (
+            Math.abs(records[i].width - base.width) > 0.300001 ||
+            Math.abs(records[i].height - base.height) > 0.300001
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+function v28HasDPIDifference(records) {
+    if (records.length <= 1) {
+        return false;
+    }
+
+    var base = records[0].dpi;
+
+    for (var i = 1; i < records.length; i++) {
+        if (Math.abs(records[i].dpi - base) > 1) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 function v27RegisterDifferenceAnomalies(records, anomalies) {
     var sizeGroups = v27GroupRecords(
         records,
@@ -4442,7 +4804,8 @@ function v27RegisterDifferenceAnomalies(records, anomalies) {
         }
     );
 
-    if (sizeGroups.length > 1) {
+    // 沿用既有生产容差：尺寸差不超过0.3 cm不报警。
+    if (v28HasSizeDifference(records)) {
         for (var i = 0; i < records.length; i++) {
             v27AddAnomaly(
                 anomalies,
@@ -4464,7 +4827,8 @@ function v27RegisterDifferenceAnomalies(records, anomalies) {
         }
     );
 
-    if (dpiGroups.length > 1) {
+    // 沿用既有生产容差：DPI差不超过1不报警。
+    if (v28HasDPIDifference(records)) {
         for (var d = 0; d < records.length; d++) {
             v27AddAnomaly(
                 anomalies,
@@ -4635,7 +4999,8 @@ function v27BuildRunLogText(
     scannedCount,
     successCount,
     runSecondsValue,
-    anomalies
+    anomalies,
+    environment
 ) {
     var failedCount = scannedCount - successCount;
     var text = "";
@@ -4647,6 +5012,7 @@ function v27BuildRunLogText(
     text += "成功输出数量：\n" + successCount + " 个\n\n";
     text += "失败文件数量：\n" + failedCount + " 个\n\n";
     text += "运行耗时：\n" + v27FormatDuration(runSecondsValue) + "\n\n";
+    text += v28BuildEnvironmentText(environment);
     text += v27BuildAnomalyText(anomalies);
     text += "联系作者：\n";
     text += "even.woo@gmail.com\n\n\n";
@@ -4656,30 +5022,207 @@ function v27BuildRunLogText(
 }
 
 
+function v28VersionedTextFile(folder, baseName) {
+    var first = new File(v28JoinPath(folder, baseName + ".txt"));
+
+    if (!first.exists) {
+        return first;
+    }
+
+    var version = 2;
+    var candidate;
+
+    do {
+        var versionText = version < 10 ? "0" + version : String(version);
+        candidate = new File(v28JoinPath(
+            folder,
+            baseName + "_v" + versionText + ".txt"
+        ));
+        version++;
+    } while (candidate.exists);
+
+    return candidate;
+}
+
+
+function v28FolderKey(folder) {
+    try {
+        return String(folder.absoluteURI).toLowerCase();
+    } catch (absoluteURIError) {
+        return String(folder).toLowerCase();
+    }
+}
+
+
+function v28AddUniqueFolder(folders, folder) {
+    if (!folder) {
+        return;
+    }
+
+    var key = v28FolderKey(folder);
+
+    for (var i = 0; i < folders.length; i++) {
+        if (v28FolderKey(folders[i]) == key) {
+            return;
+        }
+    }
+
+    folders.push(folder);
+}
+
+
+function v28CurrentRunLogText(elapsedSeconds) {
+    return v27BuildRunLogText(
+        v27RuntimeState.projectName,
+        v27RuntimeState.scannedCount,
+        v27RuntimeState.successCount,
+        elapsedSeconds,
+        v27RuntimeState.anomalies,
+        v27RuntimeState.environment
+    );
+}
+
+
+function v28WriteRunLog(dateStamp, elapsedSeconds, fallbackFolder) {
+    var folders = [];
+    var baseName = dateStamp + "_" +
+        v27SanitizeFilePart(v27RuntimeState.projectName) +
+        "_运行日志";
+    var lastError = "";
+    var desktopFolderKey = "";
+
+    try {
+        var desktopFolder = Folder.desktop;
+        v28AddUniqueFolder(folders, desktopFolder);
+        desktopFolderKey = v28FolderKey(desktopFolder);
+    } catch (desktopFolderError) {
+        v27AddAnomaly(
+            v27RuntimeState.anomalies,
+            "桌面目录不可用",
+            "运行日志",
+            v27ErrorText(desktopFolderError)
+        );
+    }
+
+    v28AddUniqueFolder(folders, fallbackFolder);
+
+    try {
+        v28AddUniqueFolder(folders, Folder.temp);
+    } catch (tempFolderError) {
+        v27AddAnomaly(
+            v27RuntimeState.anomalies,
+            "临时目录不可用",
+            "运行日志",
+            v27ErrorText(tempFolderError)
+        );
+    }
+
+    for (var i = 0; i < folders.length; i++) {
+        var runLogFile = null;
+
+        try {
+            runLogFile = v28VersionedTextFile(folders[i], baseName);
+            v27SafeWriteUTF8(
+                runLogFile,
+                v28CurrentRunLogText(elapsedSeconds)
+            );
+
+            return {
+                file: runLogFile,
+                usedFallback: !desktopFolderKey ||
+                    v28FolderKey(folders[i]) != desktopFolderKey,
+                errorText: ""
+            };
+        } catch (writeError) {
+            lastError = v27ErrorText(writeError);
+
+            v27AddAnomaly(
+                v27RuntimeState.anomalies,
+                "运行日志写入失败",
+                runLogFile ? runLogFile.fsName : "运行日志",
+                lastError
+            );
+        }
+    }
+
+    return {
+        file: null,
+        usedFallback: false,
+        errorText: lastError || "没有可写的日志目录"
+    };
+}
+
+
+function v28WriteRunLogSafely(dateStamp, elapsedSeconds, fallbackFolder) {
+    try {
+        return v28WriteRunLog(dateStamp, elapsedSeconds, fallbackFolder);
+    } catch (unexpectedLogError) {
+        return {
+            file: null,
+            usedFallback: false,
+            errorText: v27ErrorText(unexpectedLogError)
+        };
+    }
+}
+
+
 var v27RuntimeState = {
     projectName: "批处理",
     scannedCount: 0,
     successCount: 0,
     startMilliseconds: 0,
-    anomalies: []
+    anomalies: [],
+    environment: null,
+    outputFolder: null,
+    batchStarted: false
 };
 
 
 function runV27() {
-    if (!v27PrepareOpenDocuments()) {
+    var anomalies = [];
+    var environment = v28InspectEnvironment();
+
+    v27RuntimeState.projectName = "批处理";
+    v27RuntimeState.scannedCount = 0;
+    v27RuntimeState.successCount = 0;
+    v27RuntimeState.startMilliseconds = 0;
+    v27RuntimeState.anomalies = anomalies;
+    v27RuntimeState.environment = environment;
+    v27RuntimeState.outputFolder = null;
+    v27RuntimeState.batchStarted = false;
+
+    if (!v28ValidateEnvironment(environment)) {
         return;
     }
 
-    var startMilliseconds = new Date().getTime();
-    v27RuntimeState.startMilliseconds = startMilliseconds;
     var inputFolder = selectFolder("请选择需要处理的TIFF或JPG文件夹");
+
+    if (!inputFolder) {
+        return;
+    }
+
     var outputParent = selectFolder("请选择输出位置");
+
+    if (!outputParent) {
+        return;
+    }
+
     var projectName = v27ProjectName(inputFolder);
     v27RuntimeState.projectName = projectName;
     var dateStamp = v27DateStamp();
-    var inputFolderName = v27DecodeName(inputFolder.name);
+    var files = v27GetProductionFiles(inputFolder);
+    v27RuntimeState.scannedCount = files.length;
+
+    if (files.length === 0) {
+        alert("没有找到TIFF或JPG文件");
+        return;
+    }
+
+    var inputFolderName = v27SanitizeFilePart(
+        v27DecodeName(inputFolder.name)
+    );
     var outputFolder = new Folder(
-        outputParent + "/" + inputFolderName + "_制作文件"
+        v28JoinPath(outputParent, inputFolderName + "_制作文件")
     );
 
     if (!outputFolder.exists && !outputFolder.create()) {
@@ -4692,16 +5235,26 @@ function runV27() {
         return;
     }
 
-    var files = v27GetProductionFiles(inputFolder);
-    v27RuntimeState.scannedCount = files.length;
+    v27RuntimeState.outputFolder = outputFolder;
 
-    if (files.length === 0) {
-        alert("没有找到TIFF或JPG文件");
+    if (!v27PrepareOpenDocuments()) {
         return;
     }
 
-    var anomalies = [];
-    v27RuntimeState.anomalies = anomalies;
+    v27RuntimeState.batchStarted = true;
+
+    var startMilliseconds = new Date().getTime();
+    v27RuntimeState.startMilliseconds = startMilliseconds;
+
+    if (environment.warning) {
+        v27AddAnomaly(
+            anomalies,
+            "环境兼容提醒",
+            environment.productLabel,
+            environment.warning
+        );
+    }
+
     var scanRecords = [];
     var successRecords = [];
     var unclosedDocs = [];
@@ -4867,48 +5420,55 @@ function runV27() {
     var endTimeText = getChinaTime();
     var endMilliseconds = new Date().getTime();
     var elapsedSeconds = Math.round((endMilliseconds - startMilliseconds) / 1000);
-    var deliveryFile = new File(
-        outputFolder + "/" + dateStamp + "_" + projectName + "_交付说明.txt"
-    );
-    var runLogFile = new File(
-        Folder.desktop + "/" + dateStamp + "_" + projectName + "_运行日志.txt"
-    );
 
-    try {
-        v27SafeWriteUTF8(
-            deliveryFile,
-            v27BuildDeliveryText(projectName, endTimeText, successRecords)
+    if (successRecords.length > 0) {
+        var deliveryFile = v28VersionedTextFile(
+            outputFolder,
+            dateStamp + "_" + projectName + "_交付说明"
         );
-    } catch (deliveryError) {
+
+        try {
+            v27SafeWriteUTF8(
+                deliveryFile,
+                v27BuildDeliveryText(projectName, endTimeText, successRecords)
+            );
+        } catch (deliveryError) {
+            v27AddAnomaly(
+                anomalies,
+                "交付说明写入失败",
+                decodeFileName(deliveryFile),
+                v27ErrorText(deliveryError)
+            );
+        }
+    } else {
         v27AddAnomaly(
             anomalies,
-            "交付说明写入失败",
-            decodeFileName(deliveryFile),
-            v27ErrorText(deliveryError)
+            "未形成交付",
+            projectName,
+            "没有文件成功输出，因此未生成交付说明"
         );
     }
 
-    try {
-        v27SafeWriteUTF8(
-            runLogFile,
-            v27BuildRunLogText(
-                projectName,
-                files.length,
-                successRecords.length,
-                elapsedSeconds,
-                anomalies
-            )
-        );
-    } catch (runLogError) {
+    var runLogResult = v28WriteRunLogSafely(
+        dateStamp,
+        elapsedSeconds,
+        outputFolder
+    );
+
+    if (!runLogResult.file) {
         alert(
             "批处理已经结束，但运行日志写入失败。\n\n" +
-            "目标文件：" + runLogFile.fsName +
-            "\n原因：" + v27ErrorText(runLogError)
+            "原因：" + runLogResult.errorText
+        );
+    } else if (runLogResult.usedFallback) {
+        alert(
+            "桌面不可写，运行日志已保存到备用位置：\n" +
+            runLogResult.file.fsName
         );
     }
 
     try {
-        app.updateStatusBarMessage(
+        v28SetProgressText(
             "批处理完成：成功" + successRecords.length +
             "个，失败" + (files.length - successRecords.length) + "个"
         );
@@ -4931,49 +5491,45 @@ function v27RunSafely() {
             fatalReason
         );
 
-        try {
-            app.displayDialogs = DialogModes.NO;
+        if (v27RuntimeState.batchStarted) {
+            try {
+                app.displayDialogs = DialogModes.NO;
 
-            while (app.documents.length > 0) {
-                app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+                while (app.documents.length > 0) {
+                    app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+                }
+            } catch (closeFatalError) {
+                v27AddAnomaly(
+                    v27RuntimeState.anomalies,
+                    "批处理清理失败",
+                    v27RuntimeState.projectName,
+                    v27ErrorText(closeFatalError)
+                );
             }
-        } catch (closeFatalError) {
-            v27AddAnomaly(
-                v27RuntimeState.anomalies,
-                "批处理清理失败",
-                v27RuntimeState.projectName,
-                v27ErrorText(closeFatalError)
-            );
         }
 
-        try {
-            var emergencySeconds = v27RuntimeState.startMilliseconds > 0 ?
-                Math.round(
-                    (new Date().getTime() - v27RuntimeState.startMilliseconds) / 1000
-                ) :
-                0;
-            var emergencyLog = new File(
-                Folder.desktop + "/" +
-                v27DateStamp() + "_" +
-                v27SanitizeFilePart(v27RuntimeState.projectName) +
-                "_运行日志.txt"
-            );
+        var emergencySeconds = v27RuntimeState.startMilliseconds > 0 ?
+            Math.round(
+                (new Date().getTime() - v27RuntimeState.startMilliseconds) / 1000
+            ) :
+            0;
+        var emergencyLogResult = v28WriteRunLogSafely(
+            v27DateStamp(),
+            emergencySeconds,
+            v27RuntimeState.outputFolder
+        );
 
-            v27SafeWriteUTF8(
-                emergencyLog,
-                v27BuildRunLogText(
-                    v27RuntimeState.projectName,
-                    v27RuntimeState.scannedCount,
-                    v27RuntimeState.successCount,
-                    emergencySeconds,
-                    v27RuntimeState.anomalies
-                )
-            );
-        } catch (emergencyLogError) {
+        if (emergencyLogResult.file) {
             alert(
-                "批处理意外终止，并且无法写入桌面运行日志。\n\n" +
+                "批处理意外终止。\n\n" +
                 "原因：" + fatalReason +
-                "\n日志错误：" + v27ErrorText(emergencyLogError)
+                "\n\n运行日志：" + emergencyLogResult.file.fsName
+            );
+        } else {
+            alert(
+                "批处理意外终止，并且无法写入运行日志。\n\n" +
+                "原因：" + fatalReason +
+                "\n日志错误：" + emergencyLogResult.errorText
             );
         }
     } finally {
