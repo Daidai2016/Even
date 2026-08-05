@@ -4,22 +4,18 @@
 ## 项目定位
 
 
-Codex Design Workspace 是一个：
-
-AI + Adobe Creative Cloud 自动化设计生产工作平台。
+Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目标是将自然语言需求转化为可复用的创意能力、便捷工具和可验证交付物。
 
 
-通过 OpenAI Codex 辅助设计师建立：
+## 两个项目重点
 
-- Photoshop 自动化工作流
-- Illustrator 自动化工作流
-- Adobe 软件协同流程
-- AI辅助设计生产体系
+### 1. AIGC 图像生成能力
 
+建立审美、版式、字体和形式创意能力，并沉淀为提示词、参考资产、评价标准、工作流和 skills。
 
-目标：
+### 2. 设计便捷工具
 
-将自然语言设计需求转化为稳定、可维护的自动化生产流程。
+开发脚本、动作、模板、生成器和多工具组合技巧，降低重复操作和出错率。
 
 
 
@@ -29,40 +25,29 @@ AI + Adobe Creative Cloud 自动化设计生产工作平台。
 # 核心理念
 
 
-本项目服务于真实设计制作流程。
-
-
-开发原则：
-
-生产逻辑优先于程序结构。
+创意标准回答“什么是好结果”，工具回答“如何稳定实现”。两者可协同，不相互代替。
 
 
 优化方向：
 
-- 制作结果正确
+- 创意目标、内容、数据和制作结果正确
 - 工作流程稳定
 - 减少重复操作
 - 支持无人值守运行
 - 保证文件交付可靠
 
 
-代码结构和模块化设计必须服务于生产需求。
+形式、代码和工具结构都必须服务于实际需求。
 
 
 
 ---
 
 
-# 支持软件
+# 支持平台与交付物
 
 
-主要支持：
-
-- Adobe Photoshop
-- Adobe Illustrator
-- Adobe InDesign
-- Adobe Bridge
-- Adobe Acrobat
+平台包括 Adobe Creative Cloud、PowerPoint、Excel、Word、PDF 及其他创意和数据工具。交付物包括图像、图标、设计文件、演示文稿、数据表格、文档、报告和可复用工作流。
 
 
 
@@ -89,26 +74,10 @@ AI + Adobe Creative Cloud 自动化设计生产工作平台。
 `Codex Design 终端` 会优先使用 Windows Terminal，并明确以 Windows PowerShell 作为命令行环境，默认进入当前仓库根目录。如果电脑没有安装或无法找到 Windows Terminal，快捷方式会自动回退为直接打开 Windows PowerShell。
 
 
-工作台根目录和三个分类目录均使用自定义文件夹图标：
-
-```text
-folder_workspace.ico
-folder_development_tools.ico
-folder_adobe_scripts.ico
-folder_project_management.ico
-```
+图标文件、视觉规则和 Windows 尺寸要求统一见 `assets/icons/README.md`。
 
 
-本地项目快捷方式使用：
-
-```text
-codex_local_project.ico
-```
-
-整套图标采用明亮的 Codex 流动新拟态语言：有机云团或文件夹轮廓结合多组径向色场、局部柔光、轻微厚度和半透明表面光泽，不使用闭合白色外描边。Photoshop Beta 与 Illustrator Beta 安装脚本目录分别保留 Adobe 蓝青和金橙品牌主色。
-
-
-仓库路径由脚本所在位置动态推导，不写死盘符或绝对路径。因此同一份仓库可在例如 `D:\Codex_Design`、`E:\AI_Workspace\Codex_Design` 等不同位置运行。仓库移动后重新运行脚本，即可刷新快捷方式、文件夹图标路径和资源管理器图标缓存。
+仓库路径由脚本所在位置动态推导，不写死盘符或绝对路径。因此同一份仓库可在不同电脑、盘符或目录中运行。仓库移动后重新运行脚本，即可刷新快捷方式、文件夹图标路径和资源管理器图标缓存。
 
 
 
@@ -122,74 +91,75 @@ codex_local_project.ico
 Codex_Design/
 
 ├── scripts/
-│   Adobe自动化脚本
+│   Adobe 及其他生产自动化脚本
+│
+├── tools/
+│   仓库、环境和工作流辅助工具
 │
 ├── workflows/
-│   设计生产流程记录
+│   已验证的创意与生产流程
 │
 ├── prompts/
-│   AI提示词管理
+│   可复用 AIGC 提示词
 │
 ├── assets/
-│   设计资源
+│   设计资源、参考图、色板和字体样例
+│
+├── experiments/
+│   未验证的 AIGC 和工作流实验
 │
 ├── docs/
-│   项目文档
+│   项目文档、Word 和报告类成果
 │
-└── presentation/
-    汇报与展示文件
+├── presentation/
+│   PowerPoint 汇报与展示文件
+│
+└── work/
+    可清理的分析、生成和测试中间文件
+```
 
 
-自动化方向
-Photoshop
-主要方向：
-图像处理自动化
-批量生产流程
-图层管理
-文件输出
-AI辅助图像处理
-Illustrator
-主要方向：
-矢量图形创作
-自动排版
-图形系统生成
-SVG/PDF生产
-MCP辅助实验
+---
 
 
-工作方式
-设计需求
+# 工作方式
+
+```text
+需求
 ↓
-OpenAI Codex
+AIGC 主线：创意标准、训练、提示词、skills
+或
+工具主线：脚本、动作、模板、多工具组合
 ↓
-Adobe自动化脚本
+测试与验收
 ↓
-Photoshop / Illustrator执行
-↓
-设计生产文件
-↓
-Git版本管理
+可复用能力或可交付成果
+```
 
 
-文档规范
-项目规则：
-AGENTS.md
-用于：
-Codex工作行为规范。
-脚本开发规范：
-CODING_RULES.md
-用于：
-Adobe自动化脚本开发规则。
-软件专项规则：
-scripts/photoshop/docs/README.md
 
-scripts/illustrator/docs/README.md
-用于：
-具体软件自动化规范。
+---
 
 
-项目目标
-建立：
-设计师能够使用自然语言描述需求，
-由 Codex 辅助生成和维护 Adobe 自动化流程，
-最终形成稳定可靠的设计生产工具体系。
+# 文档体系
+
+| 文档 | 职责 |
+| --- | --- |
+| `README.md` | 项目概览、入口和工作台说明 |
+| `AGENTS.md` | 仓库级操作、安全与交付规则 |
+| `CODING_RULES.md` | 代码、自动化工具和创意交付物的通用开发规范 |
+| `docs/AIGC_CREATIVE_RULES.md` | AIGC 审美、版式、字体、形式创意与 skill 建设规范 |
+| `scripts/photoshop/AGENTS.md` | Photoshop 目录局部强制规则 |
+| `scripts/illustrator/AGENTS.md` | Illustrator 目录局部强制规则 |
+| `scripts/common/docs/ADOBE_AUTOMATION_GUIDE.md` | Adobe 软件职责与协作指南 |
+| `scripts/*/docs/README.md` | 对应软件的能力和工作流说明 |
+| `tools/docs/ENVIRONMENT.md` | 本地测试环境事实 |
+
+
+
+---
+
+
+# 项目目标
+
+建立可持续进化的 AIGC 创意能力和设计便捷工具体系，让创意标准可训练、操作流程可复用、交付结果可验证。

@@ -13,34 +13,15 @@ node_modules/
 
 
 # =====================
-# Adobe Files
-# =====================
-*.ai
-*.psd
-*.psb
-*.indd
-*.indb
-*.indt
-
-
-# =====================
 # Adobe Export Files
 # =====================
 *.pdf
 
 
 # =====================
-# Presentation
+# Presentation formats not managed by Git LFS
 # =====================
-*.ppt
-*.pptx
 *.key
-
-
-# =====================
-# Mind Map
-# =====================
-*.xmind
 
 
 # =====================
@@ -62,3 +43,4 @@ Thumbs.db
 
 # Runtime logs
 logs/*.log
+logs/environment_check_*.txt

@@ -13,6 +13,9 @@
 Photoshop 在 Codex Design 项目中的自动化生产定位。
 
 
+本文档是能力与工作流指南，不定义强制开发规则。
+
+
 Photoshop主要作为：
 
 位图图像处理与后期制作中心。
@@ -30,11 +33,18 @@ Photoshop主要作为：
 
 
 
-通用自动化规则：
+项目通用开发规范：
 
 参考：
 
-scripts/common/docs/CODING_RULES.md
+CODING_RULES.md
+
+
+Photoshop 局部强制规则：
+
+参考：
+
+scripts/photoshop/AGENTS.md
 
 
 Adobe整体自动化体系：

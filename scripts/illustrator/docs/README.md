@@ -13,6 +13,9 @@
 Illustrator 在 Codex Design 项目中的自动化生产定位。
 
 
+本文档是能力与工作流指南，不定义强制开发规则。
+
+
 Illustrator主要作为：
 
 矢量设计、图形创作与版式生产中心。
@@ -31,11 +34,18 @@ Illustrator主要作为：
 
 
 
-通用自动化规则：
+项目通用开发规范：
 
 参考：
 
-scripts/common/docs/CODING_RULES.md
+CODING_RULES.md
+
+
+Illustrator 局部强制规则：
+
+参考：
+
+scripts/illustrator/AGENTS.md
 
 
 Adobe整体自动化体系：

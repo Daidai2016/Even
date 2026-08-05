@@ -24,16 +24,16 @@ Adobe Creative Cloud 自动化生产体系。
 
 
 
-本文档定义：
+本文档说明：
 
-各Adobe软件在自动化设计生产流程中的定位、职责和协作关系。
+各 Adobe 软件在自动化设计生产流程中的定位、职责和协作关系。本文档是体系指南，不替代仓库或软件目录中的 `AGENTS.md`。
 
 
-脚本开发规范：
+项目通用开发规范：
 
 参考：
 
-scripts/common/docs/CODING_RULES.md
+CODING_RULES.md
 
 
 Codex工作规范：
@@ -439,28 +439,11 @@ PDF检查与交付
 ---
 
 
-# 七、专项规则
+# 七、专项导航
 
+- Photoshop 强制规则：`scripts/photoshop/AGENTS.md`
+- Photoshop 能力与流程指南：`scripts/photoshop/docs/README.md`
+- Illustrator 强制规则：`scripts/illustrator/AGENTS.md`
+- Illustrator 能力与流程指南：`scripts/illustrator/docs/README.md`
 
-具体软件自动化规则：
-
-
-Photoshop：
-
-参考：
-
-scripts/photoshop/docs/README.md
-
-
-
-Illustrator：
-
-参考：
-
-scripts/illustrator/docs/README.md
-
-
-
-其他Adobe软件：
-
-根据实际需求建立专项规范。
+其他 Adobe 软件在出现稳定专项需求后，再建立对应局部规则和指南。

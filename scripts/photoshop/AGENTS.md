@@ -1,169 +1,46 @@
-# Photoshop Agent Rules
+# Photoshop 自动化局部规则
 
-本文档适用于：
+## 1. 适用范围
 
-scripts/photoshop/
+本文档适用于 `scripts/photoshop/` 及其子目录。未在本文档中另行规定的内容，继承仓库根目录 `AGENTS.md` 和 `CODING_RULES.md`。
 
-以及该目录下的全部子目录。
+`scripts/photoshop/docs/README.md` 是 Photoshop 能力和工作流指南，不重复本文档的强制规则。
 
+## 2. 交付位置
 
----
+- 正式 Photoshop ExtendScript / JSX 保存到 `scripts/photoshop/jsx/`。
+- 测试样例放在 `scripts/photoshop/examples/` 或用户明确指定的测试目录。
+- 不得将正式脚本仅保存在 `docs/`、临时目录、聊天附件或仓库外。
 
-# 一、Photoshop脚本交付位置
+## 3. 稳定版本与命名
 
-正式 Photoshop ExtendScript / JSX 文件统一保存到：
-
-scripts/photoshop/jsx/
-
-
-不得将正式交付脚本保存到：
-
-- docs/
-- examples/
-- 临时目录
-- 仓库根目录
-- 仓库外部目录
-
-
----
-
-# 二、生产脚本版本规则
-
-优化已有生产脚本时：
-
-默认保留原始稳定版本。
-
-例如：
-
-原始版本：
-
-scripts/photoshop/jsx/Even_大画面批量输出助手_v26.jsx
-
-
-优化版本：
-
-scripts/photoshop/jsx/Even_大画面批量输出助手_v27.jsx
-
-
-未经用户明确确认：
-
-不得覆盖、删除或重命名原始稳定版本。
-
-
----
-
-# 三、修改原则
-
-修改 Photoshop 生产脚本前：
-
-必须先完成：
-
-1. 当前功能分析
-2. 修改目标说明
-3. 涉及区域定位
-4. 风险说明
-5. 验证方案
-
-
-默认采用：
-
-小范围修改。
-
-
-禁止未经确认：
-
-- 重写完整脚本
-- 大规模重构
-- 改变生产流程
-- 改变输出参数
-- 改变报告规则
-- 改变文件命名规则
-
-
----
-
-# 四、交付要求
-
-完成修改后：
-
-必须将最终脚本直接保存到：
-
-scripts/photoshop/jsx/
-
-
-同时说明：
-
-- 最终文件名称
-- 最终相对路径
-- 原始文件是否保持不变
-- 修改摘要
-- 测试步骤
-- 尚未验证的风险
-
-
----
-
-# 五、临时文件处理
-
-分析过程产生的临时文件：
-
-不得混入正式交付目录。
-
-测试文件应放入：
-
-scripts/photoshop/examples/
-
-或用户明确指定的测试目录。
-
-
-任务完成前：
-
-必须检查并清理无意义的临时文件。
-
-
----
-
-# 六、Git安全规则
-
-任务完成后可以运行：
-
-git status
-
-git diff --stat
-
-git diff
-
-
-未经用户明确确认：
-
-不得自动提交或推送 Git。
-
-# 文件命名规则
-
-Photoshop JSX文件：
-
-使用：
-
-功能_对象_动作_版本号
-
-格式：
-
-lowercase_english_with_underscore.jsx
-
+- 优化已有生产脚本时，默认保留原始稳定版本。
+- 新版本使用递增的 `_vNN` 后缀；未经用户明确同意，不得覆盖、删除或重命名原版本。
+- 文件名使用小写英文和下划线，建议结构为 `功能_对象_动作_vNN.jsx`。
 
 示例：
 
-large_format_batch_output_v27.jsx
+- `large_format_batch_output_v27.jsx`
+- `large_format_single_file_process_v19.jsx`
 
-large_format_single_file_process_v19.jsx
+## 4. Photoshop 生产参数
 
+涉及图像尺寸、输出或色彩时，必须明确：
 
-禁止：
+- 物理尺寸、像素尺寸和分辨率属性。
+- 是否重采样及使用的重采样方法。
+- 色彩模式、位深、配置文件和转换意图。
+- 输出格式、质量参数和保存目录。
 
-中文文件名
+未经确认不得改变像素数量、物理尺寸、色彩环境或已有输出规则。
 
-测试.jsx
+## 5. 验证与交付说明
 
-最终版.jsx
+优先使用代表性文件验证图层结构、尺寸、像素、分辨率、色彩、命名和输出格式。
 
-new.jsx
+完成后说明：
+
+- 最终文件名称和相对路径。
+- 原始稳定版本是否保持不变。
+- 修改摘要和测试结果。
+- 尚未完成的 Photoshop 真机验证或剩余风险。
