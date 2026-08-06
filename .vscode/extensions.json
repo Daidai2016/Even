@@ -1,10 +1,35 @@
 {
     "recommendations": [
+
+        // AI
+        "openai.chatgpt",
+
+        // Adobe Automation
         "adobe.extendscript-debug",
-        "adobe.extend-script",
-        "eamodio.gitlens",
+        "adobeexl.adobe-markdown-authoring",
+        "alexmunteanu.adobe-dev-utils",
+        "hennamann.jsx",
+        "yutengjing.adobe-extension-devtools",
+        "yutengjing.scripting-listener",
         "ms-vscode.vscode-js-debug",
+
+        // Git
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+
+        // Markdown Docs
+        "shd101wyy.markdown-preview-enhanced",
         "yzhang.markdown-all-in-one",
-        "davidanson.vscode-markdownlint"
+        "davidanson.vscode-markdownlint",
+        "bierner.markdown-mermaid",
+
+        // Code
+        "ms-vscode.powershell",
+        "esbenp.prettier-vscode",
+        "redhat.vscode-yaml",
+        "dbaeumer.vscode-eslint",
+
+        // UI
+        "pkief.material-icon-theme"
     ]
 }
