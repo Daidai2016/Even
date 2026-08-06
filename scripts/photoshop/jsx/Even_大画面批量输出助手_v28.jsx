@@ -3931,7 +3931,7 @@ logText +=
 
     "联系作者：\n" +
 
-    "even.woo@gmail.com\n";
+    "huaping.woo@gmail.com\n";
 
 
 
@@ -5015,8 +5015,8 @@ function v27BuildRunLogText(
     text += v28BuildEnvironmentText(environment);
     text += v27BuildAnomalyText(anomalies);
     text += "联系作者：\n";
-    text += "even.woo@gmail.com\n\n\n";
-    text += "                         by Even Woo\n";
+    text += "huaping.woo@gmail.com\n\n\n";
+    text += "                         by Huaping Woo\n";
 
     return text;
 }

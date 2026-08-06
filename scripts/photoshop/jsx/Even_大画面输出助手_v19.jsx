@@ -17,8 +17,8 @@ app.bringToFront();
 // 自动归档
 // 客户版输出报告
 //
-// 作者：Even Woo
-// 联系：even.woo@gmail.com
+// 作者：Huaping Woo
+// 联系：huaping.woo@gmail.com
 //
 // 不修改：
 // CMYK
@@ -426,7 +426,7 @@ var authorText =
 bottomGroup.add(
     "statictext",
     undefined,
-    "by Even Woo"
+    "by Huaping Woo"
 );
 
 
@@ -708,7 +708,7 @@ projectName+
 
 "========================\n"+
 "  联系作者：\n"+
-"  even.woo@gmail.com"
+"  huaping.woo@gmail.com"
 
 
 );
