@@ -1,0 +1,124 @@
+# ==========================================
+# Codex Design EditorConfig
+# 编辑器编码、换行与缩进规范
+# ==========================================
+
+root = true
+
+
+# ------------------------------------------
+# 全局默认规则
+# ------------------------------------------
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+
+# ------------------------------------------
+# Windows PowerShell
+#
+# Windows PowerShell 5.1 使用 UTF-8 with BOM，
+# 并保留 Windows CRLF 换行。
+# ------------------------------------------
+
+[*.{ps1,psm1,psd1}]
+charset = utf-8-bom
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+
+
+# ------------------------------------------
+# Windows 批处理脚本
+# ------------------------------------------
+
+[*.{bat,cmd}]
+charset = utf-8
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+
+
+# ------------------------------------------
+# Adobe ExtendScript / JavaScript
+# ------------------------------------------
+
+[*.{js,jsx,jsxinc}]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+
+
+# ------------------------------------------
+# JSON / JSONC
+# ------------------------------------------
+
+[*.{json,jsonc}]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+
+
+# ------------------------------------------
+# Markdown
+#
+# Markdown 行末两个空格可能用于强制换行，
+# 因此不自动删除尾随空格。
+# ------------------------------------------
+
+[*.md]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = false
+
+
+# ------------------------------------------
+# YAML
+# ------------------------------------------
+
+[*.{yml,yaml}]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+
+
+# ------------------------------------------
+# Web、SVG 与配置文本
+# ------------------------------------------
+
+[*.{html,htm,css,svg,xml,toml}]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+
+
+# ------------------------------------------
+# 纯文本、Git 配置文件
+# ------------------------------------------
+
+[*.txt]
+charset = utf-8
+end_of_line = lf
+
+[.gitignore]
+charset = utf-8
+end_of_line = lf
+
+[.gitattributes]
+charset = utf-8
+end_of_line = lf
+
+[.editorconfig]
+charset = utf-8
+end_of_line = lf

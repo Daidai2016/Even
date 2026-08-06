@@ -1,16 +1,154 @@
+# ==========================================
+# Codex Design Git Attributes
+#
+# 功能：
+# 1. 统一文本文件换行规则
+# 2. 正确识别普通二进制文件
+# 3. 使用 Git LFS 管理大型设计与办公文件
+# ==========================================
+
+
+# ------------------------------------------
+# 默认文本识别
+# ------------------------------------------
+
+* text=auto
+
+
+# ------------------------------------------
+# Windows PowerShell
+#
+# PowerShell 文件在 Windows 工作区使用 CRLF。
+# UTF-8 BOM 由 .editorconfig 和 VS Code 负责。
+# ------------------------------------------
+
+*.ps1       text eol=crlf
+*.psm1      text eol=crlf
+*.psd1      text eol=crlf
+
+
+# ------------------------------------------
+# Windows 批处理脚本
+# ------------------------------------------
+
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+
+
+# ------------------------------------------
+# Adobe ExtendScript / JavaScript
+# ------------------------------------------
+
+*.js        text eol=lf
+*.jsx       text eol=lf
+*.jsxinc    text eol=lf
+
+
+# ------------------------------------------
+# Markdown 与普通文本
+# ------------------------------------------
+
+*.md        text eol=lf
+*.txt       text eol=lf
+
+
+# ------------------------------------------
+# JSON 与配置文件
+# ------------------------------------------
+
+*.json      text eol=lf
+*.jsonc     text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.toml      text eol=lf
+*.ini       text eol=lf
+*.xml       text eol=lf
+
+
+# ------------------------------------------
+# Web 与矢量源文件
+# ------------------------------------------
+
+*.html      text eol=lf
+*.htm       text eol=lf
+*.css       text eol=lf
+*.svg       text eol=lf
+
+
+# ------------------------------------------
+# 仓库配置文件
+# ------------------------------------------
+
+.editorconfig   text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+
+
+# ------------------------------------------
+# 普通图片与二进制文件
+#
+# TIFF 已由下方 Git LFS 规则管理，
+# 因此这里不重复声明。
+# ------------------------------------------
+
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.webp      binary
+*.bmp       binary
+*.ico       binary
+
+*.eps       binary
+*.pdf       binary
+
+
+# ------------------------------------------
+# 编译、归档和程序文件
+# ------------------------------------------
+
+*.jsxbin    binary
+*.zip       binary
+*.7z        binary
+*.rar       binary
+*.exe       binary
+*.dll       binary
+*.lnk       binary
+
+
+# ==========================================
+# Git LFS：Adobe 大型设计文件
+# ==========================================
+
 *.ai filter=lfs diff=lfs merge=lfs -text
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.psb filter=lfs diff=lfs merge=lfs -text
+
 *.indd filter=lfs diff=lfs merge=lfs -text
 *.indb filter=lfs diff=lfs merge=lfs -text
 *.indt filter=lfs diff=lfs merge=lfs -text
+
+
+# ==========================================
+# Git LFS：Microsoft Office 文件
+# ==========================================
+
 *.ppt filter=lfs diff=lfs merge=lfs -text
 *.pptx filter=lfs diff=lfs merge=lfs -text
+
 *.doc filter=lfs diff=lfs merge=lfs -text
 *.docx filter=lfs diff=lfs merge=lfs -text
+
 *.xls filter=lfs diff=lfs merge=lfs -text
 *.xlsx filter=lfs diff=lfs merge=lfs -text
 *.xlsm filter=lfs diff=lfs merge=lfs -text
+
+
+# ==========================================
+# Git LFS：其他大型生产文件
+# ==========================================
+
 *.xmind filter=lfs diff=lfs merge=lfs -text
+
 *.tif filter=lfs diff=lfs merge=lfs -text
 *.tiff filter=lfs diff=lfs merge=lfs -text
