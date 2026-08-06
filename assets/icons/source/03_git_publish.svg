@@ -1,45 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
+  <!-- Generator: Adobe Illustrator 30.8.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 80)  -->
   <defs>
-    <path id="cloud" d="M176 815C94 781 49 698 62 612C73 537 119 480 184 450C184 365 247 300 333 285C363 196 450 143 544 156C625 168 687 220 714 291C791 262 878 284 929 347C976 405 984 484 952 548C1011 596 1033 676 1006 750C976 832 901 885 818 892H247C207 892 175 860 175 820C175 818 175 817 176 815Z"/>
-    <clipPath id="clip"><use xlink:href="#cloud"/></clipPath>
-    <radialGradient id="base" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(365 255) rotate(48) scale(690 625)">
-      <stop offset="0" stop-color="#c8bdff"/><stop offset=".28" stop-color="#9194ff"/><stop offset=".58" stop-color="#647bff"/><stop offset=".82" stop-color="#4d45ff"/><stop offset="1" stop-color="#2a20d9"/>
+    <style>
+      .st0 {
+        fill: url(#_未命名的渐变);
+      }
+    </style>
+    <radialGradient id="_未命名的渐变" data-name="未命名的渐变" cx="361.62" cy="605.21" fx="361.62" fy="605.21" r="760.95" gradientTransform="translate(0 1021.8898) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset=".04" stop-color="#aa9bff"/>
+      <stop offset=".26" stop-color="#7686ff"/>
+      <stop offset=".47" stop-color="#738eff"/>
+      <stop offset=".82" stop-color="#3124ff"/>
     </radialGradient>
-    <radialGradient id="cyanFlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(205 524) rotate(10) scale(535 400)">
-      <stop offset="0" stop-color="#6ee8ff" stop-opacity=".92"/><stop offset=".38" stop-color="#59b8ff" stop-opacity=".58"/><stop offset="1" stop-color="#4d60ff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="violetFlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(708 752) rotate(-28) scale(500 330)">
-      <stop offset="0" stop-color="#6a17ff" stop-opacity=".98"/><stop offset=".38" stop-color="#4331ff" stop-opacity=".74"/><stop offset="1" stop-color="#3f32f8" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(717 284) rotate(130) scale(330 440)">
-      <stop offset="0" stop-color="#d8bfff" stop-opacity=".78"/><stop offset=".5" stop-color="#b885ff" stop-opacity=".25"/><stop offset="1" stop-color="#8e62ff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glass" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(374 134) rotate(70) scale(285 610)">
-      <stop offset="0" stop-color="#fff" stop-opacity=".78"/><stop offset=".32" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="symbol" x1="304" y1="363" x2="693" y2="770" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff"/><stop offset=".58" stop-color="#f5f7ff"/><stop offset="1" stop-color="#dbe4ff"/>
-    </linearGradient>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="28" stdDeviation="27" flood-color="#17115e" flood-opacity=".42"/></filter>
-    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="34"/></filter>
-    <filter id="symbolShadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="13" stdDeviation="10" flood-color="#2016a9" flood-opacity=".38"/></filter>
   </defs>
-  <g filter="url(#shadow)">
-    <use xlink:href="#cloud" transform="translate(0 18)" fill="#2817bc" opacity=".9"/>
-    <use xlink:href="#cloud" fill="url(#base)"/>
-    <g clip-path="url(#clip)">
-      <rect width="1024" height="1024" fill="url(#cyanFlow)"/>
-      <rect width="1024" height="1024" fill="url(#warmGlow)"/>
-      <rect width="1024" height="1024" fill="url(#violetFlow)"/>
-      <ellipse cx="332" cy="304" rx="298" ry="122" transform="rotate(-21 332 304)" fill="#fff" opacity=".18" filter="url(#soft)"/>
-      <ellipse cx="708" cy="683" rx="244" ry="130" transform="rotate(-34 708 683)" fill="#2714ff" opacity=".28" filter="url(#soft)"/>
-      <rect width="1024" height="1024" fill="url(#glass)"/>
-      <path d="M168 377C208 222 354 126 509 128C629 129 714 171 776 235" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="22" stroke-linecap="round" filter="url(#soft)"/>
-      <path d="M166 566C166 730 296 846 454 858" fill="none" stroke="#8ef0ff" stroke-opacity=".18" stroke-width="20" stroke-linecap="round"/>
-    </g>
-    <g filter="url(#symbolShadow)">
-      <path d="M344 411C335 363 348 321 370 291C425 298 462 323 485 343C503 339 521 339 539 343C562 323 599 298 654 291C676 321 689 363 680 411C724 448 745 499 740 559C733 647 676 692 585 707C606 733 616 764 616 803V892H548V759C548 735 534 718 512 718C490 718 476 735 476 759V892H408V803C408 764 418 733 439 707C348 692 291 647 284 559C279 499 300 448 344 411Z" fill="url(#symbol)"/>
-      <path d="M420 673C363 726 299 724 263 678C244 654 225 639 199 630" fill="none" stroke="url(#symbol)" stroke-width="60" stroke-linecap="round"/>
-    </g>
-  </g>
+  <path class="st0" d="M947.44,522.04c33.7-67.42,25.27-150.63-24.22-211.72-53.72-66.37-145.35-89.53-226.46-58.99-28.44-74.78-93.74-129.56-179.07-142.2-99.02-13.69-190.65,42.13-222.25,135.87-90.59,15.81-156.94,84.26-156.94,173.8-68.47,31.6-116.93,91.64-128.51,170.64-13.69,90.59,33.7,178.02,120.08,213.82-1.05,2.1-1.05,3.16-1.05,5.27,0,42.13,33.7,75.83,75.83,75.83h235.35v-20.62c.24-1.06.37-2.17.37-3.32l.12-62.17c-27.45,5.77-58.54,6.65-83.9-5.82-16.96-8.33-31.86-22.7-38.23-40.81-7.95-22.55-21.46-41.54-42.18-53.95-5.33-3.19-13.65-10.45-12.5-15.31.95-4.01,11.76-6.25,17.75-5.3,22.19,3.52,42.27,16.37,53.51,35.87,21.55,37.39,68.83,51.05,106.65,29.96,1.45-18.45,9.62-35.06,22.88-48.41-19.51-2.35-37.79-5.37-56.09-10.92-57.55-17.45-92.05-53.68-104.36-112.77-3.54-16.96-4.74-33.43-4.96-50.88-.47-36.1,12.79-70.76,37.6-96.99-11.04-30.82-9.74-64.3,3.79-94.25,7.87-1.29,14.84-.48,22.24.71,27.96,5.83,53.28,20.21,76.94,35.91,60.09-15.99,122.42-15.77,182.05-.02,24.38-16,50.76-30.74,79.05-36.17,6.82-1.05,13.24-1.6,20.17-.4,13.43,29.63,14.88,63.25,3.76,94.18,25.66,26.54,39.28,61.65,38.73,98.4-.46,30.22-4.34,58.8-16.81,86.34-12.54,27.7-33.74,49.45-60.8,63.3-27.49,14.08-56.55,20.04-88,23.74,18.53,17.62,25.35,41.22,25.3,66.11l-.1,48.21h-.22v73.47c-2.5.66-5.01,1.29-7.54,1.89h190.9c87.43-7.38,166.42-63.2,198.03-149.58,28.44-77.95,5.27-162.21-56.88-212.77l-.02.02Z"/>
 </svg>

@@ -1,45 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
+  <!-- Generator: Adobe Illustrator 30.8.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 80)  -->
   <defs>
-    <path id="cloud" d="M512 82C584 79 645 112 688 164C760 143 836 162 884 217C930 271 935 341 903 401C959 440 987 509 971 577C956 643 906 694 842 713C843 786 801 853 736 886C672 919 599 913 546 873C488 930 398 945 325 909C263 878 226 820 220 758C148 742 93 689 77 617C61 548 88 478 142 435C104 373 111 294 158 239C199 191 259 169 319 178C344 112 424 67 512 82Z"/>
-    <clipPath id="clip"><use xlink:href="#cloud"/></clipPath>
-    <radialGradient id="base" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(365 255) rotate(48) scale(690 625)">
-      <stop offset="0" stop-color="#c8bdff"/><stop offset=".28" stop-color="#9194ff"/><stop offset=".58" stop-color="#647bff"/><stop offset=".82" stop-color="#4d45ff"/><stop offset="1" stop-color="#2a20d9"/>
+    <style>
+      .st0 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 100px;
+      }
+
+      .st1 {
+        fill: url(#_未命名的渐变_46);
+      }
+    </style>
+    <radialGradient id="_未命名的渐变_46" data-name="未命名的渐变 46" cx="616.12" cy="223.57" fx="616.12" fy="223.57" r="790.05" gradientUnits="userSpaceOnUse">
+      <stop offset=".04" stop-color="#aa9bff"/>
+      <stop offset=".26" stop-color="#7686ff"/>
+      <stop offset=".47" stop-color="#738eff"/>
+      <stop offset=".82" stop-color="#3124ff"/>
     </radialGradient>
-    <radialGradient id="cyanFlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(205 524) rotate(10) scale(535 400)">
-      <stop offset="0" stop-color="#6ee8ff" stop-opacity=".92"/><stop offset=".38" stop-color="#59b8ff" stop-opacity=".58"/><stop offset="1" stop-color="#4d60ff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="violetFlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(708 752) rotate(-28) scale(500 330)">
-      <stop offset="0" stop-color="#6a17ff" stop-opacity=".98"/><stop offset=".38" stop-color="#4331ff" stop-opacity=".74"/><stop offset="1" stop-color="#3f32f8" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(717 284) rotate(130) scale(330 440)">
-      <stop offset="0" stop-color="#d8bfff" stop-opacity=".78"/><stop offset=".5" stop-color="#b885ff" stop-opacity=".25"/><stop offset="1" stop-color="#8e62ff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glass" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(374 134) rotate(70) scale(285 610)">
-      <stop offset="0" stop-color="#fff" stop-opacity=".78"/><stop offset=".32" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="symbol" x1="304" y1="363" x2="693" y2="770" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff"/><stop offset=".58" stop-color="#f5f7ff"/><stop offset="1" stop-color="#dbe4ff"/>
-    </linearGradient>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="28" stdDeviation="27" flood-color="#17115e" flood-opacity=".42"/></filter>
-    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="34"/></filter>
-    <filter id="symbolShadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="13" stdDeviation="10" flood-color="#2016a9" flood-opacity=".38"/></filter>
   </defs>
-  <g filter="url(#shadow)">
-    <use xlink:href="#cloud" transform="translate(0 18)" fill="#2817bc" opacity=".9"/>
-    <use xlink:href="#cloud" fill="url(#base)"/>
-    <g clip-path="url(#clip)">
-      <rect width="1024" height="1024" fill="url(#cyanFlow)"/>
-      <rect width="1024" height="1024" fill="url(#warmGlow)"/>
-      <rect width="1024" height="1024" fill="url(#violetFlow)"/>
-      <ellipse cx="332" cy="304" rx="298" ry="122" transform="rotate(-21 332 304)" fill="#fff" opacity=".18" filter="url(#soft)"/>
-      <ellipse cx="708" cy="683" rx="244" ry="130" transform="rotate(-34 708 683)" fill="#2714ff" opacity=".28" filter="url(#soft)"/>
-      <rect width="1024" height="1024" fill="url(#glass)"/>
-      <path d="M168 377C208 222 354 126 509 128C629 129 714 171 776 235" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="22" stroke-linecap="round" filter="url(#soft)"/>
-      <path d="M166 566C166 730 296 846 454 858" fill="none" stroke="#8ef0ff" stroke-opacity=".18" stroke-width="20" stroke-linecap="round"/>
-    </g>
-    <g filter="url(#symbolShadow)">
-      <path d="M292 394C292 359 320 331 355 331H474C496 331 516 341 529 358L560 399H669C704 399 732 427 732 462V630C732 665 704 693 669 693H355C320 693 292 665 292 630V394Z" fill="url(#symbol)"/>
-      <path d="M391 469L452 512L391 555M526 558H632" fill="none" stroke="#555be4" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
-  </g>
+  <path class="st1" d="M783.86,781.82c-21.33,70.98-75.87,131.13-145.83,152.89-81,25.18-164.44,4.48-223.53-53.16-71.31,18.44-143.87,2.89-199.45-43.87-66.26-55.41-93.11-141.53-72.49-226.01-55.6-55.81-77.3-136.7-57.11-212.57,20.2-75.87,79.24-135.26,155.25-156.64,20.71-76.44,79.83-135.59,155.53-156.07,75.7-20.48,156.58.78,212.52,55.9,100.92-26.33,204.35,18.58,253.51,110.06,26.06,48.5,31.66,104.98,18.65,159.27,26.82,27.66,46.62,61.7,56.74,97.54,33.51,118.67-37.9,237.16-153.81,272.65Z"/>
+  <polyline class="st0" points="349.84 382.08 413.06 513.04 340.81 641.92"/>
+  <line class="st0" x1="568.85" y1="619.16" x2="735.93" y2="619.16"/>
 </svg>

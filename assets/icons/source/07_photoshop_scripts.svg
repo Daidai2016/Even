@@ -1,33 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+  <!-- Generator: Adobe Illustrator 30.8.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 80)  -->
   <defs>
-    <path id="cloud" d="M512 82C584 79 645 112 688 164C760 143 836 162 884 217C930 271 935 341 903 401C959 440 987 509 971 577C956 643 906 694 842 713C843 786 801 853 736 886C672 919 599 913 546 873C488 930 398 945 325 909C263 878 226 820 220 758C148 742 93 689 77 617C61 548 88 478 142 435C104 373 111 294 158 239C199 191 259 169 319 178C344 112 424 67 512 82Z"/>
-    <clipPath id="clip"><use xlink:href="#cloud"/></clipPath>
-    <radialGradient id="base" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(362 234) rotate(49) scale(694 632)">
-      <stop stop-color="#194b8c"/><stop offset=".3" stop-color="#0e3575"/><stop offset=".6" stop-color="#09255e"/><stop offset=".84" stop-color="#061945"/><stop offset="1" stop-color="#020d2d"/>
-    </radialGradient>
-    <radialGradient id="aqua" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(208 548) rotate(7) scale(520 390)"><stop stop-color="#1edfff" stop-opacity=".5"/><stop offset=".42" stop-color="#00a8ed" stop-opacity=".24"/><stop offset="1" stop-color="#007dcc" stop-opacity="0"/></radialGradient>
-    <radialGradient id="deep" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(710 752) rotate(-30) scale(500 344)"><stop stop-color="#020820"/><stop offset=".48" stop-color="#041237" stop-opacity=".88"/><stop offset="1" stop-color="#071e50" stop-opacity="0"/></radialGradient>
-    <radialGradient id="glass" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(368 128) rotate(69) scale(280 600)"><stop stop-color="#fff" stop-opacity=".45"/><stop offset=".32" stop-color="#fff" stop-opacity=".11"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-    <linearGradient id="panel" x1="326" y1="312" x2="714" y2="757" gradientUnits="userSpaceOnUse"><stop stop-color="#102f70" stop-opacity=".94"/><stop offset="1" stop-color="#061945" stop-opacity=".96"/></linearGradient>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="28" stdDeviation="27" flood-color="#00164a" flood-opacity=".48"/></filter>
-    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="34"/></filter>
-    <filter id="symbolShadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="14" stdDeviation="11" flood-color="#001747" flood-opacity=".5"/></filter>
+    <style>
+      .st0 {
+        stroke: #3ab1fc;
+      }
+
+      .st0, .st1 {
+        fill: none;
+        stroke-linecap: round;
+        stroke-width: 48px;
+      }
+
+      .st1 {
+        stroke: #2ea9f8;
+      }
+
+      .st2 {
+        fill: #001e36;
+      }
+
+      .st3 {
+        fill: #24affc;
+        font-family: SegoeUI-Bold, 'Segoe UI';
+        font-size: 188px;
+        font-weight: 700;
+        isolation: isolate;
+      }
+    </style>
   </defs>
-  <g filter="url(#shadow)">
-    <use xlink:href="#cloud" transform="translate(0 18)" fill="#03276f"/>
-    <use xlink:href="#cloud" fill="url(#base)"/>
-    <g clip-path="url(#clip)">
-      <rect width="1024" height="1024" fill="url(#aqua)"/>
-      <rect width="1024" height="1024" fill="url(#deep)"/>
-      <ellipse cx="334" cy="303" rx="300" ry="122" transform="rotate(-21 334 303)" fill="#fff" opacity=".18" filter="url(#soft)"/>
-      <ellipse cx="721" cy="388" rx="224" ry="132" transform="rotate(33 721 388)" fill="#35d9ff" opacity=".2" filter="url(#soft)"/>
-      <rect width="1024" height="1024" fill="url(#glass)"/>
-      <path d="M168 377C208 222 354 126 509 128C629 129 714 171 776 235" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="22" stroke-linecap="round" filter="url(#soft)"/>
-    </g>
-    <g filter="url(#symbolShadow)" fill="none" stroke="#20d9f4" stroke-width="48" stroke-linecap="round">
-      <path d="M383 320C344 320 330 350 330 390V446C330 486 312 507 276 512C312 517 330 538 330 578V634C330 674 344 704 383 704"/>
-      <path d="M641 320C680 320 694 350 694 390V446C694 486 712 507 748 512C712 517 694 538 694 578V634C694 674 680 704 641 704"/>
-      <text x="512" y="512" text-anchor="middle" dominant-baseline="central" font-family="Segoe UI,Arial,sans-serif" font-size="188" font-weight="700" fill="#27dff7" stroke="none">Ps</text>
-    </g>
-  </g>
+  <path class="st2" d="M783.86,788.11c-21.33,70.98-75.87,131.13-145.83,152.89-81,25.18-164.44,4.48-223.53-53.16-71.31,18.44-143.87,2.89-199.45-43.87-66.26-55.41-93.11-141.53-72.49-226.01-55.6-55.81-77.3-136.7-57.11-212.57,20.2-75.87,79.24-135.26,155.25-156.64,20.71-76.44,79.83-135.59,155.53-156.07,75.7-20.48,156.58.78,212.52,55.9,100.92-26.33,204.35,18.58,253.51,110.06,26.06,48.5,31.66,104.98,18.65,159.27,26.82,27.66,46.62,61.7,56.74,97.54,33.51,118.67-37.9,237.16-153.81,272.65Z"/>
+  <path class="st0" d="M383,320c-39,0-53,30-53,70v56c0,40-18,61-54,66,36,5,54,26,54,66v56c0,40,14,70,53,70"/>
+  <path class="st1" d="M641,320c39,0,53,30,53,70v56c0,40,18,61,54,66-36,5-54,26-54,66v56c0,40-14,70-53,70"/>
+  <text class="st3" transform="translate(412.91 512)"><tspan x="0" y="0">Ps</tspan></text>
 </svg>

@@ -1,33 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024">
+  <!-- Generator: Adobe Illustrator 30.8.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 80)  -->
   <defs>
-    <path id="cloud" d="M512 82C584 79 645 112 688 164C760 143 836 162 884 217C930 271 935 341 903 401C959 440 987 509 971 577C956 643 906 694 842 713C843 786 801 853 736 886C672 919 599 913 546 873C488 930 398 945 325 909C263 878 226 820 220 758C148 742 93 689 77 617C61 548 88 478 142 435C104 373 111 294 158 239C199 191 259 169 319 178C344 112 424 67 512 82Z"/>
-    <clipPath id="clip"><use xlink:href="#cloud"/></clipPath>
-    <radialGradient id="base" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(361 235) rotate(48) scale(700 640)">
-      <stop stop-color="#ffd46a"/><stop offset=".25" stop-color="#ff9e2e"/><stop offset=".54" stop-color="#ff5a16"/><stop offset=".8" stop-color="#d62d09"/><stop offset="1" stop-color="#7e1706"/>
-    </radialGradient>
-    <radialGradient id="gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 505) rotate(8) scale(510 388)"><stop stop-color="#fff18d" stop-opacity=".95"/><stop offset=".38" stop-color="#ffbb33" stop-opacity=".62"/><stop offset="1" stop-color="#ff8a1d" stop-opacity="0"/></radialGradient>
-    <radialGradient id="red" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(706 749) rotate(-31) scale(490 332)"><stop stop-color="#8e1003"/><stop offset=".43" stop-color="#c91f05" stop-opacity=".82"/><stop offset="1" stop-color="#ee4210" stop-opacity="0"/></radialGradient>
-    <radialGradient id="glass" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(368 128) rotate(69) scale(280 600)"><stop stop-color="#fff" stop-opacity=".7"/><stop offset=".32" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-    <linearGradient id="panel" x1="326" y1="312" x2="714" y2="757" gradientUnits="userSpaceOnUse"><stop stop-color="#5b210e" stop-opacity=".94"/><stop offset="1" stop-color="#2a0a04" stop-opacity=".97"/></linearGradient>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%"><feDropShadow dx="0" dy="28" stdDeviation="27" flood-color="#481000" flood-opacity=".48"/></filter>
-    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="34"/></filter>
-    <filter id="symbolShadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="14" stdDeviation="11" flood-color="#451000" flood-opacity=".5"/></filter>
+    <style>
+      .st0 {
+        fill: #fe9902;
+        font-family: SegoeUI-Bold, 'Segoe UI';
+        font-size: 188px;
+        font-weight: 700;
+        isolation: isolate;
+      }
+
+      .st1 {
+        fill: #300000;
+      }
+
+      .st2 {
+        fill: none;
+        stroke: #fd9a06;
+        stroke-linecap: round;
+        stroke-width: 48px;
+      }
+    </style>
   </defs>
-  <g filter="url(#shadow)">
-    <use xlink:href="#cloud" transform="translate(0 18)" fill="#751604"/>
-    <use xlink:href="#cloud" fill="url(#base)"/>
-    <g clip-path="url(#clip)">
-      <rect width="1024" height="1024" fill="url(#gold)"/>
-      <rect width="1024" height="1024" fill="url(#red)"/>
-      <ellipse cx="334" cy="303" rx="300" ry="122" transform="rotate(-21 334 303)" fill="#fff" opacity=".17" filter="url(#soft)"/>
-      <ellipse cx="730" cy="377" rx="223" ry="132" transform="rotate(35 730 377)" fill="#ffbc3c" opacity=".18" filter="url(#soft)"/>
-      <rect width="1024" height="1024" fill="url(#glass)"/>
-      <path d="M168 377C208 222 354 126 509 128C629 129 714 171 776 235" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="22" stroke-linecap="round" filter="url(#soft)"/>
-    </g>
-    <g filter="url(#symbolShadow)" fill="none" stroke="#fff0c2" stroke-width="48" stroke-linecap="round">
-      <path d="M383 320C344 320 330 350 330 390V446C330 486 312 507 276 512C312 517 330 538 330 578V634C330 674 344 704 383 704"/>
-      <path d="M641 320C680 320 694 350 694 390V446C694 486 712 507 748 512C712 517 694 538 694 578V634C694 674 680 704 641 704"/>
-      <text x="512" y="512" text-anchor="middle" dominant-baseline="central" font-family="Segoe UI,Arial,sans-serif" font-size="188" font-weight="700" fill="#fff0c2" stroke="none">Ai</text>
-    </g>
-  </g>
+  <path class="st1" d="M783.86,788.11c-21.33,70.98-75.87,131.13-145.83,152.89-81,25.18-164.44,4.48-223.53-53.16-71.31,18.44-143.87,2.89-199.45-43.87-66.26-55.41-93.11-141.53-72.49-226.01-55.6-55.81-77.3-136.7-57.11-212.57,20.2-75.87,79.24-135.26,155.25-156.64,20.71-76.44,79.83-135.59,155.53-156.07,75.7-20.48,156.58.78,212.52,55.9,100.92-26.33,204.35,18.58,253.51,110.06,26.06,48.5,31.66,104.98,18.65,159.27,26.82,27.66,46.62,61.7,56.74,97.54,33.51,118.67-37.9,237.16-153.81,272.65Z"/>
+  <path class="st2" d="M383,320c-39,0-53,30-53,70v56c0,40-18,61-54,66,36,5,54,26,54,66v56c0,40,14,70,53,70"/>
+  <path class="st2" d="M641,320c39,0,53,30,53,70v56c0,40,18,61,54,66-36,5-54,26-54,66v56c0,40-14,70-53,70"/>
+  <text class="st0" transform="translate(419.19 512)"><tspan x="0" y="0">Ai</tspan></text>
 </svg>
