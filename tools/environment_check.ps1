@@ -1,6 +1,17 @@
 ﻿# ==========================================
-# Codex Design 环境检查工具 V2.2.0
+# Codex Design 环境检查工具 V2.3.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
+#
+# 主要功能：
+# - 检查 Windows 和 PowerShell
+# - 检查 Git、Node.js、npm、Python、Codex、VS Code
+# - 检查 VS Code 工作区配置
+# - 检查 Adobe Beta 和 JSX 目录
+# - 检查 Illustrator MCP 配置、令牌变量和实时端口
+# - 检查 Git 仓库和 GitHub 连接
+# - 检查 Windows 网络代理状态
+# - 自动生成环境检查报告
+# - 每类运行日志只保留最近 30 份
 #
 # Illustrator MCP 三层健康检查：
 # 1. 配置状态
@@ -9,9 +20,12 @@
 #
 # 安全说明：
 # - 不显示或记录令牌真实值
+# - 不显示或记录 API Key
+# - 不显示或记录代理地址和代理凭据
 # - 不向 MCP 发送业务请求
 # - 不读取或修改 Illustrator 文档
 # - 只检查本机 TCP 端口是否正在监听
+# - 不执行 force push、reset、clean 等 Git 操作
 # ==========================================
 
 $ErrorActionPreference = "Stop"
@@ -41,6 +55,74 @@ function New-CheckResult {
 
 
 # ==========================================
+# 安全执行原生命令
+#
+# 作用：
+# - 捕获标准输出和错误输出
+# - 返回退出代码
+# - 原生命令失败时不终止整个环境检查
+# - 兼容 Windows PowerShell 5.1 和新版 PowerShell
+# ==========================================
+
+function Invoke-NativeCommandSafe {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FilePath,
+
+        [string[]]$Arguments = @()
+    )
+
+    $OldNativeErrorPreference = $null
+    $HasNativeErrorPreference = $false
+
+    $NativePreferenceVariable = Get-Variable `
+        -Name "PSNativeCommandUseErrorActionPreference" `
+        -ErrorAction SilentlyContinue
+
+    if ($null -ne $NativePreferenceVariable) {
+        $HasNativeErrorPreference = $true
+        $OldNativeErrorPreference =
+            $PSNativeCommandUseErrorActionPreference
+
+        $PSNativeCommandUseErrorActionPreference = $false
+    }
+
+    try {
+        $Output = @(
+            & $FilePath @Arguments 2>&1
+        )
+
+        $ExitCode = $LASTEXITCODE
+
+        if ($null -eq $ExitCode) {
+            $ExitCode = 0
+        }
+
+        return [PSCustomObject]@{
+            Output   = $Output
+            ExitCode = [int]$ExitCode
+            Threw    = $false
+        }
+    }
+    catch {
+        return [PSCustomObject]@{
+            Output = @(
+                [string]$_.Exception.Message
+            )
+            ExitCode = -1
+            Threw    = $true
+        }
+    }
+    finally {
+        if ($HasNativeErrorPreference) {
+            $PSNativeCommandUseErrorActionPreference =
+                $OldNativeErrorPreference
+        }
+    }
+}
+
+
+# ==========================================
 # 检查普通命令版本
 # ==========================================
 
@@ -61,49 +143,40 @@ function Get-CommandVersionResult {
             -Status "Failure"
     }
 
-    try {
-        $VersionOutput = @(
-            & $Command.Source @Arguments 2>&1
-        )
+    $CommandResult = Invoke-NativeCommandSafe `
+        -FilePath $Command.Source `
+        -Arguments $Arguments
 
-        $ExitCode = $LASTEXITCODE
-
-        if (
-            $ExitCode -ne 0 -or
-            $VersionOutput.Count -eq 0
-        ) {
-            return New-CheckResult `
-                -Value "已安装，但无法读取版本" `
-                -Status "Failure"
-        }
-
-        $FirstLine = (
-            [string](
-                $VersionOutput |
-                    Where-Object {
-                        -not [string]::IsNullOrWhiteSpace(
-                            [string]$_
-                        )
-                    } |
-                    Select-Object -First 1
-            )
-        ).Trim()
-
-        if ([string]::IsNullOrWhiteSpace($FirstLine)) {
-            return New-CheckResult `
-                -Value "已安装，但无版本信息" `
-                -Status "Failure"
-        }
-
+    if (
+        $CommandResult.ExitCode -ne 0 -or
+        $CommandResult.Output.Count -eq 0
+    ) {
         return New-CheckResult `
-            -Value $FirstLine `
-            -Status "Success"
-    }
-    catch {
-        return New-CheckResult `
-            -Value "已安装，但检测失败" `
+            -Value "已安装，但无法读取版本" `
             -Status "Failure"
     }
+
+    $FirstLine = (
+        [string](
+            $CommandResult.Output |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        [string]$_
+                    )
+                } |
+                Select-Object -First 1
+        )
+    ).Trim()
+
+    if ([string]::IsNullOrWhiteSpace($FirstLine)) {
+        return New-CheckResult `
+            -Value "已安装，但无版本信息" `
+            -Status "Failure"
+    }
+
+    return New-CheckResult `
+        -Value $FirstLine `
+        -Status "Success"
 }
 
 
@@ -138,44 +211,35 @@ function Get-PythonVersionResult {
             continue
         }
 
-        try {
-            $PythonOutput = @(
-                & $PythonPath --version 2>&1
-            )
+        $PythonResult = Invoke-NativeCommandSafe `
+            -FilePath $PythonPath `
+            -Arguments @("--version")
 
-            $PythonExitCode = $LASTEXITCODE
+        $PythonText = (
+            (
+                $PythonResult.Output |
+                    ForEach-Object {
+                        [string]$_
+                    }
+            ) -join " "
+        ).Trim()
 
-            $PythonText = (
-                (
-                    $PythonOutput |
-                        ForEach-Object {
-                            [string]$_
-                        }
-                ) -join " "
-            ).Trim()
-
-            if (
-                $PythonExitCode -eq 0 -and
-                $PythonText -match "^Python\s+\d"
-            ) {
-                return New-CheckResult `
-                    -Value $PythonText `
-                    -Status "Success"
-            }
-
-            if (
-                $PythonPath -match "\\WindowsApps\\" -or
-                $PythonText -match "Python was not found" -or
-                $PythonText -match "Microsoft Store" -or
-                $PythonText -match "App execution aliases"
-            ) {
-                $StoreAliasDetected = $true
-            }
+        if (
+            $PythonResult.ExitCode -eq 0 -and
+            $PythonText -match "^Python\s+\d"
+        ) {
+            return New-CheckResult `
+                -Value $PythonText `
+                -Status "Success"
         }
-        catch {
-            if ($PythonPath -match "\\WindowsApps\\") {
-                $StoreAliasDetected = $true
-            }
+
+        if (
+            $PythonPath -match "\\WindowsApps\\" -or
+            $PythonText -match "Python was not found" -or
+            $PythonText -match "Microsoft Store" -or
+            $PythonText -match "App execution aliases"
+        ) {
+            $StoreAliasDetected = $true
         }
     }
 
@@ -187,33 +251,26 @@ function Get-PythonVersionResult {
         Select-Object -First 1
 
     if ($null -ne $PythonLauncher) {
-        try {
-            $LauncherOutput = @(
-                & $PythonLauncher.Source --version 2>&1
-            )
+        $LauncherResult = Invoke-NativeCommandSafe `
+            -FilePath $PythonLauncher.Source `
+            -Arguments @("--version")
 
-            $LauncherExitCode = $LASTEXITCODE
+        $LauncherText = (
+            (
+                $LauncherResult.Output |
+                    ForEach-Object {
+                        [string]$_
+                    }
+            ) -join " "
+        ).Trim()
 
-            $LauncherText = (
-                (
-                    $LauncherOutput |
-                        ForEach-Object {
-                            [string]$_
-                        }
-                ) -join " "
-            ).Trim()
-
-            if (
-                $LauncherExitCode -eq 0 -and
-                $LauncherText -match "^Python\s+\d"
-            ) {
-                return New-CheckResult `
-                    -Value "$LauncherText（通过 py 启动器）" `
-                    -Status "Success"
-            }
-        }
-        catch {
-            # Python 属于可选工具，不终止整个检查。
+        if (
+            $LauncherResult.ExitCode -eq 0 -and
+            $LauncherText -match "^Python\s+\d"
+        ) {
+            return New-CheckResult `
+                -Value "$LauncherText（通过 py 启动器）" `
+                -Status "Success"
         }
     }
 
@@ -243,7 +300,10 @@ function Find-FirstExistingPath {
             continue
         }
 
-        if (Test-Path -LiteralPath $Candidate) {
+        if (
+            Test-Path `
+                -LiteralPath $Candidate
+        ) {
             return (
                 Resolve-Path `
                     -LiteralPath $Candidate
@@ -258,8 +318,8 @@ function Find-FirstExistingPath {
 # ==========================================
 # 检查环境变量是否存在
 #
-# 只返回存在状态，不读取到报告，
-# 不显示或记录变量真实值。
+# 只返回存在状态。
+# 不显示、不记录、不验证变量真实值。
 # ==========================================
 
 function Test-EnvironmentVariableExists {
@@ -364,10 +424,11 @@ function Test-TcpPort {
             $null
         )
 
-        $ConnectedInTime = $AsyncResult.AsyncWaitHandle.WaitOne(
-            $TimeoutMilliseconds,
-            $false
-        )
+        $ConnectedInTime =
+            $AsyncResult.AsyncWaitHandle.WaitOne(
+                $TimeoutMilliseconds,
+                $false
+            )
 
         if (-not $ConnectedInTime) {
             return $false
@@ -389,6 +450,173 @@ function Test-TcpPort {
         }
 
         $TcpClient.Close()
+    }
+}
+
+
+# ==========================================
+# 清理本地运行日志
+#
+# 每种日志分别保留最近 Keep 份。
+#
+# 当前管理：
+# - environment_check_*.txt
+# - bootstrap_workspace_*.txt
+#
+# 安全限制：
+# - 只操作项目 logs 目录
+# - 只删除符合指定命名规则的文件
+# - 不删除目录
+# - 不操作其他项目文件
+# ==========================================
+
+function Invoke-RuntimeLogCleanup {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$LogsPath,
+
+        [ValidateRange(1, 1000)]
+        [int]$Keep = 30
+    )
+
+    $Details = New-Object `
+        "System.Collections.Generic.List[string]"
+
+    $Warnings = New-Object `
+        "System.Collections.Generic.List[string]"
+
+    $TotalFound = 0
+    $TotalRemoved = 0
+    $TotalRemaining = 0
+
+    if (
+        -not (
+            Test-Path `
+                -LiteralPath $LogsPath `
+                -PathType Container
+        )
+    ) {
+        return [PSCustomObject]@{
+            TotalFound     = 0
+            TotalRemoved   = 0
+            TotalRemaining = 0
+            Details        = @(
+                "日志目录不存在，无需清理。"
+            )
+            Warnings       = @()
+        }
+    }
+
+    $CleanupRules = @(
+        [PSCustomObject]@{
+            Name   = "环境检查日志"
+            Filter = "environment_check_*.txt"
+        },
+        [PSCustomObject]@{
+            Name   = "工作区恢复日志"
+            Filter = "bootstrap_workspace_*.txt"
+        }
+    )
+
+    $LogsRoot = [System.IO.Path]::GetFullPath(
+        $LogsPath
+    )
+
+    $LogsRoot = $LogsRoot.TrimEnd(
+        [char[]]@(
+            "\",
+            "/"
+        )
+    ) + [System.IO.Path]::DirectorySeparatorChar
+
+    foreach ($Rule in $CleanupRules) {
+        try {
+            $Files = @(
+                Get-ChildItem `
+                    -LiteralPath $LogsPath `
+                    -Filter $Rule.Filter `
+                    -File `
+                    -ErrorAction SilentlyContinue |
+                    Sort-Object `
+                        -Property LastWriteTimeUtc, Name `
+                        -Descending
+            )
+
+            $FilesToRemove = @(
+                $Files |
+                    Select-Object `
+                        -Skip $Keep
+            )
+
+            $RemovedForRule = 0
+
+            foreach ($File in $FilesToRemove) {
+                try {
+                    $FullFilePath =
+                        [System.IO.Path]::GetFullPath(
+                            $File.FullName
+                        )
+
+                    if (
+                        -not $FullFilePath.StartsWith(
+                            $LogsRoot,
+                            [System.StringComparison]::OrdinalIgnoreCase
+                        )
+                    ) {
+                        [void]$Warnings.Add(
+                            "拒绝删除 logs 目录之外的文件：$FullFilePath"
+                        )
+
+                        continue
+                    }
+
+                    if ($File.Name -notlike $Rule.Filter) {
+                        [void]$Warnings.Add(
+                            "拒绝删除不符合日志规则的文件：$($File.Name)"
+                        )
+
+                        continue
+                    }
+
+                    Remove-Item `
+                        -LiteralPath $FullFilePath `
+                        -Force `
+                        -ErrorAction Stop
+
+                    $RemovedForRule++
+                    $TotalRemoved++
+                }
+                catch {
+                    [void]$Warnings.Add(
+                        "$($Rule.Name)清理失败：$($File.Name)"
+                    )
+                }
+            }
+
+            $RemainingForRule =
+                $Files.Count -
+                $RemovedForRule
+
+            $TotalFound += $Files.Count
+            $TotalRemaining += $RemainingForRule
+
+            [void]$Details.Add(
+                "$($Rule.Name)：找到 $($Files.Count) 份，删除 $RemovedForRule 份，保留 $RemainingForRule 份。"
+            )
+        }
+        catch {
+            [void]$Warnings.Add(
+                "$($Rule.Name)统计或清理失败。"
+            )
+        }
+    }
+
+    return [PSCustomObject]@{
+        TotalFound     = $TotalFound
+        TotalRemoved   = $TotalRemoved
+        TotalRemaining = $TotalRemaining
+        Details        = @($Details)
+        Warnings       = @($Warnings)
     }
 }
 
@@ -506,7 +734,7 @@ try {
     # 报告标题
     # --------------------------------------
 
-    Add-Report "Codex Design 环境检查 V2.2.0"
+    Add-Report "Codex Design 环境检查 V2.3.0"
     Add-Report "========================================"
     Add-Report "检查时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Add-Report "项目目录：$ProjectPath"
@@ -517,8 +745,12 @@ try {
     # 系统环境
     # ======================================
 
-    $OS = Get-CimInstance Win32_OperatingSystem
-    $PowerShellVersion = $PSVersionTable.PSVersion.ToString()
+    $OS = Get-CimInstance `
+        Win32_OperatingSystem `
+        -ErrorAction Stop
+
+    $PowerShellVersion =
+        $PSVersionTable.PSVersion.ToString()
 
     Add-Report "系统"
     Add-Report "----------------------------------------"
@@ -607,7 +839,8 @@ try {
     $VSCodeFiles = @(
         "extensions.json",
         "settings.json",
-        "tasks.json"
+        "tasks.json",
+        "launch.json"
     )
 
     foreach ($FileName in $VSCodeFiles) {
@@ -640,9 +873,10 @@ try {
     # Adobe Beta
     # ======================================
 
-    $ProgramFilesX86 = [Environment]::GetEnvironmentVariable(
-        "ProgramFiles(x86)"
-    )
+    $ProgramFilesX86 =
+        [Environment]::GetEnvironmentVariable(
+            "ProgramFiles(x86)"
+        )
 
     $PhotoshopCandidates = @(
         (
@@ -785,7 +1019,9 @@ try {
     Add-Report "----------------------------------------"
 
     $McpName = "adobe_illustrator"
-    $McpTokenVariableName = "ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN"
+    $McpTokenVariableName =
+        "ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN"
+
     $McpHost = "127.0.0.1"
     $McpPort = 18412
 
@@ -806,56 +1042,49 @@ try {
             -Status "Failure"
     }
     else {
-        try {
-            $McpOutput = @(
-                & $CodexCommand.Source mcp list 2>&1
+        $McpResult = Invoke-NativeCommandSafe `
+            -FilePath $CodexCommand.Source `
+            -Arguments @(
+                "mcp",
+                "list"
             )
 
-            $McpExitCode = $LASTEXITCODE
+        $McpText = (
+            (
+                $McpResult.Output |
+                    ForEach-Object {
+                        [string]$_
+                    }
+            ) -join "`n"
+        )
 
-            $McpText = (
-                (
-                    $McpOutput |
-                        ForEach-Object {
-                            [string]$_
-                        }
-                ) -join "`n"
-            )
-
-            if ($McpExitCode -ne 0) {
-                Add-Status `
-                    -Name "配置状态" `
-                    -Value "codex mcp list 检查失败" `
-                    -Status "Failure"
-            }
-            elseif (
-                $McpText -match [regex]::Escape($McpName) -and
-                $McpText -match "(?i)\benabled\b"
-            ) {
-                Add-Status `
-                    -Name "配置状态" `
-                    -Value "$McpName 已配置并启用" `
-                    -Status "Success"
-            }
-            elseif (
-                $McpText -match [regex]::Escape($McpName)
-            ) {
-                Add-Status `
-                    -Name "配置状态" `
-                    -Value "$McpName 已配置，但未确认启用状态" `
-                    -Status "Warning"
-            }
-            else {
-                Add-Status `
-                    -Name "配置状态" `
-                    -Value "未发现 $McpName 配置" `
-                    -Status "Failure"
-            }
-        }
-        catch {
+        if ($McpResult.ExitCode -ne 0) {
             Add-Status `
                 -Name "配置状态" `
-                -Value "检查失败" `
+                -Value "codex mcp list 检查失败" `
+                -Status "Failure"
+        }
+        elseif (
+            $McpText -match [regex]::Escape($McpName) -and
+            $McpText -match "(?i)\benabled\b"
+        ) {
+            Add-Status `
+                -Name "配置状态" `
+                -Value "$McpName 已配置并启用" `
+                -Status "Success"
+        }
+        elseif (
+            $McpText -match [regex]::Escape($McpName)
+        ) {
+            Add-Status `
+                -Name "配置状态" `
+                -Value "$McpName 已配置，但未确认启用状态" `
+                -Status "Warning"
+        }
+        else {
+            Add-Status `
+                -Name "配置状态" `
+                -Value "未发现 $McpName 配置" `
                 -Status "Failure"
         }
     }
@@ -868,8 +1097,9 @@ try {
     # 不显示、不记录、不验证真实值。
     # --------------------------------------
 
-    $McpTokenExists = Test-EnvironmentVariableExists `
-        -VariableName $McpTokenVariableName
+    $McpTokenExists =
+        Test-EnvironmentVariableExists `
+            -VariableName $McpTokenVariableName
 
     if ($McpTokenExists) {
         Add-Status `
@@ -937,19 +1167,24 @@ try {
             -Status "Failure"
     }
     else {
-        $RepositoryCheck = @(
-            & $GitCommand.Source `
-                rev-parse `
-                --is-inside-work-tree `
-                2>&1
-        )
+        $RepositoryResult =
+            Invoke-NativeCommandSafe `
+                -FilePath $GitCommand.Source `
+                -Arguments @(
+                    "rev-parse",
+                    "--is-inside-work-tree"
+                )
 
-        $RepositoryExitCode = $LASTEXITCODE
+        $RepositoryText = (
+            [string](
+                $RepositoryResult.Output |
+                    Select-Object -First 1
+            )
+        ).Trim()
 
         if (
-            $RepositoryExitCode -ne 0 -or
-            $RepositoryCheck.Count -eq 0 -or
-            ([string]$RepositoryCheck[0]).Trim() -ne "true"
+            $RepositoryResult.ExitCode -ne 0 -or
+            $RepositoryText -ne "true"
         ) {
             Add-Status `
                 -Name "Git状态" `
@@ -962,22 +1197,21 @@ try {
                 -Status "Failure"
         }
         else {
-            $GitChanges = @(
-                & $GitCommand.Source `
-                    status `
-                    --porcelain `
-                    2>&1
-            )
+            $GitStatusResult =
+                Invoke-NativeCommandSafe `
+                    -FilePath $GitCommand.Source `
+                    -Arguments @(
+                        "status",
+                        "--porcelain"
+                    )
 
-            $GitStatusExitCode = $LASTEXITCODE
-
-            if ($GitStatusExitCode -ne 0) {
+            if ($GitStatusResult.ExitCode -ne 0) {
                 Add-Status `
                     -Name "Git状态" `
                     -Value "检查失败" `
                     -Status "Failure"
             }
-            elseif ($GitChanges.Count -gt 0) {
+            elseif ($GitStatusResult.Output.Count -gt 0) {
                 Add-Status `
                     -Name "Git状态" `
                     -Value "发现本地修改（需要提交）" `
@@ -990,34 +1224,58 @@ try {
                     -Status "Success"
             }
 
-            $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
-            $env:GIT_TERMINAL_PROMPT = "0"
 
-            try {
-                $GitHubOutput = @(
-                    & $GitCommand.Source `
-                        ls-remote `
-                        origin `
-                        2>&1
-                )
+            # ----------------------------------
+            # 检查 origin 是否存在
+            # ----------------------------------
 
-                $GitHubExitCode = $LASTEXITCODE
-            }
-            finally {
-                $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
-            }
+            $RemoteResult =
+                Invoke-NativeCommandSafe `
+                    -FilePath $GitCommand.Source `
+                    -Arguments @(
+                        "remote",
+                        "get-url",
+                        "origin"
+                    )
 
-            if ($GitHubExitCode -eq 0) {
+            if ($RemoteResult.ExitCode -ne 0) {
                 Add-Status `
                     -Name "GitHub连接" `
-                    -Value "正常" `
-                    -Status "Success"
+                    -Value "未发现 origin 远程仓库" `
+                    -Status "Failure"
             }
             else {
-                Add-Status `
-                    -Name "GitHub连接" `
-                    -Value "连接失败" `
-                    -Status "Failure"
+                $PreviousGitPrompt =
+                    $env:GIT_TERMINAL_PROMPT
+
+                $env:GIT_TERMINAL_PROMPT = "0"
+
+                try {
+                    $GitHubResult =
+                        Invoke-NativeCommandSafe `
+                            -FilePath $GitCommand.Source `
+                            -Arguments @(
+                                "ls-remote",
+                                "origin"
+                            )
+                }
+                finally {
+                    $env:GIT_TERMINAL_PROMPT =
+                        $PreviousGitPrompt
+                }
+
+                if ($GitHubResult.ExitCode -eq 0) {
+                    Add-Status `
+                        -Name "GitHub连接" `
+                        -Value "正常" `
+                        -Status "Success"
+                }
+                else {
+                    Add-Status `
+                        -Name "GitHub连接" `
+                        -Value "暂时无法连接（可能是网络、DNS、代理或 GitHub 服务状态）" `
+                        -Status "Warning"
+                }
             }
         }
     }
@@ -1048,13 +1306,13 @@ try {
         if ([string]::IsNullOrWhiteSpace($ProxyServer)) {
             Add-Status `
                 -Name "Windows代理" `
-                -Value "已启用，但未读取到代理地址" `
+                -Value "已启用，但未读取到代理配置" `
                 -Status "Warning"
         }
         else {
             Add-Status `
                 -Name "Windows代理" `
-                -Value "已启用：$ProxyServer" `
+                -Value "已启用（具体代理地址不写入报告）" `
                 -Status "Success"
         }
     }
@@ -1063,6 +1321,51 @@ try {
             -Name "Windows代理" `
             -Value "未启用（允许使用直连或其他全局网络方式）" `
             -Status "Success"
+    }
+
+    Add-Report ""
+
+
+    # ======================================
+    # 日志管理
+    #
+    # 先创建本次日志占位文件，
+    # 确保本次报告计入最近 30 份。
+    # ======================================
+
+    New-Item `
+        -ItemType File `
+        -Path $LogFile `
+        -Force |
+        Out-Null
+
+    $LogCleanupResult =
+        Invoke-RuntimeLogCleanup `
+            -LogsPath $LogsPath `
+            -Keep 30
+
+    Add-Report "日志管理"
+    Add-Report "----------------------------------------"
+
+    if ($LogCleanupResult.Warnings.Count -eq 0) {
+        Add-Status `
+            -Name "日志保留规则" `
+            -Value "每类保留最近 30 份；本次删除 $($LogCleanupResult.TotalRemoved) 份" `
+            -Status "Success"
+    }
+    else {
+        Add-Status `
+            -Name "日志保留规则" `
+            -Value "已执行，但存在 $($LogCleanupResult.Warnings.Count) 条清理警告" `
+            -Status "Warning"
+    }
+
+    foreach ($Detail in $LogCleanupResult.Details) {
+        Add-Report "  $Detail"
+    }
+
+    foreach ($CleanupWarning in $LogCleanupResult.Warnings) {
+        Add-Report "  ⚠ $CleanupWarning"
     }
 
     Add-Report ""
@@ -1082,11 +1385,13 @@ try {
     Add-Report "说明："
     Add-Report "1. Python 是当前项目的可选工具，未安装仅记录为警告。"
     Add-Report "2. Git 存在本地修改时仅记录为警告，不会自动提交或丢弃修改。"
-    Add-Report "3. Illustrator MCP 使用配置、令牌变量和实时端口三层检查。"
-    Add-Report "4. Illustrator 未启动或端口未监听时只记录为警告。"
-    Add-Report "5. 端口检查只建立本机 TCP 测试，不发送 MCP 请求。"
-    Add-Report "6. 本脚本不会读取或修改 Illustrator 文档。"
-    Add-Report "7. 本报告不记录密码、Token、API Key 或代理凭据。"
+    Add-Report "3. GitHub 网络、DNS 或代理异常只记录为警告，不会中断环境检查。"
+    Add-Report "4. Illustrator MCP 使用配置、令牌变量和实时端口三层检查。"
+    Add-Report "5. Illustrator 未启动或端口未监听时只记录为警告。"
+    Add-Report "6. 端口检查只建立本机 TCP 测试，不发送 MCP 请求。"
+    Add-Report "7. 本脚本不会读取或修改 Illustrator 文档。"
+    Add-Report "8. 每种运行日志分别保留最近 30 份。"
+    Add-Report "9. 本报告不记录密码、Token、API Key、代理地址或代理凭据。"
 
 
     # ======================================
