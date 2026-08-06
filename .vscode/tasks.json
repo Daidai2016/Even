@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+
+    "tasks": [
+
+        {
+            "label": "Codex Design 同步GitHub",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\tools\\git_sync.ps1"
+            ],
+            "problemMatcher": []
+        },
+
+
+        {
+            "label": "Codex Design 发布GitHub",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\tools\\git_publish.ps1"
+            ],
+            "problemMatcher": []
+        },
+
+
+        {
+            "label": "Codex Design Git状态检查",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\tools\\git_status.ps1"
+            ],
+            "problemMatcher": []
+        },
+
+
+        {
+            "label": "Codex Design 创建桌面工作台",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
+            ],
+            "problemMatcher": []
+        }
+
+    ]
+}
