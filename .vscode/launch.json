@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "[Adobe] 启动当前 JSX",
+      "type": "extendscript-debug",
+      "request": "launch",
+      "bringToFront": true,
+      "debugLevel": 1
+    },
+    {
+      "name": "[Adobe] 启动当前 JSX并停在第一行",
+      "type": "extendscript-debug",
+      "request": "launch",
+      "bringToFront": true,
+      "debugLevel": 2
+    },
+    {
+      "name": "[Adobe] 附加到 ExtendScript 引擎",
+      "type": "extendscript-debug",
+      "request": "attach"
+    }
+  ]
+}

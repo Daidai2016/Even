@@ -1,76 +1,154 @@
 {
-    "version": "2.0.0",
-
-    "tasks": [
-
-        {
-            "label": "Codex Design 创建桌面工作台",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design 同步GitHub",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_sync.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design Git状态检查",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_status.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design 发布GitHub",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_publish.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design 环境检查",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\environment_check.ps1"
-            ],
-            "problemMatcher": []
-        }
-
-    ]
+  "version": "2.0.0",
+  "presentation": {
+    "echo": true,
+    "reveal": "always",
+    "focus": false,
+    "panel": "dedicated",
+    "showReuseMessage": false,
+    "clear": true,
+    "close": false
+  },
+  "tasks": [
+    {
+      "label": "[Git] Codex Design 状态检查",
+      "detail": "Git｜检查当前分支、修改文件和远程同步状态",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\git_status.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[Git] Codex Design 同步GitHub",
+      "detail": "Git｜安全获取并同步 GitHub main 分支",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\git_sync.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[Git] Codex Design 发布GitHub",
+      "detail": "Git｜执行安全预检、提交并推送本地修改",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\git_publish.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] Codex Design 环境检查",
+      "detail": "环境｜检查开发工具、Adobe、MCP、Git 和网络状态",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\environment_check.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] Codex Design 一键恢复工作区",
+      "detail": "环境｜检测新电脑环境、恢复项目入口并输出缺失项",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\bootstrap_workspace.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[桌面] Codex Design 创建桌面工作台",
+      "detail": "桌面｜创建或恢复 Codex Design 桌面快捷入口",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[Adobe] Illustrator MCP 状态",
+      "detail": "Adobe｜只读检查 Illustrator 进程和本地 18412 监听端口",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$illustrator = Get-Process -Name 'Illustrator' -ErrorAction SilentlyContinue; $listener = Get-NetTCPConnection -LocalPort 18412 -State Listen -ErrorAction SilentlyContinue; Write-Host ''; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ' Illustrator MCP 实时状态' -ForegroundColor Cyan; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ''; if ($illustrator) { Write-Host 'Illustrator：正在运行' -ForegroundColor Green } else { Write-Host 'Illustrator：当前未运行' -ForegroundColor Yellow }; if ($listener) { Write-Host 'MCP端口：18412 正在监听' -ForegroundColor Green } else { Write-Host 'MCP端口：18412 当前未监听' -ForegroundColor Yellow; Write-Host '提示：Illustrator 可能未启动，或 MCP 服务尚未开启。' -ForegroundColor Yellow }; Write-Host ''; Write-Host '本任务只读取进程和端口状态，不读取或修改 Illustrator 文档。' -ForegroundColor DarkGray"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": false
+      },
+      "problemMatcher": []
+    }
+  ]
 }
