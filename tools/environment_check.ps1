@@ -1,6 +1,17 @@
 ﻿# ==========================================
-# Codex Design 环境检查工具 V2.1.2
+# Codex Design 环境检查工具 V2.2.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
+#
+# Illustrator MCP 三层健康检查：
+# 1. 配置状态
+# 2. 令牌变量
+# 3. 实时端口
+#
+# 安全说明：
+# - 不显示或记录令牌真实值
+# - 不向 MCP 发送业务请求
+# - 不读取或修改 Illustrator 文档
+# - 只检查本机 TCP 端口是否正在监听
 # ==========================================
 
 $ErrorActionPreference = "Stop"
@@ -69,7 +80,12 @@ function Get-CommandVersionResult {
         $FirstLine = (
             [string](
                 $VersionOutput |
-                Select-Object -First 1
+                    Where-Object {
+                        -not [string]::IsNullOrWhiteSpace(
+                            [string]$_
+                        )
+                    } |
+                    Select-Object -First 1
             )
         ).Trim()
 
@@ -102,7 +118,7 @@ function Get-CommandVersionResult {
 function Get-PythonVersionResult {
     $PythonCommands = @(
         Get-Command `
-            "python" `
+            "python.exe" `
             -All `
             -ErrorAction SilentlyContinue |
             Where-Object {
@@ -127,19 +143,19 @@ function Get-PythonVersionResult {
                 & $PythonPath --version 2>&1
             )
 
-            $ExitCode = $LASTEXITCODE
+            $PythonExitCode = $LASTEXITCODE
 
             $PythonText = (
                 (
                     $PythonOutput |
-                    ForEach-Object {
-                        [string]$_
-                    }
+                        ForEach-Object {
+                            [string]$_
+                        }
                 ) -join " "
             ).Trim()
 
             if (
-                $ExitCode -eq 0 -and
+                $PythonExitCode -eq 0 -and
                 $PythonText -match "^Python\s+\d"
             ) {
                 return New-CheckResult `
@@ -163,9 +179,10 @@ function Get-PythonVersionResult {
         }
     }
 
-    # 检查 Windows Python Launcher
+    # 检查 Windows Python Launcher。
+
     $PythonLauncher = Get-Command `
-        "py" `
+        "py.exe" `
         -ErrorAction SilentlyContinue |
         Select-Object -First 1
 
@@ -180,9 +197,9 @@ function Get-PythonVersionResult {
             $LauncherText = (
                 (
                     $LauncherOutput |
-                    ForEach-Object {
-                        [string]$_
-                    }
+                        ForEach-Object {
+                            [string]$_
+                        }
                 ) -join " "
             ).Trim()
 
@@ -196,7 +213,7 @@ function Get-PythonVersionResult {
             }
         }
         catch {
-            # Python 属于可选项，此处不终止整个检查。
+            # Python 属于可选工具，不终止整个检查。
         }
     }
 
@@ -228,12 +245,151 @@ function Find-FirstExistingPath {
 
         if (Test-Path -LiteralPath $Candidate) {
             return (
-                Resolve-Path -LiteralPath $Candidate
+                Resolve-Path `
+                    -LiteralPath $Candidate
             ).Path
         }
     }
 
     return "未找到"
+}
+
+
+# ==========================================
+# 检查环境变量是否存在
+#
+# 只返回存在状态，不读取到报告，
+# 不显示或记录变量真实值。
+# ==========================================
+
+function Test-EnvironmentVariableExists {
+    param(
+        [string]$VariableName
+    )
+
+    $ProcessValue = $null
+    $UserValue = $null
+    $MachineValue = $null
+
+    try {
+        $ProcessValue = [Environment]::GetEnvironmentVariable(
+            $VariableName,
+            [System.EnvironmentVariableTarget]::Process
+        )
+    }
+    catch {
+        $ProcessValue = $null
+    }
+
+    try {
+        $UserValue = [Environment]::GetEnvironmentVariable(
+            $VariableName,
+            [System.EnvironmentVariableTarget]::User
+        )
+    }
+    catch {
+        $UserValue = $null
+    }
+
+    try {
+        $MachineValue = [Environment]::GetEnvironmentVariable(
+            $VariableName,
+            [System.EnvironmentVariableTarget]::Machine
+        )
+    }
+    catch {
+        $MachineValue = $null
+    }
+
+    $Exists = $false
+
+    if (
+        -not [string]::IsNullOrWhiteSpace(
+            [string]$ProcessValue
+        )
+    ) {
+        $Exists = $true
+    }
+
+    if (
+        -not [string]::IsNullOrWhiteSpace(
+            [string]$UserValue
+        )
+    ) {
+        $Exists = $true
+    }
+
+    if (
+        -not [string]::IsNullOrWhiteSpace(
+            [string]$MachineValue
+        )
+    ) {
+        $Exists = $true
+    }
+
+    # 主动清除局部变量引用。
+
+    $ProcessValue = $null
+    $UserValue = $null
+    $MachineValue = $null
+
+    return $Exists
+}
+
+
+# ==========================================
+# 检查 TCP 端口
+#
+# 仅建立本机 TCP 连接测试。
+# 不发送 HTTP、MCP 或 Illustrator 指令。
+# ==========================================
+
+function Test-TcpPort {
+    param(
+        [string]$ComputerName,
+        [int]$Port,
+        [int]$TimeoutMilliseconds = 800
+    )
+
+    $TcpClient = New-Object `
+        System.Net.Sockets.TcpClient
+
+    $AsyncResult = $null
+
+    try {
+        $AsyncResult = $TcpClient.BeginConnect(
+            $ComputerName,
+            $Port,
+            $null,
+            $null
+        )
+
+        $ConnectedInTime = $AsyncResult.AsyncWaitHandle.WaitOne(
+            $TimeoutMilliseconds,
+            $false
+        )
+
+        if (-not $ConnectedInTime) {
+            return $false
+        }
+
+        $TcpClient.EndConnect($AsyncResult)
+
+        return $TcpClient.Connected
+    }
+    catch {
+        return $false
+    }
+    finally {
+        if (
+            $null -ne $AsyncResult -and
+            $null -ne $AsyncResult.AsyncWaitHandle
+        ) {
+            $AsyncResult.AsyncWaitHandle.Close()
+        }
+
+        $TcpClient.Close()
+    }
 }
 
 
@@ -246,7 +402,7 @@ function Add-Report {
         [string]$Text
     )
 
-    $script:Report.Add($Text)
+    [void]$script:Report.Add($Text)
 }
 
 
@@ -350,7 +506,7 @@ try {
     # 报告标题
     # --------------------------------------
 
-    Add-Report "Codex Design 环境检查 V2.1.2"
+    Add-Report "Codex Design 环境检查 V2.2.0"
     Add-Report "========================================"
     Add-Report "检查时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Add-Report "项目目录：$ProjectPath"
@@ -362,7 +518,6 @@ try {
     # ======================================
 
     $OS = Get-CimInstance Win32_OperatingSystem
-
     $PowerShellVersion = $PSVersionTable.PSVersion.ToString()
 
     Add-Report "系统"
@@ -497,16 +652,6 @@ try {
         )
     )
 
-    if (
-        -not [string]::IsNullOrWhiteSpace(
-            $ProgramFilesX86
-        )
-    ) {
-        $PhotoshopCandidates += Join-Path `
-            $ProgramFilesX86 `
-            "Adobe\Adobe Photoshop (Beta)"
-    }
-
     $IllustratorCandidates = @(
         (
             Join-Path `
@@ -520,6 +665,10 @@ try {
             $ProgramFilesX86
         )
     ) {
+        $PhotoshopCandidates += Join-Path `
+            $ProgramFilesX86 `
+            "Adobe\Adobe Photoshop (Beta)"
+
         $IllustratorCandidates += Join-Path `
             $ProgramFilesX86 `
             "Adobe\Adobe Illustrator (Beta)"
@@ -562,7 +711,7 @@ try {
 
 
     # --------------------------------------
-    # Adobe 安装脚本目录
+    # Adobe 脚本目录
     # --------------------------------------
 
     $PhotoshopJSXPath = ""
@@ -629,11 +778,21 @@ try {
 
 
     # ======================================
-    # Illustrator MCP
+    # Illustrator MCP 三层健康检查
     # ======================================
 
-    Add-Report "MCP"
+    Add-Report "Illustrator MCP"
     Add-Report "----------------------------------------"
+
+    $McpName = "adobe_illustrator"
+    $McpTokenVariableName = "ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN"
+    $McpHost = "127.0.0.1"
+    $McpPort = 18412
+
+
+    # --------------------------------------
+    # 第一层：配置状态
+    # --------------------------------------
 
     $CodexCommand = Get-Command `
         "codex" `
@@ -642,7 +801,7 @@ try {
 
     if ($null -eq $CodexCommand) {
         Add-Status `
-            -Name "Illustrator MCP" `
+            -Name "配置状态" `
             -Value "无法检查：未安装 Codex CLI" `
             -Status "Failure"
     }
@@ -657,48 +816,98 @@ try {
             $McpText = (
                 (
                     $McpOutput |
-                    ForEach-Object {
-                        [string]$_
-                    }
+                        ForEach-Object {
+                            [string]$_
+                        }
                 ) -join "`n"
             )
 
             if ($McpExitCode -ne 0) {
                 Add-Status `
-                    -Name "Illustrator MCP" `
-                    -Value "检查失败" `
+                    -Name "配置状态" `
+                    -Value "codex mcp list 检查失败" `
                     -Status "Failure"
             }
             elseif (
-                $McpText -match "adobe_illustrator" -and
-                $McpText -match "enabled"
+                $McpText -match [regex]::Escape($McpName) -and
+                $McpText -match "(?i)\benabled\b"
             ) {
                 Add-Status `
-                    -Name "Illustrator MCP" `
-                    -Value "已配置并启用" `
+                    -Name "配置状态" `
+                    -Value "$McpName 已配置并启用" `
                     -Status "Success"
             }
             elseif (
-                $McpText -match "adobe_illustrator"
+                $McpText -match [regex]::Escape($McpName)
             ) {
                 Add-Status `
-                    -Name "Illustrator MCP" `
-                    -Value "已配置，但未确认启用状态" `
+                    -Name "配置状态" `
+                    -Value "$McpName 已配置，但未确认启用状态" `
                     -Status "Warning"
             }
             else {
                 Add-Status `
-                    -Name "Illustrator MCP" `
-                    -Value "未发现 adobe_illustrator 配置" `
+                    -Name "配置状态" `
+                    -Value "未发现 $McpName 配置" `
                     -Status "Failure"
             }
         }
         catch {
             Add-Status `
-                -Name "Illustrator MCP" `
+                -Name "配置状态" `
                 -Value "检查失败" `
                 -Status "Failure"
         }
+    }
+
+
+    # --------------------------------------
+    # 第二层：令牌变量
+    #
+    # 只检查变量是否存在。
+    # 不显示、不记录、不验证真实值。
+    # --------------------------------------
+
+    $McpTokenExists = Test-EnvironmentVariableExists `
+        -VariableName $McpTokenVariableName
+
+    if ($McpTokenExists) {
+        Add-Status `
+            -Name "令牌变量" `
+            -Value "$McpTokenVariableName 已存在（值不显示）" `
+            -Status "Success"
+    }
+    else {
+        Add-Status `
+            -Name "令牌变量" `
+            -Value "$McpTokenVariableName 未配置" `
+            -Status "Warning"
+    }
+
+
+    # --------------------------------------
+    # 第三层：实时端口
+    #
+    # 只检测本机 18412 TCP 端口。
+    # 不发送 MCP 请求，不读取 Illustrator 文档。
+    # --------------------------------------
+
+    $McpPortOpen = Test-TcpPort `
+        -ComputerName $McpHost `
+        -Port $McpPort `
+        -TimeoutMilliseconds 800
+
+    if ($McpPortOpen) {
+        Add-Status `
+            -Name "实时端口" `
+            -Value "$McpHost`:$McpPort 正在监听（Illustrator MCP 服务可访问）" `
+            -Status "Success"
+    }
+    else {
+        Add-Status `
+            -Name "实时端口" `
+            -Value "$McpPort 当前未监听（Illustrator 可能未启动或 MCP 尚未开启）" `
+            -Status "Warning"
     }
 
     Add-Report ""
@@ -737,7 +946,11 @@ try {
 
         $RepositoryExitCode = $LASTEXITCODE
 
-        if ($RepositoryExitCode -ne 0) {
+        if (
+            $RepositoryExitCode -ne 0 -or
+            $RepositoryCheck.Count -eq 0 -or
+            ([string]$RepositoryCheck[0]).Trim() -ne "true"
+        ) {
             Add-Status `
                 -Name "Git状态" `
                 -Value "当前目录不是有效 Git 仓库" `
@@ -777,7 +990,7 @@ try {
                     -Status "Success"
             }
 
-            $PreviousTerminalPrompt = $env:GIT_TERMINAL_PROMPT
+            $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
             $env:GIT_TERMINAL_PROMPT = "0"
 
             try {
@@ -789,22 +1002,22 @@ try {
                 )
 
                 $GitHubExitCode = $LASTEXITCODE
-
-                if ($GitHubExitCode -eq 0) {
-                    Add-Status `
-                        -Name "GitHub连接" `
-                        -Value "正常" `
-                        -Status "Success"
-                }
-                else {
-                    Add-Status `
-                        -Name "GitHub连接" `
-                        -Value "连接失败" `
-                        -Status "Failure"
-                }
             }
             finally {
-                $env:GIT_TERMINAL_PROMPT = $PreviousTerminalPrompt
+                $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
+            }
+
+            if ($GitHubExitCode -eq 0) {
+                Add-Status `
+                    -Name "GitHub连接" `
+                    -Value "正常" `
+                    -Status "Success"
+            }
+            else {
+                Add-Status `
+                    -Name "GitHub连接" `
+                    -Value "连接失败" `
+                    -Status "Failure"
             }
         }
     }
@@ -869,12 +1082,18 @@ try {
     Add-Report "说明："
     Add-Report "1. Python 是当前项目的可选工具，未安装仅记录为警告。"
     Add-Report "2. Git 存在本地修改时仅记录为警告，不会自动提交或丢弃修改。"
-    Add-Report "3. 本报告不记录密码、Token、API Key 或代理凭据。"
+    Add-Report "3. Illustrator MCP 使用配置、令牌变量和实时端口三层检查。"
+    Add-Report "4. Illustrator 未启动或端口未监听时只记录为警告。"
+    Add-Report "5. 端口检查只建立本机 TCP 测试，不发送 MCP 请求。"
+    Add-Report "6. 本脚本不会读取或修改 Illustrator 文档。"
+    Add-Report "7. 本报告不记录密码、Token、API Key 或代理凭据。"
 
 
     # ======================================
     # 保存报告
-    # Windows PowerShell 5.1 的 UTF8 会写入 BOM
+    #
+    # Windows PowerShell 5.1 的 UTF8
+    # 会写入 UTF-8 BOM。
     # ======================================
 
     $Report |
