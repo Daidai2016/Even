@@ -4,6 +4,20 @@
     "tasks": [
 
         {
+            "label": "Codex Design 创建桌面工作台",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
+            ],
+            "problemMatcher": []
+        },
+
+
+        {
             "label": "Codex Design 同步GitHub",
             "type": "shell",
             "command": "powershell",
@@ -12,20 +26,6 @@
                 "Bypass",
                 "-File",
                 "${workspaceFolder}\\tools\\git_sync.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design 发布GitHub",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_publish.ps1"
             ],
             "problemMatcher": []
         },
@@ -46,14 +46,28 @@
 
 
         {
-            "label": "Codex Design 创建桌面工作台",
+            "label": "Codex Design 发布GitHub",
             "type": "shell",
             "command": "powershell",
             "args": [
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
+                "${workspaceFolder}\\tools\\git_publish.ps1"
+            ],
+            "problemMatcher": []
+        },
+
+
+        {
+            "label": "Codex Design 环境检查",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\tools\\environment_check.ps1"
             ],
             "problemMatcher": []
         }
