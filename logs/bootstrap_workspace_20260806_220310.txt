@@ -1,0 +1,106 @@
+﻿Codex Design 工作区恢复工具 V1.0
+==============================================
+项目目录：D:\Codex_Design
+开始时间：2026-08-06 22:03:10
+
+本工具只执行检测、入口恢复和报告生成。
+本工具不会自动安装软件、修改 Git 历史或记录敏感凭据。
+
+[1/9] 检查系统环境
+----------------------------------------------
+✓ Windows：Microsoft Windows 10 专业版 10.0.19045
+✓ PowerShell：5.1.19041.6456（符合 Windows PowerShell 5.1 兼容目标）
+
+[2/9] 检查仓库结构
+----------------------------------------------
+✓ 目录：.vscode：存在
+✓ 目录：tools：存在
+✓ 目录：tools\docs：存在
+✓ 目录：scripts：存在
+✓ 文件：README.md：存在
+✓ 文件：AGENTS.md：存在
+✓ 文件：CODING_RULES.md：存在
+✓ 文件：.editorconfig：存在
+✓ 文件：.gitattributes：存在
+✓ 文件：.gitignore：存在
+✓ 文件：.vscode\extensions.json：存在
+✓ 文件：.vscode\settings.json：存在
+✓ 文件：.vscode\tasks.json：存在
+✓ 文件：tools\git_status.ps1：存在
+✓ 文件：tools\git_sync.ps1：存在
+✓ 文件：tools\git_publish.ps1：存在
+✓ 文件：tools\environment_check.ps1：存在
+✓ 文件：tools\create_desktop_shortcuts.ps1：存在
+✓ 文件：tools\bootstrap_workspace.ps1：存在
+✓ 文件：tools\docs\ENVIRONMENT.md：存在
+✓ PowerShell语法：tools\git_status.ps1：通过
+✓ PowerShell语法：tools\git_sync.ps1：通过
+✓ PowerShell语法：tools\git_publish.ps1：通过
+✓ PowerShell语法：tools\environment_check.ps1：通过
+✓ PowerShell语法：tools\create_desktop_shortcuts.ps1：通过
+✓ PowerShell语法：tools\bootstrap_workspace.ps1：通过
+
+[3/9] 检查开发工具
+----------------------------------------------
+✓ Git：git version 2.55.0.windows.2
+✓ Git LFS：git-lfs/3.7.1 (GitHub; windows amd64; go 1.25.1; git b84b3384)
+✓ Node.js：v24.18.0
+✓ npm：11.16.0
+✓ Codex：codex-cli 0.146.0
+✓ VS Code：1.132.0
+
+[4/9] 检查 Git 仓库
+----------------------------------------------
+✓ Git仓库：有效
+✓ 当前分支：main
+✓ 远程仓库：https://github.com/Daidai2016/Even.git
+✓ GitHub连接：正常
+⚠ Git状态：存在本地修改，不会自动提交或丢弃
+
+[5/9] 检查 VS Code 工作区
+----------------------------------------------
+❌ extensions.json：JSON 格式无效
+✓ tasks.json：格式正常
+✓ settings.json：存在（JSONC 配置不做严格 JSON 解析）
+
+[6/9] 检查 Adobe Beta
+----------------------------------------------
+✓ Photoshop Beta：C:\Program Files\Adobe\Adobe Photoshop (Beta)
+✓ Photoshop脚本目录：C:\Program Files\Adobe\Adobe Photoshop (Beta)\Presets\Scripts
+✓ Illustrator Beta：C:\Program Files\Adobe\Adobe Illustrator (Beta)
+✓ Illustrator脚本目录：C:\Program Files\Adobe\Adobe Illustrator (Beta)\Presets\zh_CN\脚本
+
+[7/9] 检查 Illustrator MCP
+----------------------------------------------
+✓ MCP配置：adobe_illustrator 已配置并启用
+✓ MCP令牌变量：ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN：已配置（值不显示）
+⚠ MCP本地端口：18412 当前未监听，Illustrator 可能尚未启动
+
+[8/9] 生成桌面工作台
+----------------------------------------------
+正在运行桌面工作台生成工具。
+✓ 桌面工作台：生成或恢复完成
+
+[9/9] 运行完整环境检查
+----------------------------------------------
+正在运行完整环境检查。
+⚠ 完整环境检查：失败 0，警告 2；报告：environment_check_20260806_220429.txt
+
+恢复摘要
+----------------------------------------------
+通过：47
+警告：3
+失败：1
+
+必须完成项
+----------------------------------------------
+1. 修复 .vscode/extensions.json
+
+建议完成项
+----------------------------------------------
+1. 确认本地修改内容，测试后使用安全发布工具提交
+2. 需要使用 MCP 时，启动 Illustrator Beta 并确认 MCP 功能已开启
+3. 查看环境报告中的警告项，确认是否属于可选配置
+
+完成时间：2026-08-06 22:05:19
+安全说明：报告不记录 Token、API Key、密码或代理凭据。
