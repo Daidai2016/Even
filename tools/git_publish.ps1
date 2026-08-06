@@ -1,597 +1,255 @@
 ﻿# ==========================================
-# Codex Design GitHub 安全发布工具 V2.0.1
+# Codex Design GitHub 安全发布 V2.0.3
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
+# 功能：
+# 1. 获取远程仓库状态
+# 2. 检查本地修改
+# 3. 执行安全预检
+# 4. 暂存全部确认过的修改
+# 5. 创建 Git 提交
+# 6. 推送到 GitHub
+# 7. 验证本地与远程状态
+#
 # 安全原则：
-# 1. 只允许发布 main 分支
-# 2. 不执行 force push
-# 3. 不执行 reset、clean 或自动 stash
-# 4. 不自动丢弃本地修改
-# 5. 远程领先或分支分叉时停止
-# 6. 发布前检查语法、配置、密钥和 Git LFS
-# 7. 工作区干净但存在未推送提交时，允许安全推送
+# - 禁止 Git 使用分页器
+# - 兼容 Windows PowerShell 5.1
+# - 不执行 force push
+# - 不执行 reset、clean 或 checkout 覆盖
+# - 远程有新提交时停止发布
+# - 检测到冲突时停止发布
+# - 检测到格式错误时停止发布
+# - 检测到删除文件时要求二次确认
+# - 提交说明不能为空
 # ==========================================
 
 $ErrorActionPreference = "Stop"
 
 
 # ==========================================
-# 基础输出函数
+# 禁止 Git 使用分页器
+#
+# 防止 git diff、git log 等命令进入 less，
+# 导致 VS Code 任务停留在“:”页面。
 # ==========================================
 
-function Write-Title {
-    Write-Host ""
-    Write-Host "==============================================" -ForegroundColor Cyan
-    Write-Host " Codex Design GitHub 安全发布 V2.0.1" -ForegroundColor Cyan
-    Write-Host "==============================================" -ForegroundColor Cyan
-    Write-Host ""
-}
+$env:GIT_PAGER = "cat"
+$env:PAGER = "cat"
 
 
-function Write-Section {
+# ==========================================
+# 输出步骤标题
+# ==========================================
+
+function Write-Step {
     param(
+        [ValidateRange(1, 7)]
+        [int]$Number,
+
         [string]$Title
     )
 
     Write-Host ""
-    Write-Host $Title -ForegroundColor Yellow
+    Write-Host "[$Number/7] $Title" -ForegroundColor Cyan
     Write-Host "----------------------------------------------"
 }
 
 
+# ==========================================
+# 安全停止发布
+# ==========================================
+
 function Stop-Publish {
     param(
-        [string]$Message
-    )
-
-    throw $Message
-}
-
-
-function Pause-AndExit {
-    param(
-        [int]$ExitCode
+        [string]$Message,
+        [int]$ExitCode = 1
     )
 
     Write-Host ""
-    [void](Read-Host "按 Enter 键关闭窗口")
+    Write-Host "发布已停止。" -ForegroundColor Yellow
+    Write-Host $Message -ForegroundColor Yellow
+    Write-Host ""
+
     exit $ExitCode
 }
 
 
 # ==========================================
-# 获取项目中的全部变化文件
-# ==========================================
-
-function Get-ChangedFiles {
-    $Files = @()
-
-    $Files += @(
-        & $script:GitExe `
-            -c "core.quotepath=false" `
-            diff `
-            --name-only
-    )
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法读取未暂存文件列表。"
-    }
-
-    $Files += @(
-        & $script:GitExe `
-            -c "core.quotepath=false" `
-            diff `
-            --cached `
-            --name-only
-    )
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法读取暂存区文件列表。"
-    }
-
-    $Files += @(
-        & $script:GitExe `
-            -c "core.quotepath=false" `
-            ls-files `
-            --others `
-            --exclude-standard
-    )
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法读取未跟踪文件列表。"
-    }
-
-    return @(
-        $Files |
-            ForEach-Object {
-                ([string]$_).Trim()
-            } |
-            Where-Object {
-                -not [string]::IsNullOrWhiteSpace($_)
-            } |
-            Sort-Object -Unique
-    )
-}
-
-
-# ==========================================
-# 获取尚未推送到 origin/main 的提交
-# ==========================================
-
-function Get-UnpushedCommits {
-    $Commits = @(
-        & $script:GitExe `
-            -c "core.quotepath=false" `
-            log `
-            --oneline `
-            "origin/main..HEAD"
-    )
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法读取尚未推送的本地提交。"
-    }
-
-    return @(
-        $Commits |
-            ForEach-Object {
-                ([string]$_).Trim()
-            } |
-            Where-Object {
-                -not [string]::IsNullOrWhiteSpace($_)
-            }
-    )
-}
-
-
-# ==========================================
-# 安全执行普通 Git Push
+# 执行 Git 命令
 #
-# 只执行：
-# git push origin main
+# Windows PowerShell 5.1 兼容说明：
 #
-# 不包含 force、reset、clean 或其他破坏性参数。
+# Git 的 fetch、push 等命令即使执行成功，
+# 也会把 From、进度等普通信息写入标准错误流。
+#
+# 全局 ErrorActionPreference 为 Stop 时，
+# Windows PowerShell 5.1 可能把这些普通信息
+# 转换成 PowerShell 异常。
+#
+# 因此，本函数执行 Git 时临时使用 Continue，
+# 最终仍根据 Git 的退出代码判断是否成功。
+#
+# 每条命令还会自动添加 --no-pager，
+# 防止 Git 打开 less 分页器。
 # ==========================================
 
-function Invoke-SafePush {
-    $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
-    $env:GIT_TERMINAL_PROMPT = "0"
+function Invoke-Git {
+    param(
+        [string[]]$Arguments = @()
+    )
 
-    [int]$PushExitCode = 1
+    $ActualArguments = @(
+        "--no-pager"
+    ) + $Arguments
+
+    $HasNativePreference = $false
+    $PreviousNativePreference = $null
+
+    $NativePreferenceVariable = Get-Variable `
+        -Name "PSNativeCommandUseErrorActionPreference" `
+        -ErrorAction SilentlyContinue
+
+    if ($null -ne $NativePreferenceVariable) {
+        $HasNativePreference = $true
+
+        $PreviousNativePreference =
+            $PSNativeCommandUseErrorActionPreference
+    }
 
     try {
-        & $script:GitExe push origin main
-        $PushExitCode = $LASTEXITCODE
+        $ErrorActionPreference = "Continue"
+
+        if ($HasNativePreference) {
+            $PSNativeCommandUseErrorActionPreference = $false
+        }
+
+        $Output = @(
+            & $script:GitPath @ActualArguments 2>&1
+        )
+
+        $ExitCode = $LASTEXITCODE
+
+        if ($null -eq $ExitCode) {
+            $ExitCode = 0
+        }
+
+        return [PSCustomObject]@{
+            Output   = $Output
+            ExitCode = [int]$ExitCode
+            Threw    = $false
+        }
+    }
+    catch {
+        return [PSCustomObject]@{
+            Output = @(
+                [string]$_.Exception.Message
+            )
+            ExitCode = -1
+            Threw    = $true
+        }
     }
     finally {
-        $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
+        if ($HasNativePreference) {
+            $PSNativeCommandUseErrorActionPreference =
+                $PreviousNativePreference
+        }
     }
-
-    return $PushExitCode
 }
 
 
 # ==========================================
-# 检查敏感文件名
+# 输出 Git 命令返回内容
 # ==========================================
 
-function Test-SensitiveFileNames {
+function Show-GitOutput {
     param(
-        [string[]]$Files
+        [Parameter(Mandatory = $true)]
+        [PSCustomObject]$Result
     )
 
-    $BlockedFiles = @()
-
-    foreach ($File in $Files) {
-        $NormalizedPath = $File.Replace("\", "/")
-        $BaseName = [System.IO.Path]::GetFileName($NormalizedPath)
-
-        $IsBlocked = $false
+    foreach ($Line in @($Result.Output)) {
+        $LineText = [string]$Line
 
         if (
-            $BaseName -match "^\.env($|\.)" -and
-            $BaseName -notmatch "^\.env\.(example|sample|template)$"
-        ) {
-            $IsBlocked = $true
-        }
-
-        if (
-            $BaseName -match "^(id_rsa|id_ed25519)(\.pub)?$"
-        ) {
-            $IsBlocked = $true
-        }
-
-        if (
-            $BaseName -match "\.(pem|pfx|p12|key)$"
-        ) {
-            $IsBlocked = $true
-        }
-
-        if (
-            $BaseName -match "^(credentials|secrets|token|auth)\.json$"
-        ) {
-            $IsBlocked = $true
-        }
-
-        if (
-            $NormalizedPath -match "(^|/)\.codex/"
-        ) {
-            $IsBlocked = $true
-        }
-
-        if ($IsBlocked) {
-            $BlockedFiles += $File
-        }
-    }
-
-    if ($BlockedFiles.Count -gt 0) {
-        Write-Host ""
-        Write-Host "检测到禁止发布的敏感文件：" -ForegroundColor Red
-
-        foreach ($BlockedFile in $BlockedFiles) {
-            Write-Host "  $BlockedFile" -ForegroundColor Red
-        }
-
-        Stop-Publish "请移除敏感文件，或把它们加入 .gitignore。"
-    }
-
-    Write-Host "敏感文件名检查：通过" -ForegroundColor Green
-}
-
-
-# ==========================================
-# 检查文件内容中的疑似密钥
-# ==========================================
-
-function Test-SecretContent {
-    param(
-        [string[]]$Files
-    )
-
-    $TextExtensions = @(
-        ".ps1",
-        ".psm1",
-        ".psd1",
-        ".cmd",
-        ".bat",
-        ".md",
-        ".txt",
-        ".json",
-        ".jsonc",
-        ".js",
-        ".jsx",
-        ".jsxinc",
-        ".svg",
-        ".xml",
-        ".yml",
-        ".yaml",
-        ".toml",
-        ".ini",
-        ".html",
-        ".htm",
-        ".css"
-    )
-
-    $TextBaseNames = @(
-        ".editorconfig",
-        ".gitattributes",
-        ".gitignore"
-    )
-
-    $SecretPatterns = @(
-        'sk-proj-[A-Za-z0-9_-]{20,}',
-        'sk-[A-Za-z0-9_-]{20,}',
-        'ilst_[A-Za-z0-9]{20,}',
-        'ghp_[A-Za-z0-9]{20,}',
-        'github_pat_[A-Za-z0-9_]{20,}',
-        '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----',
-        'ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN\s*=\s*[''"]?ilst_',
-        '(?i)bearer\s+[A-Za-z0-9._-]{24,}'
-    )
-
-    $SuspiciousFiles = @()
-
-    foreach ($File in $Files) {
-        $FullPath = Join-Path $script:ProjectPath $File
-
-        if (
-            -not (
-                Test-Path `
-                    -LiteralPath $FullPath `
-                    -PathType Leaf
+            -not [string]::IsNullOrWhiteSpace(
+                $LineText
             )
         ) {
-            continue
-        }
-
-        $Extension = [System.IO.Path]::GetExtension(
-            $FullPath
-        ).ToLowerInvariant()
-
-        $BaseName = [System.IO.Path]::GetFileName(
-            $FullPath
-        )
-
-        $IsTextFile = (
-            $TextExtensions -contains $Extension -or
-            $TextBaseNames -contains $BaseName
-        )
-
-        if (-not $IsTextFile) {
-            continue
-        }
-
-        try {
-            $Content = Get-Content `
-                -LiteralPath $FullPath `
-                -Raw `
-                -Encoding UTF8
-
-            foreach ($Pattern in $SecretPatterns) {
-                if ($Content -match $Pattern) {
-                    $SuspiciousFiles += $File
-                    break
-                }
-            }
-        }
-        catch {
-            Stop-Publish "无法安全读取文件进行凭据检查：$File"
+            Write-Host $LineText
         }
     }
-
-    $SuspiciousFiles = @(
-        $SuspiciousFiles |
-            Sort-Object -Unique
-    )
-
-    if ($SuspiciousFiles.Count -gt 0) {
-        Write-Host ""
-        Write-Host "检测到疑似密钥、令牌或私钥内容：" -ForegroundColor Red
-
-        foreach ($SuspiciousFile in $SuspiciousFiles) {
-            Write-Host "  $SuspiciousFile" -ForegroundColor Red
-        }
-
-        Write-Host ""
-        Write-Host "为避免泄露，脚本不会显示具体匹配内容。" -ForegroundColor Yellow
-
-        Stop-Publish "请删除或脱敏敏感内容后再发布。"
-    }
-
-    Write-Host "敏感内容检查：通过" -ForegroundColor Green
 }
 
 
 # ==========================================
-# 检查 PowerShell 文件语法
-# ==========================================
-
-function Test-PowerShellSyntax {
-    param(
-        [string[]]$Files
-    )
-
-    $PowerShellFiles = @(
-        $Files |
-            Where-Object {
-                $_ -match "\.(ps1|psm1|psd1)$"
-            }
-    )
-
-    if ($PowerShellFiles.Count -eq 0) {
-        Write-Host "PowerShell语法检查：无相关修改，跳过"
-        return
-    }
-
-    $AllErrors = @()
-
-    foreach ($File in $PowerShellFiles) {
-        $FullPath = Join-Path $script:ProjectPath $File
-
-        if (
-            -not (
-                Test-Path `
-                    -LiteralPath $FullPath `
-                    -PathType Leaf
-            )
-        ) {
-            continue
-        }
-
-        $ParseTokens = $null
-        $ParseErrors = $null
-
-        [System.Management.Automation.Language.Parser]::ParseFile(
-            $FullPath,
-            [ref]$ParseTokens,
-            [ref]$ParseErrors
-        ) | Out-Null
-
-        if (
-            $null -ne $ParseErrors -and
-            $ParseErrors.Count -gt 0
-        ) {
-            foreach ($ParseError in $ParseErrors) {
-                $LineNumber = $ParseError.Extent.StartLineNumber
-                $Message = $ParseError.Message
-
-                $AllErrors += "$File，第 $LineNumber 行：$Message"
-            }
-        }
-    }
-
-    if ($AllErrors.Count -gt 0) {
-        Write-Host ""
-        Write-Host "PowerShell语法检查失败：" -ForegroundColor Red
-
-        foreach ($ErrorText in $AllErrors) {
-            Write-Host "  $ErrorText" -ForegroundColor Red
-        }
-
-        Stop-Publish "请修复 PowerShell 语法错误后再发布。"
-    }
-
-    Write-Host "PowerShell语法检查：通过" -ForegroundColor Green
-}
-
-
-# ==========================================
-# 检查关键严格 JSON 文件
+# 读取本地领先和落后数量
 #
-# settings.json 属于 JSONC，可以包含注释，
-# 因此不使用 ConvertFrom-Json 检查。
+# 返回：
+# Ahead  = 本地领先远程的提交数
+# Behind = 本地落后远程的提交数
 # ==========================================
 
-function Test-StrictJsonFiles {
+function Get-AheadBehind {
     param(
-        [string[]]$Files
+        [Parameter(Mandatory = $true)]
+        [string]$BranchName
     )
 
-    $StrictJsonFiles = @(
-        ".vscode/extensions.json",
-        ".vscode/tasks.json",
-        "tools/config/shortcut_config.json",
-        "package.json",
-        "package-lock.json"
-    )
-
-    $InvalidFiles = @()
-
-    foreach ($File in $Files) {
-        $NormalizedFile = $File.Replace("\", "/")
-
-        if ($StrictJsonFiles -notcontains $NormalizedFile) {
-            continue
-        }
-
-        $FullPath = Join-Path $script:ProjectPath $File
-
-        if (
-            -not (
-                Test-Path `
-                    -LiteralPath $FullPath `
-                    -PathType Leaf
-            )
-        ) {
-            continue
-        }
-
-        try {
-            Get-Content `
-                -LiteralPath $FullPath `
-                -Raw `
-                -Encoding UTF8 |
-                ConvertFrom-Json |
-                Out-Null
-        }
-        catch {
-            $InvalidFiles += $File
-        }
-    }
-
-    if ($InvalidFiles.Count -gt 0) {
-        Write-Host ""
-        Write-Host "JSON格式检查失败：" -ForegroundColor Red
-
-        foreach ($InvalidFile in $InvalidFiles) {
-            Write-Host "  $InvalidFile" -ForegroundColor Red
-        }
-
-        Stop-Publish "请修复 JSON 格式错误后再发布。"
-    }
-
-    Write-Host "关键JSON配置检查：通过" -ForegroundColor Green
-}
-
-
-# ==========================================
-# 检查 Git LFS 和大型文件
-# ==========================================
-
-function Test-LfsAndLargeFiles {
-    param(
-        [string[]]$Files
-    )
-
-    [int64]$LargeFileThreshold = 50MB
-
-    $LfsFiles = @()
-    $UnmanagedLargeFiles = @()
-
-    foreach ($File in $Files) {
-        $FullPath = Join-Path $script:ProjectPath $File
-
-        if (
-            -not (
-                Test-Path `
-                    -LiteralPath $FullPath `
-                    -PathType Leaf
-            )
-        ) {
-            continue
-        }
-
-        $AttributeOutput = @(
-            & $script:GitExe `
-                check-attr `
-                filter `
-                -- `
-                $File
+    $Result = Invoke-Git `
+        -Arguments @(
+            "rev-list",
+            "--left-right",
+            "--count",
+            "$BranchName...origin/$BranchName"
         )
 
-        if ($LASTEXITCODE -ne 0) {
-            Stop-Publish "Git 属性检查失败：$File"
-        }
+    if ($Result.ExitCode -ne 0) {
+        return $null
+    }
 
-        $AttributeText = [string](
-            $AttributeOutput |
+    $CountText = (
+        [string](
+            $Result.Output |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        [string]$_
+                    )
+                } |
                 Select-Object -First 1
         )
+    ).Trim()
 
-        $UsesLfs = $AttributeText -match ":\s*filter:\s*lfs\s*$"
+    $Parts = @(
+        $CountText -split "\s+"
+    )
 
-        if ($UsesLfs) {
-            $LfsFiles += $File
-        }
-
-        $FileInfo = Get-Item `
-            -LiteralPath $FullPath `
-            -ErrorAction Stop
-
-        if (
-            $FileInfo.Length -ge $LargeFileThreshold -and
-            -not $UsesLfs
-        ) {
-            $SizeMB = [math]::Round(
-                $FileInfo.Length / 1MB,
-                2
-            )
-
-            $UnmanagedLargeFiles += "$File（$SizeMB MB）"
-        }
+    if ($Parts.Count -lt 2) {
+        return $null
     }
 
-    if ($UnmanagedLargeFiles.Count -gt 0) {
-        Write-Host ""
-        Write-Host "检测到未使用 Git LFS 管理的大型文件：" -ForegroundColor Red
+    $Ahead = 0
+    $Behind = 0
 
-        foreach ($LargeFile in $UnmanagedLargeFiles) {
-            Write-Host "  $LargeFile" -ForegroundColor Red
-        }
+    $AheadParsed = [int]::TryParse(
+        [string]$Parts[0],
+        [ref]$Ahead
+    )
 
-        Stop-Publish "请先配置 Git LFS，再发布大型文件。"
+    $BehindParsed = [int]::TryParse(
+        [string]$Parts[1],
+        [ref]$Behind
+    )
+
+    if (
+        -not $AheadParsed -or
+        -not $BehindParsed
+    ) {
+        return $null
     }
 
-    if ($LfsFiles.Count -gt 0) {
-        & $script:GitExe lfs version | Out-Null
-
-        if ($LASTEXITCODE -ne 0) {
-            Stop-Publish "当前修改包含 Git LFS 文件，但未检测到可用的 Git LFS。"
-        }
-
-        Write-Host "Git LFS检查：通过，涉及 $($LfsFiles.Count) 个文件" -ForegroundColor Green
-    }
-    else {
-        Write-Host "Git LFS检查：无相关修改"
+    return [PSCustomObject]@{
+        Ahead  = $Ahead
+        Behind = $Behind
     }
 }
 
@@ -601,22 +259,18 @@ function Test-LfsAndLargeFiles {
 # ==========================================
 
 try {
-    Write-Title
-
     # --------------------------------------
-    # 动态确定仓库根目录
+    # 动态计算项目路径
     # --------------------------------------
 
-    $script:ProjectPath = (
+    $ProjectPath = (
         Resolve-Path `
             -LiteralPath (
                 Join-Path $PSScriptRoot ".."
             )
     ).Path
 
-    Set-Location -LiteralPath $script:ProjectPath
-
-    Write-Host "项目目录：$script:ProjectPath"
+    Set-Location -LiteralPath $ProjectPath
 
 
     # --------------------------------------
@@ -624,516 +278,853 @@ try {
     # --------------------------------------
 
     $GitCommand = Get-Command `
-        "git" `
+        "git.exe" `
         -ErrorAction SilentlyContinue |
         Select-Object -First 1
 
     if ($null -eq $GitCommand) {
-        Stop-Publish "未检测到 Git，请检查安装和 PATH。"
+        $GitCommand = Get-Command `
+            "git" `
+            -ErrorAction SilentlyContinue |
+            Select-Object -First 1
     }
 
-    $script:GitExe = $GitCommand.Source
+    if ($null -eq $GitCommand) {
+        Stop-Publish `
+            -Message "未检测到 Git，请先安装或修复 Git。"
+    }
+
+    $script:GitPath = [string]$GitCommand.Source
 
 
     # --------------------------------------
-    # 检查仓库
+    # 检查是否为 Git 仓库
     # --------------------------------------
 
-    $RepositoryCheck = @(
-        & $script:GitExe `
-            rev-parse `
-            --is-inside-work-tree `
-            2>&1
-    )
+    $RepositoryResult = Invoke-Git `
+        -Arguments @(
+            "rev-parse",
+            "--is-inside-work-tree"
+        )
 
-    $RepositoryExitCode = $LASTEXITCODE
+    $RepositoryText = (
+        [string](
+            $RepositoryResult.Output |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        [string]$_
+                    )
+                } |
+                Select-Object -First 1
+        )
+    ).Trim()
 
     if (
-        $RepositoryExitCode -ne 0 -or
-        $RepositoryCheck.Count -eq 0 -or
-        ([string]$RepositoryCheck[0]).Trim() -ne "true"
+        $RepositoryResult.ExitCode -ne 0 -or
+        $RepositoryText -ne "true"
     ) {
-        Stop-Publish "当前目录不是有效的 Git 仓库：$script:ProjectPath"
+        Stop-Publish `
+            -Message "当前目录不是有效的 Git 仓库：$ProjectPath"
     }
 
 
     # --------------------------------------
-    # 检查分支
+    # 获取当前分支
     # --------------------------------------
 
-    $CurrentBranchOutput = @(
-        & $script:GitExe `
-            rev-parse `
-            --abbrev-ref `
-            HEAD
-    )
-
-    $BranchExitCode = $LASTEXITCODE
-
-    if (
-        $BranchExitCode -ne 0 -or
-        $CurrentBranchOutput.Count -eq 0
-    ) {
-        Stop-Publish "无法读取当前 Git 分支。"
-    }
+    $BranchResult = Invoke-Git `
+        -Arguments @(
+            "branch",
+            "--show-current"
+        )
 
     $CurrentBranch = (
         [string](
-            $CurrentBranchOutput |
+            $BranchResult.Output |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        [string]$_
+                    )
+                } |
                 Select-Object -First 1
         )
     ).Trim()
 
-    Write-Host "当前分支：$CurrentBranch"
-
-    if ($CurrentBranch -ne "main") {
-        Stop-Publish "安全发布工具只允许从 main 分支发布。当前分支：$CurrentBranch"
-    }
-
-
-    # --------------------------------------
-    # 检查 origin
-    # --------------------------------------
-
-    $RemoteOutput = @(
-        & $script:GitExe `
-            remote `
-            get-url `
-            origin
-    )
-
-    $RemoteExitCode = $LASTEXITCODE
-
     if (
-        $RemoteExitCode -ne 0 -or
-        $RemoteOutput.Count -eq 0
+        $BranchResult.ExitCode -ne 0 -or
+        [string]::IsNullOrWhiteSpace(
+            $CurrentBranch
+        )
     ) {
-        Stop-Publish "未找到 Git 远程仓库 origin。"
+        Stop-Publish `
+            -Message "无法读取当前 Git 分支。"
     }
+
+
+    # --------------------------------------
+    # 获取 origin 地址
+    # --------------------------------------
+
+    $RemoteResult = Invoke-Git `
+        -Arguments @(
+            "remote",
+            "get-url",
+            "origin"
+        )
 
     $RemoteUrl = (
         [string](
-            $RemoteOutput |
+            $RemoteResult.Output |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        [string]$_
+                    )
+                } |
                 Select-Object -First 1
         )
     ).Trim()
 
-    if ([string]::IsNullOrWhiteSpace($RemoteUrl)) {
-        Stop-Publish "远程仓库 origin 地址为空。"
-    }
-
-    $SafeRemoteUrl = $RemoteUrl -replace "://[^/@]+@", "://***@"
-
-    Write-Host "远程仓库：$SafeRemoteUrl"
-
-
-    # ======================================
-    # 第 1 步：获取远程状态
-    # ======================================
-
-    Write-Section "[1/7] 获取远程状态"
-
-    $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
-    $env:GIT_TERMINAL_PROMPT = "0"
-
-    [int]$FetchExitCode = 1
-
-    try {
-        & $script:GitExe fetch origin main
-        $FetchExitCode = $LASTEXITCODE
-    }
-    finally {
-        $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
-    }
-
-    if ($FetchExitCode -ne 0) {
-        Stop-Publish "无法连接 GitHub 或获取 origin/main。请检查网络代理。"
-    }
-
-    $OriginCheck = @(
-        & $script:GitExe `
-            rev-parse `
-            --verify `
-            origin/main `
-            2>&1
-    )
-
-    $OriginExitCode = $LASTEXITCODE
-
-    if ($OriginExitCode -ne 0) {
-        Stop-Publish "未找到远程分支 origin/main。"
-    }
-
-    $AheadBehindOutput = @(
-        & $script:GitExe `
-            rev-list `
-            --left-right `
-            --count `
-            "HEAD...origin/main"
-    )
-
-    $AheadBehindExitCode = $LASTEXITCODE
-
     if (
-        $AheadBehindExitCode -ne 0 -or
-        $AheadBehindOutput.Count -eq 0
-    ) {
-        Stop-Publish "无法比较本地 main 与 origin/main。"
-    }
-
-    $AheadBehindText = (
-        [string](
-            $AheadBehindOutput |
-                Select-Object -First 1
+        $RemoteResult.ExitCode -ne 0 -or
+        [string]::IsNullOrWhiteSpace(
+            $RemoteUrl
         )
-    ).Trim()
-
-    $AheadBehindParts = $AheadBehindText -split "\s+"
-
-    if ($AheadBehindParts.Count -lt 2) {
-        Stop-Publish "无法解析本地与远程分支差异。"
-    }
-
-    [int]$AheadCount = $AheadBehindParts[0]
-    [int]$BehindCount = $AheadBehindParts[1]
-
-    Write-Host "本地领先远程：$AheadCount 个提交"
-    Write-Host "本地落后远程：$BehindCount 个提交"
-
-    if ($BehindCount -gt 0) {
-        if ($AheadCount -gt 0) {
-            Stop-Publish "本地和远程已经分叉。脚本不会自动合并、reset 或 force push。"
-        }
-
-        Stop-Publish "远程 main 有新提交。请先运行同步工具，再发布本地修改。"
+    ) {
+        Stop-Publish `
+            -Message "未检测到 origin 远程仓库。"
     }
 
 
-    # ======================================
-    # 第 2 步：检查本地变化
-    # ======================================
-
-    Write-Section "[2/7] 检查本地变化"
-
-    $ChangedFiles = @(Get-ChangedFiles)
-
-    if ($AheadCount -gt 0) {
-        $ExistingUnpushedCommits = @(Get-UnpushedCommits)
-
-        Write-Host "发现尚未推送到 GitHub 的本地提交：" -ForegroundColor Yellow
-
-        foreach ($Commit in $ExistingUnpushedCommits) {
-            Write-Host "  $Commit"
-        }
-
-        Write-Host ""
-    }
-
-
-    # ======================================
-    # 核心修复：
-    # 工作区没有文件变化，但本地存在未推送提交
-    # ======================================
-
-    if ($ChangedFiles.Count -eq 0) {
-        if ($AheadCount -eq 0) {
-            Write-Host "工作区干净，本地与 GitHub 已同步。" -ForegroundColor Green
-            Write-Host "没有需要提交或推送的内容。" -ForegroundColor Green
-
-            Pause-AndExit 0
-        }
-
-        Write-Host "工作区当前没有未提交修改。" -ForegroundColor Green
-        Write-Host "但本地仍有 $AheadCount 个提交尚未推送到 GitHub。" -ForegroundColor Yellow
-        Write-Host ""
-        Write-Host "脚本将只执行：" -ForegroundColor Cyan
-        Write-Host "git push origin main"
-        Write-Host ""
-        Write-Host "不会创建新提交，也不会执行 force push、reset 或 clean。" -ForegroundColor Yellow
-
-        $PushOnlyConfirm = Read-Host "确认推送以上本地提交？请输入 PUSH"
-
-        if ($PushOnlyConfirm -cne "PUSH") {
-            Write-Host ""
-            Write-Host "已取消推送。" -ForegroundColor Yellow
-            Write-Host "本地提交仍然保留，没有发生任何修改。" -ForegroundColor Yellow
-
-            Pause-AndExit 0
-        }
-
-        Write-Section "[3/3] 推送已有本地提交"
-
-        $PushOnlyExitCode = Invoke-SafePush
-
-        if ($PushOnlyExitCode -ne 0) {
-            Write-Host ""
-            Write-Host "GitHub推送失败。" -ForegroundColor Red
-            Write-Host "已有本地提交仍然保留，没有自动撤销或重置。" -ForegroundColor Yellow
-            Write-Host "请检查网络、远程更新或 GitHub 权限后重新运行发布工具。" -ForegroundColor Yellow
-
-            Pause-AndExit 1
-        }
-
-        Write-Host ""
-        Write-Host "==============================================" -ForegroundColor Green
-        Write-Host " 已有本地提交成功推送到 GitHub" -ForegroundColor Green
-        Write-Host "==============================================" -ForegroundColor Green
-        Write-Host ""
-
-        & $script:GitExe log -1 --oneline
-
-        Write-Host ""
-        & $script:GitExe status
-
-        Pause-AndExit 0
-    }
-
-
-    # ======================================
-    # 显示本地文件变化
-    # ======================================
-
-    Write-Host "发现 $($ChangedFiles.Count) 个变化文件："
-
-    foreach ($ChangedFile in $ChangedFiles) {
-        Write-Host "  $ChangedFile"
-    }
+    # --------------------------------------
+    # 标题
+    # --------------------------------------
 
     Write-Host ""
-    & $script:GitExe status --short
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法读取 Git 简要状态。"
-    }
-
+    Write-Host "==============================================" -ForegroundColor Cyan
+    Write-Host " Codex Design GitHub 安全发布 V2.0.3" -ForegroundColor Cyan
+    Write-Host "==============================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "未暂存修改统计："
+    Write-Host "项目目录：$ProjectPath"
+    Write-Host "当前分支：$CurrentBranch"
+    Write-Host "远程仓库：$RemoteUrl"
 
-    & $script:GitExe diff --stat
 
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法生成未暂存修改统计。"
+    # ======================================
+    # 1/7 获取远程状态
+    # ======================================
+
+    Write-Step `
+        -Number 1 `
+        -Title "获取远程状态"
+
+    $FetchResult = Invoke-Git `
+        -Arguments @(
+            "fetch",
+            "origin",
+            $CurrentBranch
+        )
+
+    Show-GitOutput `
+        -Result $FetchResult
+
+    if ($FetchResult.ExitCode -ne 0) {
+        Stop-Publish `
+            -Message "获取远程分支失败，请检查网络、代理或 GitHub 登录状态。"
     }
 
-    Write-Host ""
-    Write-Host "已暂存修改统计："
 
-    & $script:GitExe diff --cached --stat
+    # --------------------------------------
+    # 检查远程分支是否存在
+    # --------------------------------------
 
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法生成暂存区修改统计。"
+    $RemoteBranchResult = Invoke-Git `
+        -Arguments @(
+            "rev-parse",
+            "--verify",
+            "origin/$CurrentBranch"
+        )
+
+    if ($RemoteBranchResult.ExitCode -ne 0) {
+        Stop-Publish `
+            -Message "远程分支 origin/$CurrentBranch 不存在。"
+    }
+
+
+    # --------------------------------------
+    # 读取领先和落后数量
+    # --------------------------------------
+
+    $InitialSyncState = Get-AheadBehind `
+        -BranchName $CurrentBranch
+
+    if ($null -eq $InitialSyncState) {
+        Stop-Publish `
+            -Message "无法计算本地与远程的提交差异。"
+    }
+
+    Write-Host "本地领先远程：$($InitialSyncState.Ahead) 个提交"
+    Write-Host "本地落后远程：$($InitialSyncState.Behind) 个提交"
+
+    if ($InitialSyncState.Behind -gt 0) {
+        Stop-Publish `
+            -Message "远程仓库已有新提交。请先运行“Codex Design 同步GitHub”，确认同步后再发布。"
     }
 
 
     # ======================================
-    # 第 3 步：安全预检
+    # 2/7 检查本地变化
     # ======================================
 
-    Write-Section "[3/7] 执行安全预检"
+    Write-Step `
+        -Number 2 `
+        -Title "检查本地变化"
 
-    Test-SensitiveFileNames `
-        -Files $ChangedFiles
+    $StatusResult = Invoke-Git `
+        -Arguments @(
+            "status",
+            "--short",
+            "--untracked-files=all"
+        )
 
-    Test-SecretContent `
-        -Files $ChangedFiles
-
-    Test-PowerShellSyntax `
-        -Files $ChangedFiles
-
-    Test-StrictJsonFiles `
-        -Files $ChangedFiles
-
-    Test-LfsAndLargeFiles `
-        -Files $ChangedFiles
-
-    & $script:GitExe diff --check
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "Git diff 检测到尾随空格、冲突标记或格式问题。"
+    if ($StatusResult.ExitCode -ne 0) {
+        Stop-Publish `
+            -Message "无法读取 Git 工作区状态。"
     }
 
-    & $script:GitExe diff --cached --check
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "暂存区检测到尾随空格、冲突标记或格式问题。"
-    }
-
-    Write-Host "Git差异检查：通过" -ForegroundColor Green
-
-
-    # ======================================
-    # 第 4 步：输入提交说明
-    # ======================================
-
-    Write-Section "[4/7] 输入提交说明"
-
-    Write-Host "提交说明应清楚描述本次修改。"
-    Write-Host "示例：Fix publishing of existing local commits"
-    Write-Host "示例：Update documented local automation environment"
-    Write-Host ""
-
-    $CommitMessage = (
-        Read-Host "请输入提交说明"
-    ).Trim()
-
-    if ([string]::IsNullOrWhiteSpace($CommitMessage)) {
-        Stop-Publish "提交说明不能为空。"
-    }
-
-    if ($CommitMessage.Length -lt 6) {
-        Stop-Publish "提交说明过短，请写清楚具体修改内容。"
-    }
-
-    $GenericMessages = @(
-        "test",
-        "update",
-        "change",
-        "changes",
-        "fix",
-        "sync",
-        "修改",
-        "更新",
-        "提交"
+    $StatusLines = @(
+        $StatusResult.Output |
+            ForEach-Object {
+                [string]$_
+            } |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace(
+                    $_
+                )
+            }
     )
 
-    if (
-        $GenericMessages -contains
-        $CommitMessage.ToLowerInvariant()
-    ) {
-        Stop-Publish "提交说明过于模糊，请描述实际修改内容。"
-    }
+    $HasWorkingChanges =
+        $StatusLines.Count -gt 0
 
+    if (-not $HasWorkingChanges) {
+        Write-Host "没有发现未提交的文件变化。" -ForegroundColor Green
 
-    # ======================================
-    # 第 5 步：暂存文件
-    # ======================================
+        if ($InitialSyncState.Ahead -eq 0) {
+            Write-Host ""
+            Write-Host "本地工作区与 GitHub 已经一致，无需发布。" -ForegroundColor Green
+            Write-Host ""
 
-    Write-Section "[5/7] 暂存文件"
+            exit 0
+        }
 
-    $StageConfirm = Read-Host "确认暂存全部显示的修改？输入 Y 继续"
-
-    if ($StageConfirm -notmatch "^[Yy]$") {
         Write-Host ""
-        Write-Host "已取消发布，没有执行提交或推送。" -ForegroundColor Yellow
+        Write-Host "检测到本地已有 $($InitialSyncState.Ahead) 个提交尚未推送。" -ForegroundColor Yellow
+    }
+    else {
+        Write-Host "发现 $($StatusLines.Count) 个变化文件："
 
-        Pause-AndExit 0
+        foreach ($StatusLine in $StatusLines) {
+            if ($StatusLine.Length -ge 4) {
+                $DisplayPath =
+                    $StatusLine.Substring(3)
+            }
+            else {
+                $DisplayPath = $StatusLine
+            }
+
+            Write-Host "  $DisplayPath"
+        }
+
+        Write-Host ""
+
+        foreach ($StatusLine in $StatusLines) {
+            Write-Host $StatusLine
+        }
+
+
+        # ----------------------------------
+        # 显示未暂存修改统计
+        # ----------------------------------
+
+        $UnstagedStatResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--stat"
+            )
+
+        $UnstagedStatLines = @(
+            $UnstagedStatResult.Output |
+                ForEach-Object {
+                    [string]$_
+                } |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        $_
+                    )
+                }
+        )
+
+        if ($UnstagedStatLines.Count -gt 0) {
+            Write-Host ""
+            Write-Host "未暂存修改统计："
+
+            Show-GitOutput `
+                -Result $UnstagedStatResult
+        }
+
+
+        # ----------------------------------
+        # 显示已暂存修改统计
+        # ----------------------------------
+
+        $StagedStatResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--cached",
+                "--stat"
+            )
+
+        $StagedStatLines = @(
+            $StagedStatResult.Output |
+                ForEach-Object {
+                    [string]$_
+                } |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        $_
+                    )
+                }
+        )
+
+        if ($StagedStatLines.Count -gt 0) {
+            Write-Host ""
+            Write-Host "已暂存修改统计："
+
+            Show-GitOutput `
+                -Result $StagedStatResult
+        }
+
+
+        # ----------------------------------
+        # 检查删除文件
+        # ----------------------------------
+
+        $UnstagedDeletedResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--name-only",
+                "--diff-filter=D"
+            )
+
+        $StagedDeletedResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--cached",
+                "--name-only",
+                "--diff-filter=D"
+            )
+
+        $DeletedFiles = @()
+
+        $DeletedFiles += @(
+            $UnstagedDeletedResult.Output |
+                ForEach-Object {
+                    [string]$_
+                }
+        )
+
+        $DeletedFiles += @(
+            $StagedDeletedResult.Output |
+                ForEach-Object {
+                    [string]$_
+                }
+        )
+
+        $DeletedFiles = @(
+            $DeletedFiles |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        $_
+                    )
+                } |
+                Sort-Object -Unique
+        )
+
+        if ($DeletedFiles.Count -gt 0) {
+            Write-Host ""
+            Write-Host "检测到以下文件将从仓库中删除：" -ForegroundColor Yellow
+
+            foreach ($DeletedFile in $DeletedFiles) {
+                Write-Host "  $DeletedFile" -ForegroundColor Yellow
+            }
+
+            Write-Host ""
+
+            $DeletionConfirmation = Read-Host `
+                "确认这些删除都是预期操作吗？输入 YES 继续"
+
+            if (
+                ([string]$DeletionConfirmation).
+                    Trim().
+                    ToUpperInvariant() -ne "YES"
+            ) {
+                Stop-Publish `
+                    -Message "用户未确认删除文件，没有执行暂存、提交或推送。"
+            }
+        }
+
+
+        # ----------------------------------
+        # 总体确认
+        # ----------------------------------
+
+        Write-Host ""
+
+        $PublishConfirmation = Read-Host `
+            "确认上述所有变化都需要发布吗？输入 YES 继续"
+
+        if (
+            ([string]$PublishConfirmation).
+                Trim().
+                ToUpperInvariant() -ne "YES"
+        ) {
+            Stop-Publish `
+                -Message "用户取消发布，没有执行暂存、提交或推送。"
+        }
     }
 
-    & $script:GitExe add --all
 
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "git add 执行失败。"
+    # ======================================
+    # 3/7 安全预检
+    # ======================================
+
+    Write-Step `
+        -Number 3 `
+        -Title "执行安全预检"
+
+    if ($HasWorkingChanges) {
+        # ----------------------------------
+        # 检查未解决冲突
+        # ----------------------------------
+
+        $ConflictResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--name-only",
+                "--diff-filter=U"
+            )
+
+        $ConflictFiles = @(
+            $ConflictResult.Output |
+                ForEach-Object {
+                    [string]$_
+                } |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        $_
+                    )
+                }
+        )
+
+        if ($ConflictFiles.Count -gt 0) {
+            Write-Host "检测到未解决的冲突文件：" -ForegroundColor Red
+
+            foreach ($ConflictFile in $ConflictFiles) {
+                Write-Host "  $ConflictFile" -ForegroundColor Red
+            }
+
+            Stop-Publish `
+                -Message "请先解决 Git 冲突，再重新发布。"
+        }
+
+        Write-Host "✓ 未发现 Git 冲突" -ForegroundColor Green
+
+
+        # ----------------------------------
+        # 检查未暂存内容格式
+        # ----------------------------------
+
+        $WorkingTreeCheckResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--check"
+            )
+
+        if ($WorkingTreeCheckResult.ExitCode -ne 0) {
+            Show-GitOutput `
+                -Result $WorkingTreeCheckResult
+
+            Stop-Publish `
+                -Message "未暂存修改存在尾随空格或其他格式问题。"
+        }
+
+        Write-Host "✓ 未暂存修改格式检查通过" -ForegroundColor Green
+
+
+        # ----------------------------------
+        # 检查已暂存内容格式
+        # ----------------------------------
+
+        $IndexCheckResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--cached",
+                "--check"
+            )
+
+        if ($IndexCheckResult.ExitCode -ne 0) {
+            Show-GitOutput `
+                -Result $IndexCheckResult
+
+            Stop-Publish `
+                -Message "已暂存修改存在尾随空格或其他格式问题。"
+        }
+
+        Write-Host "✓ 已暂存修改格式检查通过" -ForegroundColor Green
+    }
+    else {
+        Write-Host "没有新的文件变化，跳过文件格式预检。"
+        Write-Host "将继续推送现有本地提交。"
     }
 
-    $StagedFiles = @(
-        & $script:GitExe `
-            -c "core.quotepath=false" `
-            diff `
-            --cached `
-            --name-only
+
+    # ======================================
+    # 4/7 暂存修改
+    # ======================================
+
+    Write-Step `
+        -Number 4 `
+        -Title "暂存确认过的修改"
+
+    if ($HasWorkingChanges) {
+        $AddResult = Invoke-Git `
+            -Arguments @(
+                "add",
+                "--all"
+            )
+
+        Show-GitOutput `
+            -Result $AddResult
+
+        if ($AddResult.ExitCode -ne 0) {
+            Stop-Publish `
+                -Message "git add 执行失败，没有创建提交。"
+        }
+
+
+        # ----------------------------------
+        # 暂存后再次检查格式
+        # ----------------------------------
+
+        $StagedCheckResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--cached",
+                "--check"
+            )
+
+        if ($StagedCheckResult.ExitCode -ne 0) {
+            Show-GitOutput `
+                -Result $StagedCheckResult
+
+            Stop-Publish `
+                -Message "暂存后的修改存在格式问题，没有创建提交。"
+        }
+
+
+        # ----------------------------------
+        # 检查是否确实有暂存内容
+        # ----------------------------------
+
+        $StagedNameResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--cached",
+                "--name-only"
+            )
+
+        $StagedFiles = @(
+            $StagedNameResult.Output |
+                ForEach-Object {
+                    [string]$_
+                } |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace(
+                        $_
+                    )
+                }
+        )
+
+        if ($StagedFiles.Count -eq 0) {
+            Stop-Publish `
+                -Message "暂存后没有发现可提交内容。"
+        }
+
+        Write-Host "已暂存 $($StagedFiles.Count) 个文件。" -ForegroundColor Green
+
+
+        # ----------------------------------
+        # 显示最终暂存状态
+        # ----------------------------------
+
+        $StagedStatusResult = Invoke-Git `
+            -Arguments @(
+                "status",
+                "--short"
+            )
+
+        Show-GitOutput `
+            -Result $StagedStatusResult
+
+        Write-Host ""
+        Write-Host "最终提交统计："
+
+        $FinalStatResult = Invoke-Git `
+            -Arguments @(
+                "diff",
+                "--cached",
+                "--stat"
+            )
+
+        Show-GitOutput `
+            -Result $FinalStatResult
+    }
+    else {
+        Write-Host "没有新的文件变化，跳过 git add。"
+    }
+
+
+    # ======================================
+    # 5/7 创建提交
+    # ======================================
+
+    Write-Step `
+        -Number 5 `
+        -Title "创建 Git 提交"
+
+    if ($HasWorkingChanges) {
+        Write-Host ""
+        Write-Host "提交说明示例：" -ForegroundColor DarkGray
+        Write-Host "  Optimize workspace icons and improve Git publishing" -ForegroundColor DarkGray
+        Write-Host ""
+
+        $CommitMessage = Read-Host `
+            "请输入本次提交说明"
+
+        if (
+            [string]::IsNullOrWhiteSpace(
+                [string]$CommitMessage
+            )
+        ) {
+            Stop-Publish `
+                -Message "提交说明不能为空。修改仍然保持暂存状态，没有创建提交。"
+        }
+
+        $CommitMessage =
+            ([string]$CommitMessage).Trim()
+
+        $CommitResult = Invoke-Git `
+            -Arguments @(
+                "commit",
+                "-m",
+                $CommitMessage
+            )
+
+        Show-GitOutput `
+            -Result $CommitResult
+
+        if ($CommitResult.ExitCode -ne 0) {
+            Stop-Publish `
+                -Message "Git 提交失败。文件仍保留在本地，请检查终端输出。"
+        }
+
+        Write-Host ""
+        Write-Host "✓ Git 提交创建成功" -ForegroundColor Green
+    }
+    else {
+        Write-Host "没有新的文件变化，跳过创建提交。"
+        Write-Host "将推送现有的本地提交。"
+    }
+
+
+    # ======================================
+    # 6/7 推送到 GitHub
+    # ======================================
+
+    Write-Step `
+        -Number 6 `
+        -Title "推送到 GitHub"
+
+    Write-Host "推送前再次获取远程状态。"
+
+    $FinalFetchResult = Invoke-Git `
+        -Arguments @(
+            "fetch",
+            "origin",
+            $CurrentBranch
+        )
+
+    Show-GitOutput `
+        -Result $FinalFetchResult
+
+    if ($FinalFetchResult.ExitCode -ne 0) {
+        Stop-Publish `
+            -Message "推送前无法获取远程状态。本地提交已经安全保留，尚未推送。"
+    }
+
+    $PrePushSyncState = Get-AheadBehind `
+        -BranchName $CurrentBranch
+
+    if ($null -eq $PrePushSyncState) {
+        Stop-Publish `
+            -Message "推送前无法计算本地与远程差异。本地提交已经安全保留。"
+    }
+
+    Write-Host "本地领先远程：$($PrePushSyncState.Ahead) 个提交"
+    Write-Host "本地落后远程：$($PrePushSyncState.Behind) 个提交"
+
+    if ($PrePushSyncState.Behind -gt 0) {
+        Stop-Publish `
+            -Message "发布期间远程仓库出现了新提交。请先同步 GitHub；本地提交已经安全保留。"
+    }
+
+    if ($PrePushSyncState.Ahead -eq 0) {
+        Write-Host "没有需要推送的本地提交。" -ForegroundColor Green
+    }
+    else {
+        $PushResult = Invoke-Git `
+            -Arguments @(
+                "push",
+                "origin",
+                $CurrentBranch
+            )
+
+        Show-GitOutput `
+            -Result $PushResult
+
+        if ($PushResult.ExitCode -ne 0) {
+            Stop-Publish `
+                -Message "推送失败。本地提交已经安全保留，没有丢失。"
+        }
+
+        Write-Host ""
+        Write-Host "✓ GitHub 推送成功" -ForegroundColor Green
+    }
+
+
+    # ======================================
+    # 7/7 最终验证
+    # ======================================
+
+    Write-Step `
+        -Number 7 `
+        -Title "验证发布结果"
+
+    $VerifyFetchResult = Invoke-Git `
+        -Arguments @(
+            "fetch",
+            "origin",
+            $CurrentBranch
+        )
+
+    if ($VerifyFetchResult.ExitCode -ne 0) {
+        Write-Host "无法执行最终远程验证，但刚才的推送命令已成功。" -ForegroundColor Yellow
+    }
+
+    $FinalSyncState = Get-AheadBehind `
+        -BranchName $CurrentBranch
+
+    if ($null -ne $FinalSyncState) {
+        Write-Host "本地领先远程：$($FinalSyncState.Ahead) 个提交"
+        Write-Host "本地落后远程：$($FinalSyncState.Behind) 个提交"
+
+        if (
+            $FinalSyncState.Ahead -eq 0 -and
+            $FinalSyncState.Behind -eq 0
+        ) {
+            Write-Host "✓ 本地分支与 GitHub 完全同步" -ForegroundColor Green
+        }
+        else {
+            Write-Host "⚠ 本地与远程仍存在提交差异，请检查。" -ForegroundColor Yellow
+        }
+    }
+    else {
+        Write-Host "⚠ 无法计算最终同步状态。" -ForegroundColor Yellow
+    }
+
+
+    # --------------------------------------
+    # 查看最新提交
+    # --------------------------------------
+
+    Write-Host ""
+    Write-Host "最新提交："
+
+    $LatestCommitResult = Invoke-Git `
+        -Arguments @(
+            "log",
+            "-1",
+            "--oneline"
+        )
+
+    Show-GitOutput `
+        -Result $LatestCommitResult
+
+
+    # --------------------------------------
+    # 查看最终工作区
+    # --------------------------------------
+
+    $FinalStatusResult = Invoke-Git `
+        -Arguments @(
+            "status",
+            "--short",
+            "--untracked-files=all"
+        )
+
+    $FinalStatusLines = @(
+        $FinalStatusResult.Output |
+            ForEach-Object {
+                [string]$_
+            } |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace(
+                    $_
+                )
+            }
     )
 
-    $StagedExitCode = $LASTEXITCODE
-
-    if (
-        $StagedExitCode -ne 0 -or
-        $StagedFiles.Count -eq 0
-    ) {
-        Stop-Publish "暂存区为空，没有可提交内容。"
-    }
-
-    & $script:GitExe diff --cached --check
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "暂存后的内容存在格式问题，已停止提交。"
-    }
-
-    Write-Host "暂存完成。" -ForegroundColor Green
-
-
-    # ======================================
-    # 第 6 步：最终确认
-    # ======================================
-
-    Write-Section "[6/7] 最终确认"
-
-    Write-Host "即将提交以下文件：" -ForegroundColor Cyan
-
-    foreach ($StagedFile in $StagedFiles) {
-        Write-Host "  $StagedFile"
-    }
-
     Write-Host ""
-    & $script:GitExe diff --cached --stat
 
-    Write-Host ""
-    Write-Host "提交说明：$CommitMessage"
-    Write-Host "目标分支：origin/main"
-
-    if ($AheadCount -gt 0) {
-        Write-Host ""
-        Write-Host "注意：提交前已有 $AheadCount 个本地提交尚未推送。" -ForegroundColor Yellow
-        Write-Host "本次推送会同时发布这些已有提交和即将创建的新提交。" -ForegroundColor Yellow
+    if ($FinalStatusLines.Count -eq 0) {
+        Write-Host "✓ Git 工作区干净" -ForegroundColor Green
     }
+    else {
+        Write-Host "⚠ 发布完成后仍有本地变化：" -ForegroundColor Yellow
 
-    Write-Host ""
-    Write-Host "脚本不会执行 force push、reset、clean 或自动丢弃修改。" -ForegroundColor Yellow
-
-    $FinalConfirm = Read-Host "确认提交并推送？请输入 PUBLISH"
-
-    if ($FinalConfirm -cne "PUBLISH") {
-        Write-Host ""
-        Write-Host "已取消提交和推送。" -ForegroundColor Yellow
-        Write-Host "文件仍保留在暂存区，没有丢失。" -ForegroundColor Yellow
-
-        Pause-AndExit 0
+        foreach ($FinalStatusLine in $FinalStatusLines) {
+            Write-Host $FinalStatusLine
+        }
     }
 
 
-    # ======================================
-    # 第 7 步：提交与推送
-    # ======================================
-
-    Write-Section "[7/7] 提交并推送 GitHub"
-
-    & $script:GitExe commit -m $CommitMessage
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "git commit 执行失败。"
-    }
-
-    Write-Host ""
-    Write-Host "本地提交成功，正在推送 GitHub……" -ForegroundColor Cyan
-
-    $PushExitCode = Invoke-SafePush
-
-    if ($PushExitCode -ne 0) {
-        Write-Host ""
-        Write-Host "GitHub推送失败。" -ForegroundColor Red
-        Write-Host "本地提交已经保留，不会自动撤销或重置。" -ForegroundColor Yellow
-        Write-Host "请检查网络、远程更新或 GitHub 权限后重新运行发布工具。" -ForegroundColor Yellow
-
-        Pause-AndExit 1
-    }
+    # --------------------------------------
+    # 完成
+    # --------------------------------------
 
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Green
-    Write-Host " GitHub发布完成" -ForegroundColor Green
+    Write-Host " Codex Design GitHub 发布完成" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host ""
-
-    & $script:GitExe log -1 --oneline
-
-    Write-Host ""
-    & $script:GitExe status
-
-    Pause-AndExit 0
 }
 catch {
     Write-Host ""
-    Write-Host "发布已停止：$($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "GitHub 发布工具发生异常：" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
     Write-Host ""
-    Write-Host "未执行 force push、reset、clean 或自动丢弃修改。" -ForegroundColor Yellow
+    Write-Host "本地文件和本地提交不会被自动删除。" -ForegroundColor Yellow
+    Write-Host ""
 
-    Pause-AndExit 1
+    exit 1
 }
