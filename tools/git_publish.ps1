@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design GitHub 安全发布工具 V2.0
+# Codex Design GitHub 安全发布工具 V2.0.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 安全原则：
@@ -9,6 +9,7 @@
 # 4. 不自动丢弃本地修改
 # 5. 远程领先或分支分叉时停止
 # 6. 发布前检查语法、配置、密钥和 Git LFS
+# 7. 工作区干净但存在未推送提交时，允许安全推送
 # ==========================================
 
 $ErrorActionPreference = "Stop"
@@ -21,7 +22,7 @@ $ErrorActionPreference = "Stop"
 function Write-Title {
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Cyan
-    Write-Host " Codex Design GitHub 安全发布 V2.0" -ForegroundColor Cyan
+    Write-Host " Codex Design GitHub 安全发布 V2.0.1" -ForegroundColor Cyan
     Write-Host "==============================================" -ForegroundColor Cyan
     Write-Host ""
 }
@@ -102,14 +103,70 @@ function Get-ChangedFiles {
 
     return @(
         $Files |
-        ForEach-Object {
-            ([string]$_).Trim()
-        } |
-        Where-Object {
-            -not [string]::IsNullOrWhiteSpace($_)
-        } |
-        Sort-Object -Unique
+            ForEach-Object {
+                ([string]$_).Trim()
+            } |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_)
+            } |
+            Sort-Object -Unique
     )
+}
+
+
+# ==========================================
+# 获取尚未推送到 origin/main 的提交
+# ==========================================
+
+function Get-UnpushedCommits {
+    $Commits = @(
+        & $script:GitExe `
+            -c "core.quotepath=false" `
+            log `
+            --oneline `
+            "origin/main..HEAD"
+    )
+
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Publish "无法读取尚未推送的本地提交。"
+    }
+
+    return @(
+        $Commits |
+            ForEach-Object {
+                ([string]$_).Trim()
+            } |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_)
+            }
+    )
+}
+
+
+# ==========================================
+# 安全执行普通 Git Push
+#
+# 只执行：
+# git push origin main
+#
+# 不包含 force、reset、clean 或其他破坏性参数。
+# ==========================================
+
+function Invoke-SafePush {
+    $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
+    $env:GIT_TERMINAL_PROMPT = "0"
+
+    [int]$PushExitCode = 1
+
+    try {
+        & $script:GitExe push origin main
+        $PushExitCode = $LASTEXITCODE
+    }
+    finally {
+        $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
+    }
+
+    return $PushExitCode
 }
 
 
@@ -221,14 +278,14 @@ function Test-SecretContent {
     )
 
     $SecretPatterns = @(
-        "sk-proj-[A-Za-z0-9_-]{20,}",
-        "sk-[A-Za-z0-9_-]{20,}",
-        "ilst_[A-Za-z0-9]{20,}",
-        "ghp_[A-Za-z0-9]{20,}",
-        "github_pat_[A-Za-z0-9_]{20,}",
-        "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----",
-        "ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN\s*=\s*['""]?ilst_",
-        "(?i)bearer\s+[A-Za-z0-9._-]{24,}"
+        'sk-proj-[A-Za-z0-9_-]{20,}',
+        'sk-[A-Za-z0-9_-]{20,}',
+        'ilst_[A-Za-z0-9]{20,}',
+        'ghp_[A-Za-z0-9]{20,}',
+        'github_pat_[A-Za-z0-9_]{20,}',
+        '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----',
+        'ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN\s*=\s*[''"]?ilst_',
+        '(?i)bearer\s+[A-Za-z0-9._-]{24,}'
     )
 
     $SuspiciousFiles = @()
@@ -246,8 +303,13 @@ function Test-SecretContent {
             continue
         }
 
-        $Extension = [System.IO.Path]::GetExtension($FullPath).ToLowerInvariant()
-        $BaseName = [System.IO.Path]::GetFileName($FullPath)
+        $Extension = [System.IO.Path]::GetExtension(
+            $FullPath
+        ).ToLowerInvariant()
+
+        $BaseName = [System.IO.Path]::GetFileName(
+            $FullPath
+        )
 
         $IsTextFile = (
             $TextExtensions -contains $Extension -or
@@ -278,7 +340,7 @@ function Test-SecretContent {
 
     $SuspiciousFiles = @(
         $SuspiciousFiles |
-        Sort-Object -Unique
+            Sort-Object -Unique
     )
 
     if ($SuspiciousFiles.Count -gt 0) {
@@ -310,9 +372,9 @@ function Test-PowerShellSyntax {
 
     $PowerShellFiles = @(
         $Files |
-        Where-Object {
-            $_ -match "\.(ps1|psm1|psd1)$"
-        }
+            Where-Object {
+                $_ -match "\.(ps1|psm1|psd1)$"
+            }
     )
 
     if ($PowerShellFiles.Count -eq 0) {
@@ -375,7 +437,7 @@ function Test-PowerShellSyntax {
 # ==========================================
 # 检查关键严格 JSON 文件
 #
-# settings.json 属于 JSONC，可包含注释，
+# settings.json 属于 JSONC，可以包含注释，
 # 因此不使用 ConvertFrom-Json 检查。
 # ==========================================
 
@@ -418,8 +480,8 @@ function Test-StrictJsonFiles {
                 -LiteralPath $FullPath `
                 -Raw `
                 -Encoding UTF8 |
-            ConvertFrom-Json |
-            Out-Null
+                ConvertFrom-Json |
+                Out-Null
         }
         catch {
             $InvalidFiles += $File
@@ -482,7 +544,7 @@ function Test-LfsAndLargeFiles {
 
         $AttributeText = [string](
             $AttributeOutput |
-            Select-Object -First 1
+                Select-Object -First 1
         )
 
         $UsesLfs = $AttributeText -match ":\s*filter:\s*lfs\s*$"
@@ -545,16 +607,16 @@ try {
     # 动态确定仓库根目录
     # --------------------------------------
 
-    $ProjectPath = (
+    $script:ProjectPath = (
         Resolve-Path `
             -LiteralPath (
-            Join-Path $PSScriptRoot ".."
-        )
+                Join-Path $PSScriptRoot ".."
+            )
     ).Path
 
-    Set-Location -LiteralPath $ProjectPath
+    Set-Location -LiteralPath $script:ProjectPath
 
-    Write-Host "项目目录：$ProjectPath"
+    Write-Host "项目目录：$script:ProjectPath"
 
 
     # --------------------------------------
@@ -564,13 +626,13 @@ try {
     $GitCommand = Get-Command `
         "git" `
         -ErrorAction SilentlyContinue |
-    Select-Object -First 1
+        Select-Object -First 1
 
     if ($null -eq $GitCommand) {
         Stop-Publish "未检测到 Git，请检查安装和 PATH。"
     }
 
-    $GitExe = $GitCommand.Source
+    $script:GitExe = $GitCommand.Source
 
 
     # --------------------------------------
@@ -578,18 +640,20 @@ try {
     # --------------------------------------
 
     $RepositoryCheck = @(
-        & $GitExe `
+        & $script:GitExe `
             rev-parse `
             --is-inside-work-tree `
             2>&1
     )
 
+    $RepositoryExitCode = $LASTEXITCODE
+
     if (
-        $LASTEXITCODE -ne 0 -or
+        $RepositoryExitCode -ne 0 -or
         $RepositoryCheck.Count -eq 0 -or
         ([string]$RepositoryCheck[0]).Trim() -ne "true"
     ) {
-        Stop-Publish "当前目录不是有效的 Git 仓库：$ProjectPath"
+        Stop-Publish "当前目录不是有效的 Git 仓库：$script:ProjectPath"
     }
 
 
@@ -597,18 +661,28 @@ try {
     # 检查分支
     # --------------------------------------
 
-    $CurrentBranch = (
-        [string](
-            & $GitExe `
-                rev-parse `
-                --abbrev-ref `
-                HEAD
-        )
-    ).Trim()
+    $CurrentBranchOutput = @(
+        & $script:GitExe `
+            rev-parse `
+            --abbrev-ref `
+            HEAD
+    )
 
-    if ($LASTEXITCODE -ne 0) {
+    $BranchExitCode = $LASTEXITCODE
+
+    if (
+        $BranchExitCode -ne 0 -or
+        $CurrentBranchOutput.Count -eq 0
+    ) {
         Stop-Publish "无法读取当前 Git 分支。"
     }
+
+    $CurrentBranch = (
+        [string](
+            $CurrentBranchOutput |
+                Select-Object -First 1
+        )
+    ).Trim()
 
     Write-Host "当前分支：$CurrentBranch"
 
@@ -621,20 +695,31 @@ try {
     # 检查 origin
     # --------------------------------------
 
+    $RemoteOutput = @(
+        & $script:GitExe `
+            remote `
+            get-url `
+            origin
+    )
+
+    $RemoteExitCode = $LASTEXITCODE
+
+    if (
+        $RemoteExitCode -ne 0 -or
+        $RemoteOutput.Count -eq 0
+    ) {
+        Stop-Publish "未找到 Git 远程仓库 origin。"
+    }
+
     $RemoteUrl = (
         [string](
-            & $GitExe `
-                remote `
-                get-url `
-                origin
+            $RemoteOutput |
+                Select-Object -First 1
         )
     ).Trim()
 
-    if (
-        $LASTEXITCODE -ne 0 -or
-        [string]::IsNullOrWhiteSpace($RemoteUrl)
-    ) {
-        Stop-Publish "未找到 Git 远程仓库 origin。"
+    if ([string]::IsNullOrWhiteSpace($RemoteUrl)) {
+        Stop-Publish "远程仓库 origin 地址为空。"
     }
 
     $SafeRemoteUrl = $RemoteUrl -replace "://[^/@]+@", "://***@"
@@ -651,8 +736,10 @@ try {
     $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
     $env:GIT_TERMINAL_PROMPT = "0"
 
+    [int]$FetchExitCode = 1
+
     try {
-        & $GitExe fetch origin main
+        & $script:GitExe fetch origin main
         $FetchExitCode = $LASTEXITCODE
     }
     finally {
@@ -664,30 +751,42 @@ try {
     }
 
     $OriginCheck = @(
-        & $GitExe `
+        & $script:GitExe `
             rev-parse `
             --verify `
             origin/main `
             2>&1
     )
 
-    if ($LASTEXITCODE -ne 0) {
+    $OriginExitCode = $LASTEXITCODE
+
+    if ($OriginExitCode -ne 0) {
         Stop-Publish "未找到远程分支 origin/main。"
+    }
+
+    $AheadBehindOutput = @(
+        & $script:GitExe `
+            rev-list `
+            --left-right `
+            --count `
+            "HEAD...origin/main"
+    )
+
+    $AheadBehindExitCode = $LASTEXITCODE
+
+    if (
+        $AheadBehindExitCode -ne 0 -or
+        $AheadBehindOutput.Count -eq 0
+    ) {
+        Stop-Publish "无法比较本地 main 与 origin/main。"
     }
 
     $AheadBehindText = (
         [string](
-            & $GitExe `
-                rev-list `
-                --left-right `
-                --count `
-                "HEAD...origin/main"
+            $AheadBehindOutput |
+                Select-Object -First 1
         )
     ).Trim()
-
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法比较本地 main 与 origin/main。"
-    }
 
     $AheadBehindParts = $AheadBehindText -split "\s+"
 
@@ -706,7 +805,7 @@ try {
             Stop-Publish "本地和远程已经分叉。脚本不会自动合并、reset 或 force push。"
         }
 
-        Stop-Publish "远程 main 有新提交。请先处理同步，再发布本地修改。"
+        Stop-Publish "远程 main 有新提交。请先运行同步工具，再发布本地修改。"
     }
 
 
@@ -718,10 +817,81 @@ try {
 
     $ChangedFiles = @(Get-ChangedFiles)
 
+    if ($AheadCount -gt 0) {
+        $ExistingUnpushedCommits = @(Get-UnpushedCommits)
+
+        Write-Host "发现尚未推送到 GitHub 的本地提交：" -ForegroundColor Yellow
+
+        foreach ($Commit in $ExistingUnpushedCommits) {
+            Write-Host "  $Commit"
+        }
+
+        Write-Host ""
+    }
+
+
+    # ======================================
+    # 核心修复：
+    # 工作区没有文件变化，但本地存在未推送提交
+    # ======================================
+
     if ($ChangedFiles.Count -eq 0) {
-        Write-Host "没有需要提交的修改。" -ForegroundColor Green
+        if ($AheadCount -eq 0) {
+            Write-Host "工作区干净，本地与 GitHub 已同步。" -ForegroundColor Green
+            Write-Host "没有需要提交或推送的内容。" -ForegroundColor Green
+
+            Pause-AndExit 0
+        }
+
+        Write-Host "工作区当前没有未提交修改。" -ForegroundColor Green
+        Write-Host "但本地仍有 $AheadCount 个提交尚未推送到 GitHub。" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "脚本将只执行：" -ForegroundColor Cyan
+        Write-Host "git push origin main"
+        Write-Host ""
+        Write-Host "不会创建新提交，也不会执行 force push、reset 或 clean。" -ForegroundColor Yellow
+
+        $PushOnlyConfirm = Read-Host "确认推送以上本地提交？请输入 PUSH"
+
+        if ($PushOnlyConfirm -cne "PUSH") {
+            Write-Host ""
+            Write-Host "已取消推送。" -ForegroundColor Yellow
+            Write-Host "本地提交仍然保留，没有发生任何修改。" -ForegroundColor Yellow
+
+            Pause-AndExit 0
+        }
+
+        Write-Section "[3/3] 推送已有本地提交"
+
+        $PushOnlyExitCode = Invoke-SafePush
+
+        if ($PushOnlyExitCode -ne 0) {
+            Write-Host ""
+            Write-Host "GitHub推送失败。" -ForegroundColor Red
+            Write-Host "已有本地提交仍然保留，没有自动撤销或重置。" -ForegroundColor Yellow
+            Write-Host "请检查网络、远程更新或 GitHub 权限后重新运行发布工具。" -ForegroundColor Yellow
+
+            Pause-AndExit 1
+        }
+
+        Write-Host ""
+        Write-Host "==============================================" -ForegroundColor Green
+        Write-Host " 已有本地提交成功推送到 GitHub" -ForegroundColor Green
+        Write-Host "==============================================" -ForegroundColor Green
+        Write-Host ""
+
+        & $script:GitExe log -1 --oneline
+
+        Write-Host ""
+        & $script:GitExe status
+
         Pause-AndExit 0
     }
+
+
+    # ======================================
+    # 显示本地文件变化
+    # ======================================
 
     Write-Host "发现 $($ChangedFiles.Count) 个变化文件："
 
@@ -730,13 +900,28 @@ try {
     }
 
     Write-Host ""
-    & $GitExe status --short
-
-    Write-Host ""
-    & $GitExe diff --stat
+    & $script:GitExe status --short
 
     if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "无法生成修改统计。"
+        Stop-Publish "无法读取 Git 简要状态。"
+    }
+
+    Write-Host ""
+    Write-Host "未暂存修改统计："
+
+    & $script:GitExe diff --stat
+
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Publish "无法生成未暂存修改统计。"
+    }
+
+    Write-Host ""
+    Write-Host "已暂存修改统计："
+
+    & $script:GitExe diff --cached --stat
+
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Publish "无法生成暂存区修改统计。"
     }
 
 
@@ -761,13 +946,13 @@ try {
     Test-LfsAndLargeFiles `
         -Files $ChangedFiles
 
-    & $GitExe diff --check
+    & $script:GitExe diff --check
 
     if ($LASTEXITCODE -ne 0) {
         Stop-Publish "Git diff 检测到尾随空格、冲突标记或格式问题。"
     }
 
-    & $GitExe diff --cached --check
+    & $script:GitExe diff --cached --check
 
     if ($LASTEXITCODE -ne 0) {
         Stop-Publish "暂存区检测到尾随空格、冲突标记或格式问题。"
@@ -783,8 +968,8 @@ try {
     Write-Section "[4/7] 输入提交说明"
 
     Write-Host "提交说明应清楚描述本次修改。"
-    Write-Host "示例：Harden Git publish workflow"
-    Write-Host "示例：Add EditorConfig and Git attributes standards"
+    Write-Host "示例：Fix publishing of existing local commits"
+    Write-Host "示例：Update documented local automation environment"
     Write-Host ""
 
     $CommitMessage = (
@@ -828,32 +1013,36 @@ try {
     $StageConfirm = Read-Host "确认暂存全部显示的修改？输入 Y 继续"
 
     if ($StageConfirm -notmatch "^[Yy]$") {
+        Write-Host ""
         Write-Host "已取消发布，没有执行提交或推送。" -ForegroundColor Yellow
+
         Pause-AndExit 0
     }
 
-    & $GitExe add --all
+    & $script:GitExe add --all
 
     if ($LASTEXITCODE -ne 0) {
         Stop-Publish "git add 执行失败。"
     }
 
     $StagedFiles = @(
-        & $GitExe `
+        & $script:GitExe `
             -c "core.quotepath=false" `
             diff `
             --cached `
             --name-only
     )
 
+    $StagedExitCode = $LASTEXITCODE
+
     if (
-        $LASTEXITCODE -ne 0 -or
+        $StagedExitCode -ne 0 -or
         $StagedFiles.Count -eq 0
     ) {
         Stop-Publish "暂存区为空，没有可提交内容。"
     }
 
-    & $GitExe diff --cached --check
+    & $script:GitExe diff --cached --check
 
     if ($LASTEXITCODE -ne 0) {
         Stop-Publish "暂存后的内容存在格式问题，已停止提交。"
@@ -875,11 +1064,18 @@ try {
     }
 
     Write-Host ""
-    & $GitExe diff --cached --stat
+    & $script:GitExe diff --cached --stat
 
     Write-Host ""
     Write-Host "提交说明：$CommitMessage"
     Write-Host "目标分支：origin/main"
+
+    if ($AheadCount -gt 0) {
+        Write-Host ""
+        Write-Host "注意：提交前已有 $AheadCount 个本地提交尚未推送。" -ForegroundColor Yellow
+        Write-Host "本次推送会同时发布这些已有提交和即将创建的新提交。" -ForegroundColor Yellow
+    }
+
     Write-Host ""
     Write-Host "脚本不会执行 force push、reset、clean 或自动丢弃修改。" -ForegroundColor Yellow
 
@@ -889,6 +1085,7 @@ try {
         Write-Host ""
         Write-Host "已取消提交和推送。" -ForegroundColor Yellow
         Write-Host "文件仍保留在暂存区，没有丢失。" -ForegroundColor Yellow
+
         Pause-AndExit 0
     }
 
@@ -899,7 +1096,7 @@ try {
 
     Write-Section "[7/7] 提交并推送 GitHub"
 
-    & $GitExe commit -m $CommitMessage
+    & $script:GitExe commit -m $CommitMessage
 
     if ($LASTEXITCODE -ne 0) {
         Stop-Publish "git commit 执行失败。"
@@ -908,22 +1105,14 @@ try {
     Write-Host ""
     Write-Host "本地提交成功，正在推送 GitHub……" -ForegroundColor Cyan
 
-    $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
-    $env:GIT_TERMINAL_PROMPT = "0"
-
-    try {
-        & $GitExe push origin main
-        $PushExitCode = $LASTEXITCODE
-    }
-    finally {
-        $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
-    }
+    $PushExitCode = Invoke-SafePush
 
     if ($PushExitCode -ne 0) {
         Write-Host ""
         Write-Host "GitHub推送失败。" -ForegroundColor Red
         Write-Host "本地提交已经保留，不会自动撤销或重置。" -ForegroundColor Yellow
-        Write-Host "请检查网络、远程更新或权限后重新推送。" -ForegroundColor Yellow
+        Write-Host "请检查网络、远程更新或 GitHub 权限后重新运行发布工具。" -ForegroundColor Yellow
+
         Pause-AndExit 1
     }
 
@@ -933,10 +1122,10 @@ try {
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host ""
 
-    & $GitExe log -1 --oneline
+    & $script:GitExe log -1 --oneline
 
     Write-Host ""
-    & $GitExe status
+    & $script:GitExe status
 
     Pause-AndExit 0
 }
