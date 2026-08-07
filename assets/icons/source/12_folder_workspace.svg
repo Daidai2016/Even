@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="_图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
   <!-- Generator: Adobe Illustrator 30.8.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 80)  -->
   <defs>
     <style>
@@ -12,37 +12,17 @@
       }
 
       .st1 {
-        fill: #2b258f;
-      }
-
-      .st2 {
-        fill: url(#_未命名的渐变);
-      }
-
-      .st3 {
-        fill: url(#_未命名的渐变_2);
+        fill: url(#_未命名的渐变_46);
       }
     </style>
-    <radialGradient id="_未命名的渐变" data-name="未命名的渐变" cx="869.85" cy="297.36" fx="869.85" fy="297.36" r="1027.03" gradientTransform="translate(0 1021.8898) scale(1 -1)" gradientUnits="userSpaceOnUse">
-      <stop offset=".04" stop-color="#aa9bff"/>
-      <stop offset=".26" stop-color="#7686ff"/>
-      <stop offset=".47" stop-color="#738eff"/>
-      <stop offset=".82" stop-color="#3124ff"/>
-    </radialGradient>
-    <radialGradient id="_未命名的渐变_2" data-name="未命名的渐变 2" cx="252.07" cy="651.04" fx="252.07" fy="651.04" r="1023.86" gradientTransform="translate(0 1021.8898) scale(1 -1)" gradientUnits="userSpaceOnUse">
+    <radialGradient id="_未命名的渐变_46" data-name="未命名的渐变 46" cx="616.12" cy="223.57" fx="616.12" fy="223.57" r="790.05" gradientUnits="userSpaceOnUse">
       <stop offset=".04" stop-color="#aa9bff"/>
       <stop offset=".26" stop-color="#7686ff"/>
       <stop offset=".47" stop-color="#738eff"/>
       <stop offset=".82" stop-color="#3124ff"/>
     </radialGradient>
   </defs>
-  <g>
-    <path id="folderShape" class="st2" d="M107.6,272.5c0-57,46-103,103-103h202c31,0,61,14,80,39l55,70h265c57,0,103,46,103,103v370c0,57-46,103-103,103H210.6c-57,0-103-46-103-103v-479Z"/>
-    <g>
-      <path id="folderFace" class="st1" d="M108.4,407.5c0-55,45-100,100-100h608c55,0,100,45,100,100v344c0,57-46,103-103,103H211.4c-57,0-103-46-103-103v-344Z"/>
-      <path id="folderFace1" class="st3" d="M108.4,407.5c0-55,45-100,100-100h608c55,0,100,45,100,100v344c0,57-46,103-103,103H211.4c-57,0-103-46-103-103v-344Z"/>
-    </g>
-  </g>
-  <polyline class="st0" points="346.38 451.08 409.6 582.04 337.35 710.92"/>
-  <line class="st0" x1="565.38" y1="688.16" x2="732.46" y2="688.16"/>
+  <path class="st1" d="M783.86,781.82c-21.33,70.98-75.87,131.13-145.83,152.89-81,25.18-164.44,4.48-223.53-53.16-71.31,18.44-143.87,2.89-199.45-43.87-66.26-55.41-93.11-141.53-72.49-226.01-55.6-55.81-77.3-136.7-57.11-212.57,20.2-75.87,79.24-135.26,155.25-156.64,20.71-76.44,79.83-135.59,155.53-156.07,75.7-20.48,156.58.78,212.52,55.9,100.92-26.33,204.35,18.58,253.51,110.06,26.06,48.5,31.66,104.98,18.65,159.27,26.82,27.66,46.62,61.7,56.74,97.54,33.51,118.67-37.9,237.16-153.81,272.65Z"/>
+  <polyline class="st0" points="349.84 382.08 413.06 513.04 340.81 641.92"/>
+  <line class="st0" x1="568.85" y1="619.16" x2="735.93" y2="619.16"/>
 </svg>
