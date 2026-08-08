@@ -114,8 +114,21 @@
 
 
     // Windows PowerShell
+    // 仅影响本工作区新终端，不修改系统执行策略。
 
-    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell (Codex Design)": {
+            "path": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": [
+                "-NoLogo",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass"
+            ]
+        }
+    },
+
+    "terminal.integrated.defaultProfile.windows": "PowerShell (Codex Design)",
 
 
     // AI/Codex

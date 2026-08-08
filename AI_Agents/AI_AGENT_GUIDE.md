@@ -1,6 +1,6 @@
 # Codex Design AI Agent 管理指南
 
-> 最后更新：2026-08-06<br>
+> 最后更新：2026-08-09<br>
 > 项目：Codex Design<br>
 > 文档性质：AI 工具角色、扩展分层、权限与安全边界说明
 
@@ -244,6 +244,12 @@ tools/git_publish.ps1
 ```
 
 Codex 可以帮助分析 Git 状态，但不得绕过安全规则执行破坏性操作。
+
+### 本地配置与扩展
+
+项目级配置位于 `.codex/config.toml`，Hooks 位于 `.codex/hooks/`。Illustrator MCP 只在项目层声明，令牌通过环境变量提供。团队可复用能力通过 `.agents/plugins/marketplace.json` 与 `plugins/` 发布；当前 `codex-design-workflows` 插件只负责把有证据的创意实验晋级为提示词、工作流或窄范围 skill。
+
+完整分层和运行链路见 `docs/CODEX_ARCHITECTURE.md`。
 
 ---
 

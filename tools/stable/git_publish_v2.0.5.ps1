@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design GitHub 安全发布 V2.1.0
+# Codex Design GitHub 安全发布 V2.0.5
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 功能：
@@ -10,11 +10,6 @@
 # 5. 创建 Git 提交
 # 6. 推送到 GitHub
 # 7. 验证本地与远程状态
-#
-# V2.1.0：
-# - 在任何 fetch 或 push 前强制验证当前 GitHub 代理
-# - 代理地址和凭据不显示、不记录
-# - 未配置代理、代理不可达或 NO_PROXY 绕过时立即停止
 #
 # V2.0.5：
 # - 修复 Windows PowerShell 5.1 单元素数组自动展开问题
@@ -521,17 +516,6 @@ try {
             )
     ).Path
 
-    $ProxyGuardScript = Join-Path `
-        $PSScriptRoot `
-        "lib\github_proxy_guard.ps1"
-
-    if (-not (Test-Path -LiteralPath $ProxyGuardScript -PathType Leaf)) {
-        Stop-Publish `
-            -Message "缺少 GitHub 代理门禁，发布已停止。"
-    }
-
-    . $ProxyGuardScript
-
     Set-Location `
         -LiteralPath $ProjectPath
 
@@ -659,14 +643,6 @@ try {
             -Message "未检测到 origin 远程仓库。"
     }
 
-    $ProxyGuardResult = Assert-GitHubProxy `
-        -ProjectPath $ProjectPath
-
-    if (-not $ProxyGuardResult.Success) {
-        Stop-Publish `
-            -Message $ProxyGuardResult.Message
-    }
-
 
     # ======================================
     # 标题
@@ -679,7 +655,7 @@ try {
         -ForegroundColor Cyan
 
     Write-Host `
-        " Codex Design GitHub 安全发布 V2.1.0" `
+        " Codex Design GitHub 安全发布 V2.0.5" `
         -ForegroundColor Cyan
 
     Write-Host `

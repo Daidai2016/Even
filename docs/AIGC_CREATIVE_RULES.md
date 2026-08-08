@@ -116,3 +116,11 @@ AIGC 需求交给工具主线时，必须提供：
 - 参考资产、评价标准和通过样例。
 
 工具主线负责把这些要求变成稳定、可重复、可验证的操作流程，不重新定义创意标准。
+
+## 8. 正式能力晋级
+
+- 所有新方向先在 `experiments/` 记录，不直接写入正式 skill。
+- 使用 `prompts/creative_experiment_review.md` 和人工视觉审核检查正向、反向样本及授权状态。
+- 每次只选择一个晋级层级：提示词、工作流或窄范围 skill。
+- 具体门禁见 `workflows/creative_capability_promotion.md`；仓库插件 `codex-design-workflows` 负责流程封装和结构验证。
+- 晋级不得移动或删除原始实验，不得用措辞替代验证证据。

@@ -1,0 +1,33 @@
+{
+  "description": "Codex Design 项目安全门禁与变更后验证。",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|shell_command|ApplyPatch|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = git rev-parse --show-toplevel; & (Join-Path $root '.codex\\hooks\\pre_tool_use_policy.ps1')\"",
+            "commandWindows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = git rev-parse --show-toplevel; & (Join-Path $root '.codex\\hooks\\pre_tool_use_policy.ps1')\"",
+            "timeout": 15,
+            "statusMessage": "检查仓库安全规则"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Bash|shell_command|ApplyPatch|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = git rev-parse --show-toplevel; & (Join-Path $root '.codex\\hooks\\post_tool_use_validate.ps1')\"",
+            "commandWindows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = git rev-parse --show-toplevel; & (Join-Path $root '.codex\\hooks\\post_tool_use_validate.ps1')\"",
+            "timeout": 45,
+            "statusMessage": "验证仓库变更"
+          }
+        ]
+      }
+    ]
+  }
+}

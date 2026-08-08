@@ -1,0 +1,17 @@
+approval_policy = "on-request"
+approvals_reviewer = "user"
+sandbox_mode = "workspace-write"
+project_doc_max_bytes = 16384
+
+[sandbox_workspace_write]
+network_access = false
+
+[features]
+hooks = true
+
+[windows]
+sandbox = "unelevated"
+
+[mcp_servers.adobe_illustrator]
+url = "http://localhost:18412/v1/mcp"
+bearer_token_env_var = "ADOBE_ILLUSTRATOR_MCP_BEARER_TOKEN"

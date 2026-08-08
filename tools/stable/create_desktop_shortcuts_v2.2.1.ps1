@@ -1,7 +1,7 @@
 ﻿# =============================================
 # Even Codex Design Desktop Workspace Generator
 #
-# Version: 2.3.0
+# Version: 2.2.1
 #
 # 功能：
 # 1. 自动识别当前项目根目录
@@ -31,7 +31,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ToolVersion = "2.3.0"
+$ToolVersion = "2.2.1"
 
 
 # =============================================
@@ -1619,7 +1619,7 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                     (Quote-Argument $ProjectPath) +
                     ' ' +
                     (Quote-Argument $PowerShellExe) +
-                    ' -NoExit -NoProfile -ExecutionPolicy Bypass'
+                    ' -NoExit -NoProfile'
 
                 $TerminalDescription = `
                     "使用 Windows Terminal 和 Windows PowerShell 打开 Even Codex Design 项目终端"
@@ -1629,7 +1629,7 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 $TerminalTarget = $PowerShellExe
 
                 $TerminalArguments = `
-                    '-NoExit -NoProfile -ExecutionPolicy Bypass -Command ' +
+                    '-NoExit -NoProfile -Command ' +
                     '"Set-Location -LiteralPath ''' +
                     $EscapedProjectPath +
                     '''"'

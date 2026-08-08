@@ -1,0 +1,31 @@
+{
+  "name": "codex-design-workflows",
+  "version": "0.1.1",
+  "description": "Codex Design 创意实验晋级、质量门禁和工作流沉淀能力。",
+  "author": {
+    "name": "Codex Design"
+  },
+  "keywords": [
+    "creative-workflow",
+    "aigc",
+    "design-production"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Design Workflows",
+    "shortDescription": "把创意实验晋级为可验证的提示词、工作流和 skill",
+    "longDescription": "为 Codex Design 仓库提供实验记录、评审门禁、正式工作流晋级和可复用 skill 封装流程。",
+    "developerName": "Codex Design",
+    "category": "Productivity",
+    "capabilities": [
+      "Analysis",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "把这个创意实验整理成可复用工作流。",
+      "评审该 AIGC 方向是否满足正式晋级条件。",
+      "将稳定流程封装为 Codex Design skill。"
+    ],
+    "brandColor": "#5B7CFA"
+  }
+}

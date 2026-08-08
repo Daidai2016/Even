@@ -1,0 +1,20 @@
+{
+  "name": "codex-design",
+  "interface": {
+    "displayName": "Codex Design Workspace"
+  },
+  "plugins": [
+    {
+      "name": "codex-design-workflows",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex-design-workflows"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

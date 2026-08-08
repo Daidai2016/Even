@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design 工作区恢复工具 V1.1
+# Codex Design 工作区恢复工具 V1.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 功能：
@@ -533,18 +533,6 @@ try {
     Set-Location `
         -LiteralPath $script:ProjectPath
 
-    $ProxyGuardPath = Join-Path `
-        $script:ProjectPath `
-        "tools\lib\github_proxy_guard.ps1"
-
-    $ProxyGuardAvailable = Test-Path `
-        -LiteralPath $ProxyGuardPath `
-        -PathType Leaf
-
-    if ($ProxyGuardAvailable) {
-        . $ProxyGuardPath
-    }
-
 
     # --------------------------------------
     # 日志目录
@@ -582,13 +570,13 @@ try {
 
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Cyan
-    Write-Host " Codex Design 工作区恢复工具 V1.1" -ForegroundColor Cyan
+    Write-Host " Codex Design 工作区恢复工具 V1.0" -ForegroundColor Cyan
     Write-Host "==============================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "项目目录：$script:ProjectPath"
     Write-Host "开始时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
-    Add-Report "Codex Design 工作区恢复工具 V1.1"
+    Add-Report "Codex Design 工作区恢复工具 V1.0"
     Add-Report "=============================================="
     Add-Report "项目目录：$script:ProjectPath"
     Add-Report "开始时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -635,16 +623,10 @@ try {
     Write-Section "[2/9] 检查仓库结构"
 
     $RequiredDirectories = @(
-        ".codex",
-        ".codex\hooks",
-        ".agents\plugins",
         ".vscode",
         "tools",
-        "tools\lib",
-        "tools\stable",
         "tools\docs",
-        "scripts",
-        "plugins\codex-design-workflows"
+        "scripts"
     )
 
     foreach ($Directory in $RequiredDirectories) {
@@ -659,11 +641,6 @@ try {
         ".editorconfig",
         ".gitattributes",
         ".gitignore",
-        ".codex\config.toml",
-        ".codex\hooks.json",
-        ".codex\hooks\pre_tool_use_policy.ps1",
-        ".codex\hooks\post_tool_use_validate.ps1",
-        ".agents\plugins\marketplace.json",
         ".vscode\extensions.json",
         ".vscode\settings.json",
         ".vscode\tasks.json",
@@ -671,19 +648,9 @@ try {
         "tools\git_sync.ps1",
         "tools\git_publish.ps1",
         "tools\environment_check.ps1",
-        "tools\validate_repository.ps1",
-        "tools\harden_codex_global_config.ps1",
-        "tools\install_codex_design_plugin.ps1",
-        "tools\lib\github_proxy_guard.ps1",
         "tools\create_desktop_shortcuts.ps1",
         "tools\bootstrap_workspace.ps1",
-        "tools\docs\ENVIRONMENT.md",
-        "tools\stable\README.md",
-        "plugins\codex-design-workflows\.codex-plugin\plugin.json",
-        "plugins\codex-design-workflows\skills\promote-creative-workflow\SKILL.md",
-        "prompts\creative_experiment_review.md",
-        "workflows\creative_capability_promotion.md",
-        "experiments\creative_experiment_record_template.md"
+        "tools\docs\ENVIRONMENT.md"
     )
 
     foreach ($File in $RequiredFiles) {
@@ -701,15 +668,8 @@ try {
         "tools\git_sync.ps1",
         "tools\git_publish.ps1",
         "tools\environment_check.ps1",
-        "tools\validate_repository.ps1",
-        "tools\harden_codex_global_config.ps1",
-        "tools\install_codex_design_plugin.ps1",
-        "tools\lib\github_proxy_guard.ps1",
         "tools\create_desktop_shortcuts.ps1",
-        "tools\bootstrap_workspace.ps1",
-        ".codex\hooks\pre_tool_use_policy.ps1",
-        ".codex\hooks\post_tool_use_validate.ps1",
-        "plugins\codex-design-workflows\skills\promote-creative-workflow\scripts\validate-promotion.ps1"
+        "tools\bootstrap_workspace.ps1"
     )
 
     $SyntaxFailureCount = 0
@@ -830,11 +790,11 @@ try {
 
 
     $CodexVersion = Get-CommandVersionResult `
-        -CommandName "codex.cmd"
+        -CommandName "codex"
 
     if ($CodexVersion.Success) {
         $CodexCommand = Get-FirstCommand `
-            -CommandName "codex.cmd"
+            -CommandName "codex"
 
         $script:CodexExe = $CodexCommand.Source
 
@@ -981,69 +941,35 @@ try {
                     -Status "Success"
 
 
-                if (-not $ProxyGuardAvailable) {
+                $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
+                $env:GIT_TERMINAL_PROMPT = "0"
+
+                try {
+                    $RemoteRefs = @(
+                        & $script:GitExe `
+                            ls-remote `
+                            origin `
+                            2>&1
+                    )
+
+                    $RemoteConnectionExitCode = $LASTEXITCODE
+                }
+                finally {
+                    $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
+                }
+
+                if ($RemoteConnectionExitCode -eq 0) {
                     Add-Status `
                         -Name "GitHub连接" `
-                        -Value "已停止：缺少代理守卫" `
-                        -Status "Failure" `
-                        -Action "恢复 tools/lib/github_proxy_guard.ps1 后再检查"
+                        -Value "正常" `
+                        -Status "Success"
                 }
                 else {
-                    $ProxyGuardResult = Test-GitHubProxyGuard `
-                        -ProjectPath $script:ProjectPath
-
                     Add-Status `
-                        -Name "GitHub代理" `
-                        -Value $ProxyGuardResult.Message `
-                        -Status $(
-                            if ($ProxyGuardResult.Success) {
-                                "Success"
-                            }
-                            else {
-                                "Failure"
-                            }
-                        ) `
-                        -Action $(
-                            if ($ProxyGuardResult.Success) {
-                                ""
-                            }
-                            else {
-                                "启用当前电脑正在使用的代理；禁止直连 GitHub"
-                            }
-                        )
-
-                    if ($ProxyGuardResult.Success) {
-                        $PreviousGitPrompt = $env:GIT_TERMINAL_PROMPT
-                        $env:GIT_TERMINAL_PROMPT = "0"
-
-                        try {
-                            $RemoteRefs = @(
-                                & $script:GitExe `
-                                    ls-remote `
-                                    origin `
-                                    2>&1
-                            )
-
-                            $RemoteConnectionExitCode = $LASTEXITCODE
-                        }
-                        finally {
-                            $env:GIT_TERMINAL_PROMPT = $PreviousGitPrompt
-                        }
-
-                        if ($RemoteConnectionExitCode -eq 0) {
-                            Add-Status `
-                                -Name "GitHub连接" `
-                                -Value "正常" `
-                                -Status "Success"
-                        }
-                        else {
-                            Add-Status `
-                                -Name "GitHub连接" `
-                                -Value "代理已验证，但连接失败" `
-                                -Status "Failure" `
-                                -Action "检查 GitHub 登录和 origin 地址"
-                        }
-                    }
+                        -Name "GitHub连接" `
+                        -Value "连接失败" `
+                        -Status "Failure" `
+                        -Action "检查 Windows 网络、代理、GitHub 登录和 origin 地址"
                 }
             }
             else {

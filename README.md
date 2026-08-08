@@ -50,6 +50,18 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 平台包括 Adobe Creative Cloud、PowerPoint、Excel、Word、PDF 及其他创意和数据工具。交付物包括图像、图标、设计文件、演示文稿、数据表格、文档、报告和可复用工作流。
 
 
+---
+
+
+# Codex 本地架构
+
+
+项目使用“个人安全基线 → 项目配置 → Hooks 门禁 → 插件与 skills → 生产脚本 → 验证与报告”的分层结构。Illustrator MCP 只在项目内配置，敏感令牌只从环境变量读取；GitHub 同步、发布和远程检查统一经过代理守卫，未检测到当前有效代理时停止，不回退直连。
+
+
+详细结构、运行链路和安全边界见 `docs/CODEX_ARCHITECTURE.md`。
+
+
 
 ---
 
@@ -68,7 +80,10 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 `Codex Design 同步GitHub` 会从脚本所在位置自动确定仓库。它只在 `main` 工作区干净、代理可用、本地仅落后 `origin/main` 时执行 `pull --ff-only`。检测到未提交修改、本地领先或分支分叉时只报告并停止，不会自动 reset、clean、stash、commit 或 force。
 
 
-`Codex Design 环境检查` 会检查 Windows、PowerShell、Git、Node.js、npm、Python、Codex、VS Code、Photoshop Beta、Illustrator Beta 和 MCP 配置概况，并在 `logs/` 中生成带时间的环境报告。报告不记录密钥、令牌或代理凭据。
+`Codex Design 环境检查` 会检查 Windows、PowerShell、Git、Node.js、npm、Python、Codex、VS Code、Photoshop Beta、Illustrator Beta、MCP、Hooks 和插件配置概况，并在 `logs/` 中生成带时间的环境报告。报告不记录密钥、令牌或代理凭据。
+
+
+VS Code 任务还提供仓库验证、个人 Codex 配置加固和本地工作流插件安装入口。配置加固会先保存时间戳备份；插件安装使用仓库内 `.agents/plugins/marketplace.json`，不依赖远程市场。
 
 
 `Codex Design 终端` 会优先使用 Windows Terminal，并明确以 Windows PowerShell 作为命令行环境，默认进入当前仓库根目录。如果电脑没有安装或无法找到 Windows Terminal，快捷方式会自动回退为直接打开 Windows PowerShell。
@@ -90,6 +105,15 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 ```text
 Codex_Design/
 
+├── .codex/
+│   项目级 Codex 配置和 Hooks
+│
+├── .agents/plugins/
+│   团队本地插件市场清单
+│
+├── plugins/
+│   Codex Design 可安装插件与 skills
+│
 ├── scripts/
 │   Adobe 及其他生产自动化脚本
 │
@@ -149,6 +173,7 @@ AIGC 主线：创意标准、训练、提示词、skills
 | `AGENTS.md` | 仓库级操作、安全与交付规则 |
 | `CODING_RULES.md` | 代码、自动化工具和创意交付物的通用开发规范 |
 | `docs/AIGC_CREATIVE_RULES.md` | AIGC 审美、版式、字体、形式创意与 skill 建设规范 |
+| `docs/CODEX_ARCHITECTURE.md` | Codex 本地配置、Hooks、插件、代理与验证架构 |
 | `scripts/photoshop/AGENTS.md` | Photoshop 目录局部强制规则 |
 | `scripts/illustrator/AGENTS.md` | Illustrator 目录局部强制规则 |
 | `scripts/common/docs/ADOBE_AUTOMATION_GUIDE.md` | Adobe 软件职责与协作指南 |

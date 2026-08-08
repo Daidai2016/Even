@@ -1,0 +1,6 @@
+interface:
+  display_name: "Promote Creative Workflow"
+  short_description: "把创意实验晋级为经过证据门禁的正式工作流"
+  default_prompt: "Use $promote-creative-workflow to review this experiment and promote only the evidence-backed parts."
+policy:
+  allow_implicit_invocation: true

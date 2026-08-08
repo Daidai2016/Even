@@ -71,6 +71,7 @@ Adobe、PowerPoint、Excel、Word、PDF 和其他创意工具都是两条主线�
 - 文档、配置和脚本中使用相对于仓库根目录的路径；不得硬编码某台电脑的仓库绝对路径。
 - Adobe 生产脚本放在 `scripts/` 下对应的软件目录。其他交付物生成代码按已有项目结构放在对应工作流或工具目录，不得为方便而全部塞入 Adobe 目录。
 - 仓库管理、环境检查和快捷方式生成等 PowerShell 工具放在 `tools/`。
+- 项目级 Codex 配置与 Hooks 放在 `.codex/`；团队插件市场清单放在 `.agents/plugins/`；可安装插件放在 `plugins/`。
 - 通用文档和 Word 类交付物放在 `docs/` 或任务已建立的专项目录；演示文稿放在 `presentation/`；软件专项文档放在对应软件目录的 `docs/`。
 - 可复用提示词放在 `prompts/`，经验证的流程放在 `workflows/`，参考图像、色板、字体样例和其他合法资源放在 `assets/`。
 - 未验证的 AIGC 方向测试放在 `experiments/`，可清理的临时文件放在 `work/`；两者都不得冒充正式成果。
@@ -90,6 +91,7 @@ Adobe、PowerPoint、Excel、Word、PDF 和其他创意工具都是两条主线�
 - 交付说明面向客户和制作供应商，记录文件规格和制作参数。
 - 两类文档不得混用，不得向客户暴露内部调试信息。
 - 任务完成前检查文件位置、稳定版本、临时文件、无关修改和 Git 状态。
+- PowerShell、JSON、插件和 skill 变更完成后运行 `tools/validate_repository.ps1`；Hook 的自动结果只作为辅助证据。
 
 ## 7. Git 操作权限
 

@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design 环境检查工具 V2.4.0
+# Codex Design 环境检查工具 V2.3.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 主要功能：
@@ -9,8 +9,7 @@
 # - 检查 Adobe Beta 和 JSX 目录
 # - 检查 Illustrator MCP 配置、令牌变量和实时端口
 # - 检查 Git 仓库和 GitHub 连接
-# - 强制检查 GitHub 当前代理及其可达性
-# - 区分插件缓存、显式启用和 manifest 健康状态
+# - 检查 Windows 网络代理状态
 # - 自动生成环境检查报告
 # - 每类运行日志只保留最近 30 份
 #
@@ -29,22 +28,7 @@
 # - 不执行 force push、reset、clean 等 Git 操作
 # ==========================================
 
-param(
-    [switch]$SkipRemoteCheck,
-    [switch]$NoPause
-)
-
 $ErrorActionPreference = "Stop"
-
-$ProxyGuardScript = Join-Path `
-    $PSScriptRoot `
-    "lib\github_proxy_guard.ps1"
-
-if (-not (Test-Path -LiteralPath $ProxyGuardScript -PathType Leaf)) {
-    throw "缺少 GitHub 代理门禁：tools/lib/github_proxy_guard.ps1"
-}
-
-. $ProxyGuardScript
 
 
 # ==========================================
@@ -750,7 +734,7 @@ try {
     # 报告标题
     # --------------------------------------
 
-    Add-Report "Codex Design 环境检查 V2.4.0"
+    Add-Report "Codex Design 环境检查 V2.3.0"
     Add-Report "========================================"
     Add-Report "检查时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Add-Report "项目目录：$ProjectPath"
@@ -800,7 +784,7 @@ try {
     $PythonVersion = Get-PythonVersionResult
 
     $CodexVersion = Get-CommandVersionResult `
-        -CommandName "codex.cmd"
+        -CommandName "codex"
 
     $VSCodeVersion = Get-CommandVersionResult `
         -CommandName "code"
@@ -838,186 +822,6 @@ try {
         -Value $VSCodeVersion.Value `
         -Status $VSCodeVersion.Status
 
-    Add-Report ""
-
-
-    # ======================================
-    # Codex 插件状态
-    # ======================================
-
-    Add-Report "Codex插件"
-    Add-Report "----------------------------------------"
-
-    $ProjectCodexConfigPath = Join-Path `
-        $ProjectPath `
-        ".codex\config.toml"
-    $ProjectHooksManifestPath = Join-Path `
-        $ProjectPath `
-        ".codex\hooks.json"
-    $RequiredHookFiles = @(
-        (Join-Path $ProjectPath ".codex\hooks\pre_tool_use_policy.ps1"),
-        (Join-Path $ProjectPath ".codex\hooks\post_tool_use_validate.ps1")
-    )
-
-    if (Test-Path -LiteralPath $ProjectCodexConfigPath -PathType Leaf) {
-        Add-Status `
-            -Name "项目Codex配置" `
-            -Value "已部署" `
-            -Status "Success"
-    }
-    else {
-        Add-Status `
-            -Name "项目Codex配置" `
-            -Value "缺失" `
-            -Status "Failure"
-    }
-
-    $HooksHealthy = Test-Path `
-        -LiteralPath $ProjectHooksManifestPath `
-        -PathType Leaf
-
-    foreach ($HookFile in $RequiredHookFiles) {
-        if (-not (Test-Path -LiteralPath $HookFile -PathType Leaf)) {
-            $HooksHealthy = $false
-        }
-    }
-
-    if ($HooksHealthy) {
-        try {
-            [void](
-                Get-Content `
-                    -LiteralPath $ProjectHooksManifestPath `
-                    -Raw `
-                    -Encoding UTF8 |
-                    ConvertFrom-Json
-            )
-        }
-        catch {
-            $HooksHealthy = $false
-        }
-    }
-
-    Add-Status `
-        -Name "安全Hooks" `
-        -Value $(if ($HooksHealthy) { "已部署且清单有效" } else { "缺失或清单无效" }) `
-        -Status $(if ($HooksHealthy) { "Success" } else { "Failure" })
-
-    $UserProfilePath = [Environment]::GetFolderPath("UserProfile")
-
-    if ([string]::IsNullOrWhiteSpace($UserProfilePath)) {
-        $UserProfilePath = [string]$env:USERPROFILE
-    }
-
-    $CodexHomePath = Join-Path $UserProfilePath ".codex"
-    $PluginCachePath = Join-Path $CodexHomePath "plugins\cache"
-    $CachedPluginNames = New-Object `
-        "System.Collections.Generic.HashSet[string]" `
-        ([System.StringComparer]::OrdinalIgnoreCase)
-
-    if (Test-Path -LiteralPath $PluginCachePath -PathType Container) {
-        foreach ($ManifestFile in @(
-            Get-ChildItem `
-                -LiteralPath $PluginCachePath `
-                -Recurse `
-                -Force `
-                -Filter "plugin.json" `
-                -File `
-                -ErrorAction SilentlyContinue |
-                Where-Object {
-                    $_.DirectoryName -match "[\\/]\.codex-plugin$"
-                }
-        )) {
-            try {
-                $ManifestData = Get-Content `
-                    -LiteralPath $ManifestFile.FullName `
-                    -Raw `
-                    -Encoding UTF8 |
-                    ConvertFrom-Json
-
-                if (-not [string]::IsNullOrWhiteSpace(
-                    [string]$ManifestData.name
-                )) {
-                    [void]$CachedPluginNames.Add(
-                        [string]$ManifestData.name
-                    )
-                }
-            }
-            catch {
-                # 单个缓存 manifest 异常不暴露路径。
-            }
-        }
-    }
-
-    $InstalledPlugins = @()
-    $PluginQuerySucceeded = $false
-    $CodexCommand = Get-Command "codex.cmd" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-
-    if ($null -ne $CodexCommand) {
-        try {
-            $PluginListOutput = @(
-                & $CodexCommand.Source plugin list --json 2>$null
-            )
-
-            if ($LASTEXITCODE -eq 0) {
-                $PluginListData = ($PluginListOutput -join `
-                    [Environment]::NewLine) |
-                    ConvertFrom-Json
-
-                $InstalledPlugins = @($PluginListData.installed)
-                $PluginQuerySucceeded = $true
-            }
-        }
-        catch {
-            $PluginQuerySucceeded = $false
-        }
-    }
-
-    Add-Status `
-        -Name "插件缓存" `
-        -Value "$($CachedPluginNames.Count) 个可识别插件包" `
-        -Status "Success"
-
-    if ($PluginQuerySucceeded) {
-        $EnabledPlugins = @(
-            $InstalledPlugins | Where-Object { $_.enabled -eq $true }
-        )
-
-        Add-Status `
-            -Name "插件安装" `
-            -Value "$($InstalledPlugins.Count) 个已安装，$($EnabledPlugins.Count) 个已启用" `
-            -Status "Success"
-
-        $WorkspacePlugin = @(
-            $InstalledPlugins |
-                Where-Object {
-                    $_.pluginId -eq `
-                        "codex-design-workflows@codex-design" -and
-                    $_.enabled -eq $true
-                }
-        )
-
-        if ($WorkspacePlugin.Count -gt 0) {
-            Add-Status `
-                -Name "项目工作流插件" `
-                -Value "已安装并启用" `
-                -Status "Success"
-        }
-        else {
-            Add-Status `
-                -Name "项目工作流插件" `
-                -Value "未安装或未启用" `
-                -Status "Warning"
-        }
-    }
-    else {
-        Add-Status `
-            -Name "插件安装" `
-            -Value "Codex CLI 当前无法读取插件状态" `
-            -Status "Warning"
-    }
-
-    Add-Report "插件授权：按连接器或 MCP 独立管理；本检查不读取凭据。"
     Add-Report ""
 
 
@@ -1343,8 +1147,6 @@ try {
     # Git 仓库与 GitHub
     # ======================================
 
-    $ProxyGuardResult = $null
-
     Add-Report "Git"
     Add-Report "----------------------------------------"
 
@@ -1443,53 +1245,36 @@ try {
                     -Status "Failure"
             }
             else {
-                $ProxyGuardResult = Test-GitHubProxyGuard `
-                    -ProjectPath $ProjectPath
+                $PreviousGitPrompt =
+                    $env:GIT_TERMINAL_PROMPT
 
-                if (-not $ProxyGuardResult.Success) {
-                    Add-Status `
-                        -Name "GitHub连接" `
-                        -Value "未执行：$($ProxyGuardResult.Message)" `
-                        -Status "Warning"
+                $env:GIT_TERMINAL_PROMPT = "0"
+
+                try {
+                    $GitHubResult =
+                        Invoke-NativeCommandSafe `
+                            -FilePath $GitCommand.Source `
+                            -Arguments @(
+                                "ls-remote",
+                                "origin"
+                            )
                 }
-                elseif ($SkipRemoteCheck) {
+                finally {
+                    $env:GIT_TERMINAL_PROMPT =
+                        $PreviousGitPrompt
+                }
+
+                if ($GitHubResult.ExitCode -eq 0) {
                     Add-Status `
                         -Name "GitHub连接" `
-                        -Value "已跳过远程连接；代理门禁已通过" `
+                        -Value "正常" `
                         -Status "Success"
                 }
                 else {
-                    $PreviousGitPrompt =
-                        $env:GIT_TERMINAL_PROMPT
-
-                    $env:GIT_TERMINAL_PROMPT = "0"
-
-                    try {
-                        $GitHubResult =
-                            Invoke-NativeCommandSafe `
-                                -FilePath $GitCommand.Source `
-                                -Arguments @(
-                                    "ls-remote",
-                                    "origin"
-                                )
-                    }
-                    finally {
-                        $env:GIT_TERMINAL_PROMPT =
-                            $PreviousGitPrompt
-                    }
-
-                    if ($GitHubResult.ExitCode -eq 0) {
-                        Add-Status `
-                            -Name "GitHub连接" `
-                            -Value "正常（已强制通过代理）" `
-                            -Status "Success"
-                    }
-                    else {
-                        Add-Status `
-                            -Name "GitHub连接" `
-                            -Value "暂时无法连接（代理已验证；请检查登录或 GitHub 状态）" `
-                            -Status "Warning"
-                    }
+                    Add-Status `
+                        -Name "GitHub连接" `
+                        -Value "暂时无法连接（可能是网络、DNS、代理或 GitHub 服务状态）" `
+                        -Status "Warning"
                 }
             }
         }
@@ -1499,29 +1284,43 @@ try {
 
 
     # ======================================
-    # GitHub 网络代理
+    # Windows 网络代理
     # ======================================
 
     Add-Report "网络"
     Add-Report "----------------------------------------"
 
-    if ($null -eq $ProxyGuardResult) {
+    $ProxyInfo = Get-ItemProperty `
+        "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" `
+        -ErrorAction SilentlyContinue
+
+    if ($null -eq $ProxyInfo) {
         Add-Status `
-            -Name "GitHub代理" `
-            -Value "未完成检查" `
+            -Name "Windows代理" `
+            -Value "无法读取系统代理状态" `
             -Status "Warning"
     }
-    elseif ($ProxyGuardResult.Success) {
-        Add-Status `
-            -Name "GitHub代理" `
-            -Value "已通过脱敏检查（$($ProxyGuardResult.Source)）" `
-            -Status "Success"
+    elseif ($ProxyInfo.ProxyEnable -eq 1) {
+        $ProxyServer = [string]$ProxyInfo.ProxyServer
+
+        if ([string]::IsNullOrWhiteSpace($ProxyServer)) {
+            Add-Status `
+                -Name "Windows代理" `
+                -Value "已启用，但未读取到代理配置" `
+                -Status "Warning"
+        }
+        else {
+            Add-Status `
+                -Name "Windows代理" `
+                -Value "已启用（具体代理地址不写入报告）" `
+                -Status "Success"
+        }
     }
     else {
         Add-Status `
-            -Name "GitHub代理" `
-            -Value $ProxyGuardResult.Message `
-            -Status "Warning"
+            -Name "Windows代理" `
+            -Value "未启用（允许使用直连或其他全局网络方式）" `
+            -Status "Success"
     }
 
     Add-Report ""
@@ -1629,9 +1428,7 @@ catch {
     exit 1
 }
 
-if (-not $NoPause) {
-    Write-Host ""
-    [void](
-        Read-Host "按 Enter 键关闭窗口"
-    )
-}
+Write-Host ""
+[void](
+    Read-Host "按 Enter 键关闭窗口"
+)
