@@ -1,62 +1,214 @@
 {
-    "version": "2.0.0",
-
-    "tasks": [
-
-        {
-            "label": "Codex Design 同步GitHub",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_sync.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design 发布GitHub",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_publish.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design Git状态检查",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\git_status.ps1"
-            ],
-            "problemMatcher": []
-        },
-
-
-        {
-            "label": "Codex Design 创建桌面工作台",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
-            ],
-            "problemMatcher": []
-        }
-
-    ]
+  "version": "2.0.0",
+  "presentation": {
+    "echo": true,
+    "reveal": "always",
+    "focus": false,
+    "panel": "dedicated",
+    "showReuseMessage": false,
+    "clear": true,
+    "close": false
+  },
+  "tasks": [
+    {
+      "label": "[Git] Codex Design 状��检�?,
+      "detail": "Git｜检查当前分支��修改文件和远程同步状��?,
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\git_status.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[Git] Codex Design 同步GitHub",
+      "detail": "Git｜安全获取并同步 GitHub main 分支",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\git_sync.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[Git] Codex Design 发布GitHub",
+      "detail": "Git｜执行安全预棢�、提交并推��本地修�?,
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\git_publish.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] Codex Design 环境棢��?,
+      "detail": "环境｜检查开发工具��Adobe、MCP、Git 和网络状�?,
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\environment_check.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] Codex Design 丢�键恢复工作区",
+      "detail": "环境｜检测新电脑环境、恢复项目入口并输出缺失�?,
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\bootstrap_workspace.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] Codex Design 仓库验证",
+      "detail": "环境｜检�?PowerShell 编码与语法��JSON、插件��skills 和敏感文�?,
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\validate_repository.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] Codex 全局配置加固",
+      "detail": "环境｜备份并收紧个人 Codex 信任、审批和 Windows 沙箱设置",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\harden_codex_global_config.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[环境] 安装 Codex Design 工作流插�?,
+      "detail": "环境｜注册仓库内本地插件市场并安装创意工作流 skill",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\install_codex_design_plugin.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[桌面] Codex Design 创建桌面工作�?,
+      "detail": "桌面｜创建或恢复 Codex Design 桌面快捷入口",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\create_desktop_shortcuts.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "[Adobe] Illustrator MCP 状��?,
+      "detail": "Adobe｜只读检�?Illustrator 进程和本�?18412 监听端口",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$illustrator = Get-Process -Name 'Illustrator' -ErrorAction SilentlyContinue; $listener = Get-NetTCPConnection -LocalPort 18412 -State Listen -ErrorAction SilentlyContinue; Write-Host ''; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ' Illustrator MCP 实时状��? -ForegroundColor Cyan; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ''; if ($illustrator) { Write-Host 'Illustrator：正在运�? -ForegroundColor Green } else { Write-Host 'Illustrator：当前未运行' -ForegroundColor Yellow }; if ($listener) { Write-Host 'MCP端口�?8412 正在监听' -ForegroundColor Green } else { Write-Host 'MCP端口�?8412 当前未监�? -ForegroundColor Yellow; Write-Host '提示：Illustrator 可能未启动，�?MCP 服务尚未弢�启��? -ForegroundColor Yellow }; Write-Host ''; Write-Host '本任务只读取进程和端口状态，不读取或修改 Illustrator 文档�? -ForegroundColor DarkGray"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": false
+      },
+      "problemMatcher": []
+    }
+  ]
 }
