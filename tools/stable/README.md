@@ -6,3 +6,9 @@
 - 默认入口仍位于 `tools/`。
 - 不自动覆盖、删除或执行这里的脚本。
 - 回退前先核对当前文件、目标版本和影响范围。
+
+本轮部署优化前新增归档：
+
+- `bootstrap_workspace_v1.1.ps1`
+- `environment_check_v2.4.0.ps1`
+- `validate_repository_v1.1.0.ps1`

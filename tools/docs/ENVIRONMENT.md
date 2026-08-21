@@ -22,6 +22,7 @@ tools/environment_check.ps1
 - 项目工作流插件：`plugins/codex-design-workflows/`
 - 本地插件市场：`.agents/plugins/marketplace.json`
 - GitHub 代理守卫：`tools/lib/github_proxy_guard.ps1`
+- 仓库级 Git 配置：`tools/configure_repository_git.ps1`
 - 仓库验证器：`tools/validate_repository.ps1`
 - 个人配置迁移：`tools/harden_codex_global_config.ps1`
 
@@ -29,4 +30,4 @@ tools/environment_check.ps1
 
 ## 日常入口
 
-优先使用 VS Code 任务或桌面工作台运行环境检查、仓库验证、同步和发布。任何 GitHub 网络检查都必须先通过当前代理验证；失败时停止，不尝试直连。
+每台电脑首次克隆后，先运行 VS Code 任务“配置本仓库 Git 规范”。随后优先使用 VS Code 任务或桌面工作台运行环境检查、仓库验证、同步和发布。任何 GitHub 网络检查都必须先通过当前代理验证；失败时停止，不尝试直连。

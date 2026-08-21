@@ -83,7 +83,7 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 `Codex Design 环境检查` 会检查 Windows、PowerShell、Git、Node.js、npm、Python、Codex、VS Code、Photoshop Beta、Illustrator Beta、MCP、Hooks 和插件配置概况，并在 `logs/` 中生成带时间的环境报告。报告不记录密钥、令牌或代理凭据。
 
 
-VS Code 任务还提供仓库验证、个人 Codex 配置加固和本地工作流插件安装入口。配置加固会先保存时间戳备份；插件安装使用仓库内 `.agents/plugins/marketplace.json`，不依赖远程市场。
+VS Code 任务还提供仓库级 Git 换行配置、仓库验证、个人 Codex 配置加固和本地工作流插件安装入口。每台电脑首次克隆后运行一次“配置本仓库 Git 规范”，会设置当前仓库的 `core.autocrlf=false`、`core.eol=lf` 和 `core.safecrlf=true`，不修改系统或其他项目。配置加固会先保存时间戳备份；插件安装使用仓库内 `.agents/plugins/marketplace.json`，不依赖远程市场。
 
 
 `Codex Design 终端` 会优先使用 Windows Terminal，并明确以 Windows PowerShell 作为命令行环境，默认进入当前仓库根目录。如果电脑没有安装或无法找到 Windows Terminal，快捷方式会自动回退为直接打开 Windows PowerShell。

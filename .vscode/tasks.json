@@ -14,7 +14,7 @@
       "label": "[Git] Codex Design 状态检查",
       "detail": "Git｜检查当前分支、修改文件和远程同步状态",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -34,7 +34,7 @@
       "label": "[Git] Codex Design 同步GitHub",
       "detail": "Git｜安全获取并同步 GitHub main 分支",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -54,7 +54,7 @@
       "label": "[Git] Codex Design 发布GitHub",
       "detail": "Git｜执行安全预检、提交并推送本地修改",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -74,7 +74,7 @@
       "label": "[环境] Codex Design 环境检查",
       "detail": "环境｜检查开发工具、Adobe、MCP、Git 和网络状态",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -94,7 +94,7 @@
       "label": "[环境] Codex Design 一键恢复工作区",
       "detail": "环境｜检测新电脑环境、恢复项目入口并输出缺失项",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -111,10 +111,30 @@
       "problemMatcher": []
     },
     {
+      "label": "[环境] 配置本仓库 Git 规范",
+      "detail": "环境｜固定当前克隆的换行设置，不修改系统或其他项目",
+      "type": "process",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\configure_repository_git.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "[环境] Codex Design 仓库验证",
       "detail": "环境｜检查 PowerShell 编码与语法、JSON、插件、skills 和敏感文件",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -134,7 +154,7 @@
       "label": "[环境] Codex 全局配置加固",
       "detail": "环境｜备份并收紧个人 Codex 信任、审批和 Windows 沙箱设置",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -154,7 +174,7 @@
       "label": "[环境] 安装 Codex Design 工作流插件",
       "detail": "环境｜注册仓库内本地插件市场并安装创意工作流 skill",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -174,7 +194,7 @@
       "label": "[桌面] Codex Design 创建桌面工作台",
       "detail": "桌面｜创建或恢复 Codex Design 桌面快捷入口",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
@@ -194,7 +214,7 @@
       "label": "[Adobe] Illustrator MCP 状态",
       "detail": "Adobe｜只读检查 Illustrator 进程和本地 18412 监听端口",
       "type": "process",
-      "command": "powershell.exe",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",

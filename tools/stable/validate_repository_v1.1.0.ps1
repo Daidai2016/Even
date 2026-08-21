@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design Repository Validator V1.2.0
+# Codex Design Repository Validator V1.1.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==========================================
 
@@ -243,12 +243,7 @@ function Test-PluginManifest {
         }
 
         if (
-            (
-                Get-Content `
-                    -LiteralPath $File.FullName `
-                    -Raw `
-                    -Encoding UTF8
-            ) -match "\[TODO:"
+            (Get-Content -LiteralPath $File.FullName -Raw) -match "\[TODO:"
         ) {
             Add-ValidationError "插件 manifest 含 TODO 占位符：$FolderName"
         }
@@ -371,10 +366,7 @@ try {
     foreach ($File in $CandidateFiles) {
         $RelativePath = Get-RelativeProjectPath $File.FullName
 
-        if (
-            @(".ps1", ".psm1", ".psd1") -contains
-            $File.Extension.ToLowerInvariant()
-        ) {
+        if ($File.Extension -ieq ".ps1") {
             Test-Utf8BomPowerShellFile -File $File
             Test-PowerShellSyntax -File $File
         }

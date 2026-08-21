@@ -1,17 +1,12 @@
 ﻿# ==========================================
-# Codex Design Git Status Tool V1.1
+# Codex Design Git Status Tool V1.2
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==========================================
 
 $ErrorActionPreference = "Stop"
 
 try {
-    # 根据当前脚本所在位置，动态计算仓库根目录。
-    # 公司电脑：
-    # D:\Codex_Design
-    #
-    # 家里电脑：
-    # E:\AI_Workspace\Codex_Design
+    # 根据当前脚本所在位置动态计算仓库根目录，不依赖电脑盘符。
 
     $ProjectPath = (
         Resolve-Path `

@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design 环境检查工具 V2.4.1
+# Codex Design 环境检查工具 V2.4.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 主要功能：
@@ -750,7 +750,7 @@ try {
     # 报告标题
     # --------------------------------------
 
-    Add-Report "Codex Design 环境检查 V2.4.1"
+    Add-Report "Codex Design 环境检查 V2.4.0"
     Add-Report "========================================"
     Add-Report "检查时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Add-Report "项目目录：$ProjectPath"
@@ -1395,65 +1395,6 @@ try {
                 -Status "Failure"
         }
         else {
-            $GitAutoCrlfResult =
-                Invoke-NativeCommandSafe `
-                    -FilePath $GitCommand.Source `
-                    -Arguments @(
-                        "config",
-                        "--local",
-                        "--get",
-                        "core.autocrlf"
-                    )
-
-            $GitEolResult =
-                Invoke-NativeCommandSafe `
-                    -FilePath $GitCommand.Source `
-                    -Arguments @(
-                        "config",
-                        "--local",
-                        "--get",
-                        "core.eol"
-                    )
-
-            $GitSafeCrlfResult =
-                Invoke-NativeCommandSafe `
-                    -FilePath $GitCommand.Source `
-                    -Arguments @(
-                        "config",
-                        "--local",
-                        "--get",
-                        "core.safecrlf"
-                    )
-
-            $GitAutoCrlf = (
-                [string]($GitAutoCrlfResult.Output -join "")
-            ).Trim().ToLowerInvariant()
-
-            $GitEol = (
-                [string]($GitEolResult.Output -join "")
-            ).Trim().ToLowerInvariant()
-
-            $GitSafeCrlf = (
-                [string]($GitSafeCrlfResult.Output -join "")
-            ).Trim().ToLowerInvariant()
-
-            if (
-                $GitAutoCrlf -eq "false" -and
-                $GitEol -eq "lf" -and
-                $GitSafeCrlf -eq "true"
-            ) {
-                Add-Status `
-                    -Name "Git换行配置" `
-                    -Value "当前仓库已固定" `
-                    -Status "Success"
-            }
-            else {
-                Add-Status `
-                    -Name "Git换行配置" `
-                    -Value "当前仓库尚未固定" `
-                    -Status "Warning"
-            }
-
             $GitStatusResult =
                 Invoke-NativeCommandSafe `
                     -FilePath $GitCommand.Source `
@@ -1644,7 +1585,7 @@ try {
 
     Add-Report "说明："
     Add-Report "1. Python 是当前项目的可选工具，未安装仅记录为警告。"
-    Add-Report "2. Git 存在本地修改或未固定仓库换行配置时仅记录为警告，不会自动修改或丢弃。"
+    Add-Report "2. Git 存在本地修改时仅记录为警告，不会自动提交或丢弃修改。"
     Add-Report "3. GitHub 网络、DNS 或代理异常只记录为警告，不会中断环境检查。"
     Add-Report "4. Illustrator MCP 使用配置、令牌变量和实时端口三层检查。"
     Add-Report "5. Illustrator 未启动或端口未监听时只记录为警告。"

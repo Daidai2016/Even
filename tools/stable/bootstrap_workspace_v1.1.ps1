@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design 工作区恢复工具 V1.2.0
+# Codex Design 工作区恢复工具 V1.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 功能：
@@ -670,7 +670,6 @@ try {
         "tools\git_status.ps1",
         "tools\git_sync.ps1",
         "tools\git_publish.ps1",
-        "tools\configure_repository_git.ps1",
         "tools\environment_check.ps1",
         "tools\validate_repository.ps1",
         "tools\harden_codex_global_config.ps1",
@@ -701,7 +700,6 @@ try {
         "tools\git_status.ps1",
         "tools\git_sync.ps1",
         "tools\git_publish.ps1",
-        "tools\configure_repository_git.ps1",
         "tools\environment_check.ps1",
         "tools\validate_repository.ps1",
         "tools\harden_codex_global_config.ps1",
@@ -913,57 +911,6 @@ try {
                 -Name "Git仓库" `
                 -Value "有效" `
                 -Status "Success"
-
-            $GitAutoCrlf = (
-                @(
-                    & $script:GitExe `
-                        config `
-                        --local `
-                        --get `
-                        core.autocrlf `
-                        2>$null
-                ) -join ""
-            ).Trim().ToLowerInvariant()
-
-            $GitEol = (
-                @(
-                    & $script:GitExe `
-                        config `
-                        --local `
-                        --get `
-                        core.eol `
-                        2>$null
-                ) -join ""
-            ).Trim().ToLowerInvariant()
-
-            $GitSafeCrlf = (
-                @(
-                    & $script:GitExe `
-                        config `
-                        --local `
-                        --get `
-                        core.safecrlf `
-                        2>$null
-                ) -join ""
-            ).Trim().ToLowerInvariant()
-
-            if (
-                $GitAutoCrlf -eq "false" -and
-                $GitEol -eq "lf" -and
-                $GitSafeCrlf -eq "true"
-            ) {
-                Add-Status `
-                    -Name "Git换行配置" `
-                    -Value "当前仓库已固定" `
-                    -Status "Success"
-            }
-            else {
-                Add-Status `
-                    -Name "Git换行配置" `
-                    -Value "当前仓库尚未固定" `
-                    -Status "Warning" `
-                    -Action "运行 VS Code 任务：[环境] 配置本仓库 Git 规范"
-            }
 
             $BranchOutput = @(
                 & $script:GitExe `
