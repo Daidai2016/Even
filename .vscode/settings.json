@@ -10,7 +10,8 @@
 
     "files.encoding": "utf-8",
 
-    "files.autoGuessEncoding": true,
+    // 仓库文本编码固定为 UTF-8，避免中文内容被误判为 GBK。
+    "files.autoGuessEncoding": false,
 
 
     // PowerShell 特殊处理

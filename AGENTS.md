@@ -124,4 +124,6 @@ Adobe、PowerPoint、Excel、Word、PDF 和其他创意工具都是两条主线�
 - PowerShell (`.ps1`)：UTF-8 with BOM，并保持 Windows PowerShell 5.1 兼容。
 - Adobe ExtendScript (`.jsx`)：UTF-8，具体语法要求见 `CODING_RULES.md`。
 - Markdown、JSON 和 SVG：UTF-8。
+- JSON 和 JSONC 使用 UTF-8 without BOM 与 LF 换行；不得依赖编辑器自动猜测编码。
+- Windows PowerShell 5.1 读取 UTF-8 文本时必须显式指定 `-Encoding UTF8`；禁止用默认编码读取后再覆盖原文件。
 - PowerPoint、Excel、Word 和 PDF 等二进制交付物不适用文本编码规则；必须使用对应格式的标准生成、打开和验证流程。

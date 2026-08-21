@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design Repository Validator V1.0.0
+# Codex Design Repository Validator V1.1.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==========================================
 
@@ -114,6 +114,64 @@ function Test-PowerShellSyntax {
     if (@($ParseErrors).Count -gt 0) {
         Add-ValidationError `
             "PowerShell 语法错误：$(Get-RelativeProjectPath $File.FullName)"
+    }
+}
+
+
+function Test-Utf8JsonText {
+    param([System.IO.FileInfo]$File)
+
+    $script:Checks++
+    $Bytes = [System.IO.File]::ReadAllBytes($File.FullName)
+    $HasBom = (
+        $Bytes.Length -ge 3 -and
+        $Bytes[0] -eq 0xEF -and
+        $Bytes[1] -eq 0xBB -and
+        $Bytes[2] -eq 0xBF
+    )
+
+    try {
+        $Utf8 = New-Object System.Text.UTF8Encoding($false, $true)
+        $Text = $Utf8.GetString($Bytes)
+    }
+    catch {
+        Add-ValidationError `
+            "JSON 不是严格 UTF-8：$(Get-RelativeProjectPath $File.FullName)"
+        return
+    }
+
+    if ($HasBom) {
+        Add-ValidationError `
+            "JSON 必须使用 UTF-8 without BOM：$(Get-RelativeProjectPath $File.FullName)"
+    }
+
+    if ($Text.IndexOf([char]0xFFFD) -ge 0) {
+        Add-ValidationError `
+            "JSON 包含 Unicode 替换字符，疑似发生编码损坏：$(Get-RelativeProjectPath $File.FullName)"
+    }
+
+    if ($Text.Contains("`r")) {
+        Add-ValidationError `
+            "JSON 必须使用 LF 换行：$(Get-RelativeProjectPath $File.FullName)"
+    }
+
+    foreach ($Marker in @(
+        "鐘舵",
+        "妫€",
+        "鐜",
+        "锝滄",
+        "鍙戝",
+        "鍚屾",
+        "瀹夎",
+        "浠撳",
+        "妗岄潰",
+        "鎻掍欢"
+    )) {
+        if ($Text.Contains($Marker)) {
+            Add-ValidationError `
+                "JSON 疑似把 UTF-8 错按 CP936/GBK 解码：$(Get-RelativeProjectPath $File.FullName)"
+            break
+        }
     }
 }
 
@@ -311,6 +369,13 @@ try {
         if ($File.Extension -ieq ".ps1") {
             Test-Utf8BomPowerShellFile -File $File
             Test-PowerShellSyntax -File $File
+        }
+
+        if (
+            $File.Extension -ieq ".json" -or
+            $File.Extension -ieq ".jsonc"
+        ) {
+            Test-Utf8JsonText -File $File
         }
 
         if (

@@ -11,8 +11,8 @@
   },
   "tasks": [
     {
-      "label": "[Git] Codex Design 状��检�?,
-      "detail": "Git｜检查当前分支��修改文件和远程同步状��?,
+      "label": "[Git] Codex Design 状态检查",
+      "detail": "Git｜检查当前分支、修改文件和远程同步状态",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -52,7 +52,7 @@
     },
     {
       "label": "[Git] Codex Design 发布GitHub",
-      "detail": "Git｜执行安全预棢�、提交并推��本地修�?,
+      "detail": "Git｜执行安全预检、提交并推送本地修改",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -71,8 +71,8 @@
       "problemMatcher": []
     },
     {
-      "label": "[环境] Codex Design 环境棢��?,
-      "detail": "环境｜检查开发工具��Adobe、MCP、Git 和网络状�?,
+      "label": "[环境] Codex Design 环境检查",
+      "detail": "环境｜检查开发工具、Adobe、MCP、Git 和网络状态",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -91,8 +91,8 @@
       "problemMatcher": []
     },
     {
-      "label": "[环境] Codex Design 丢�键恢复工作区",
-      "detail": "环境｜检测新电脑环境、恢复项目入口并输出缺失�?,
+      "label": "[环境] Codex Design 一键恢复工作区",
+      "detail": "环境｜检测新电脑环境、恢复项目入口并输出缺失项",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -112,7 +112,7 @@
     },
     {
       "label": "[环境] Codex Design 仓库验证",
-      "detail": "环境｜检�?PowerShell 编码与语法��JSON、插件��skills 和敏感文�?,
+      "detail": "环境｜检查 PowerShell 编码与语法、JSON、插件、skills 和敏感文件",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -151,7 +151,7 @@
       "problemMatcher": []
     },
     {
-      "label": "[环境] 安装 Codex Design 工作流插�?,
+      "label": "[环境] 安装 Codex Design 工作流插件",
       "detail": "环境｜注册仓库内本地插件市场并安装创意工作流 skill",
       "type": "process",
       "command": "powershell.exe",
@@ -171,7 +171,7 @@
       "problemMatcher": []
     },
     {
-      "label": "[桌面] Codex Design 创建桌面工作�?,
+      "label": "[桌面] Codex Design 创建桌面工作台",
       "detail": "桌面｜创建或恢复 Codex Design 桌面快捷入口",
       "type": "process",
       "command": "powershell.exe",
@@ -191,8 +191,8 @@
       "problemMatcher": []
     },
     {
-      "label": "[Adobe] Illustrator MCP 状��?,
-      "detail": "Adobe｜只读检�?Illustrator 进程和本�?18412 监听端口",
+      "label": "[Adobe] Illustrator MCP 状态",
+      "detail": "Adobe｜只读检查 Illustrator 进程和本地 18412 监听端口",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -200,7 +200,7 @@
         "-ExecutionPolicy",
         "Bypass",
         "-Command",
-        "$illustrator = Get-Process -Name 'Illustrator' -ErrorAction SilentlyContinue; $listener = Get-NetTCPConnection -LocalPort 18412 -State Listen -ErrorAction SilentlyContinue; Write-Host ''; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ' Illustrator MCP 实时状��? -ForegroundColor Cyan; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ''; if ($illustrator) { Write-Host 'Illustrator：正在运�? -ForegroundColor Green } else { Write-Host 'Illustrator：当前未运行' -ForegroundColor Yellow }; if ($listener) { Write-Host 'MCP端口�?8412 正在监听' -ForegroundColor Green } else { Write-Host 'MCP端口�?8412 当前未监�? -ForegroundColor Yellow; Write-Host '提示：Illustrator 可能未启动，�?MCP 服务尚未弢�启��? -ForegroundColor Yellow }; Write-Host ''; Write-Host '本任务只读取进程和端口状态，不读取或修改 Illustrator 文档�? -ForegroundColor DarkGray"
+        "$illustrator = Get-Process -Name 'Illustrator' -ErrorAction SilentlyContinue; $listener = Get-NetTCPConnection -LocalPort 18412 -State Listen -ErrorAction SilentlyContinue; Write-Host ''; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ' Illustrator MCP 实时状态' -ForegroundColor Cyan; Write-Host '==============================================' -ForegroundColor Cyan; Write-Host ''; if ($illustrator) { Write-Host 'Illustrator：正在运行' -ForegroundColor Green } else { Write-Host 'Illustrator：当前未运行' -ForegroundColor Yellow }; if ($listener) { Write-Host 'MCP端口：18412 正在监听' -ForegroundColor Green } else { Write-Host 'MCP端口：18412 当前未监听' -ForegroundColor Yellow; Write-Host '提示：Illustrator 可能未启动，或 MCP 服务尚未开启。' -ForegroundColor Yellow }; Write-Host ''; Write-Host '本任务只读取进程和端口状态，不读取或修改 Illustrator 文档。' -ForegroundColor DarkGray"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
