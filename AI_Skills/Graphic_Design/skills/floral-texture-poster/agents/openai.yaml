@@ -1,0 +1,4 @@
+interface:
+  display_name: "花卉图片转肌理质感素材"
+  short_description: "将花卉参考图转成极简几何、纸张颗粒与丝网印刷质感的静态海报"
+  default_prompt: "使用 $floral-texture-poster 把这张花卉图片转成可排版的肌理质感主视觉。"

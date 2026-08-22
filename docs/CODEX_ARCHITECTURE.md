@@ -12,7 +12,8 @@
 | 项目运行配置 | `.codex/config.toml` | 本仓库审批、沙箱、Hooks 和 Illustrator MCP |
 | 项目治理 | `AGENTS.md`、`CODING_RULES.md` | 仓库、生产、安全和交付规则 |
 | 自动门禁 | `.codex/hooks.json`、`.codex/hooks/` | 工具调用前阻止危险命令，变更后执行仓库验证 |
-| 能力封装 | `plugins/`、`.agents/plugins/` | 团队可安装插件与窄范围 skills |
+| Skill 源文件 | `AI_Skills/` | 按专业分类维护共享规范、具体 Skill 和初始版本 |
+| 能力封装 | `plugins/`、`.agents/plugins/` | 只保存通过晋级门禁的可安装插件与窄范围 skills |
 | 创意证据 | `experiments/`、`prompts/`、`workflows/`、`assets/` | 实验、评审、正式能力和合法资源 |
 | 生产实现 | `scripts/`、`tools/` | Adobe 自动化和仓库运维工具 |
 | 观测与恢复 | `logs/`、`tools/stable/` | 本地报告和修改前稳定版本 |
@@ -40,7 +41,9 @@
 
 ## 可复用能力晋级
 
-创意内容从 `experiments/` 开始。只有具备代表性正反样本、来源和授权记录、人工视觉评审与复测证据时，才依次选择晋级到 `prompts/`、`workflows/` 或窄范围 skill。仓库插件 `codex-design-workflows` 提供这一流程，不将未验证方向包装成正式能力。
+创意内容从 `experiments/` 开始。Skill 的共享规则、具体入口和初始版本在 `AI_Skills/` 按专业分类维护，并显式记录实验来源与验证状态。只有具备代表性正反样本、来源和授权记录、人工视觉评审与复测证据时，才选择晋级到 `prompts/`、`workflows/`，或把窄范围 Skill 封装到 `plugins/` 并加入本地市场。仓库插件 `codex-design-workflows` 提供这一流程，不将未验证方向包装成正式能力。
+
+`AI_Skills/` 是源文件管理层，不是 Codex 插件安装目录。需要在 Codex 中作为可安装能力分发时，必须经过晋级后封装到 `plugins/`。
 
 ## 操作入口
 

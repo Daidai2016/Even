@@ -17,6 +17,7 @@
 - `AGENTS.md`：仓库级操作、安全和交付规则。
 - `CODING_RULES.md`：代码、自动化工具和创意交付物的通用开发规范。
 - `docs/AIGC_CREATIVE_RULES.md`：AIGC 图像生成、创意训练和 skill 建设的专项规范。
+- `AI_Skills/`：按专业分类维护 AIGC Skill 源文件、共享规范和具体 Skill；进入某一分类前读取其局部 `AGENTS.md`。
 - 子目录 `AGENTS.md`：该软件或目录的局部强制规则。
 - `scripts/*/docs/README.md`：软件定位、能力和工作流指南，不重复强制规则。
 - `tools/docs/ENVIRONMENT.md`：当前测试环境事实，不定义通用开发规则。
@@ -74,8 +75,9 @@ Adobe、PowerPoint、Excel、Word、PDF 和其他创意工具都是两条主线�
 - 项目级 Codex 配置与 Hooks 放在 `.codex/`；团队插件市场清单放在 `.agents/plugins/`；可安装插件放在 `plugins/`。
 - 通用文档和 Word 类交付物放在 `docs/` 或任务已建立的专项目录；演示文稿放在 `presentation/`；软件专项文档放在对应软件目录的 `docs/`。
 - 可复用提示词放在 `prompts/`，经验证的流程放在 `workflows/`，参考图像、色板、字体样例和其他合法资源放在 `assets/`。
+- AIGC Skill 源文件放在 `AI_Skills/` 下对应专业分类。处理平面或动态视觉任务时，先读取 `AI_Skills/Graphic_Design/AGENTS.md`，再按其路由读取共享规范与具体 Skill。
 - 未验证的 AIGC 方向测试放在 `experiments/`，可清理的临时文件放在 `work/`；两者都不得冒充正式成果。
-- 可复用 skill 按 `docs/AIGC_CREATIVE_RULES.md` 统一管理。
+- 可复用 skill 按 `docs/AIGC_CREATIVE_RULES.md` 统一管理；只有通过晋级门禁的能力才封装到 `plugins/` 并进入本地插件市场。
 - 需要进入版本管理的大型设计、演示和思维导图文件（如 `.ai`、`.psd`、`.psb`、`.indd`、`.tif`、`.pptx`、`.xmind`）必须按 `.gitattributes` 中的 Git LFS 策略管理。
 - 桌面快捷方式和测试临时产物不得加入 Git。
 

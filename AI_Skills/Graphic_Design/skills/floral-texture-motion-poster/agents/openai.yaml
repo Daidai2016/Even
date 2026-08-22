@@ -1,0 +1,4 @@
+interface:
+  display_name: "肌理质感花卉动态海报"
+  short_description: "将静态花卉肌理海报延展为固定镜头、生长绽放与文字渐显的短视频"
+  default_prompt: "使用 $floral-texture-motion-poster 把这张花卉肌理海报延展成首尾连续的动态海报。"

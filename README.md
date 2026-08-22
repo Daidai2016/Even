@@ -61,6 +61,8 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 
 详细结构、运行链路和安全边界见 `docs/CODEX_ARCHITECTURE.md`。
 
+`AI_Skills/` 保存按专业分类维护的 Skill 源文件和共享规范；`plugins/` 只保存通过证据门禁、可供 Codex 安装的正式插件。两者不得混为同一层。
+
 
 
 ---
@@ -111,8 +113,11 @@ Codex_Design/
 ├── .agents/plugins/
 │   团队本地插件市场清单
 │
+├── AI_Skills/
+│   按专业分类维护的 Skill 源文件、共享规则和初始版本
+│
 ├── plugins/
-│   Codex Design 可安装插件与 skills
+│   通过验证后封装的 Codex Design 可安装插件与 skills
 │
 ├── scripts/
 │   Adobe 及其他生产自动化脚本
@@ -138,9 +143,23 @@ Codex_Design/
 ├── presentation/
 │   PowerPoint 汇报与展示文件
 │
+├── logs/
+│   可清理的本地运行记录，不作为正式交付
+│
 └── work/
     可清理的分析、生成和测试中间文件
 ```
+
+仓库外层工作区建议只保留三个明确入口：
+
+```text
+AI_Workspace/
+├── Codex_Design/       创意能力、规范、工具和插件仓库
+├── Client_Projects/    客户或生产项目，与平台仓库分开
+└── Shared_Assets/      跨项目共用且有来源记录的大型素材
+```
+
+脚本、模板、MCP 配置和设计自动化不在工作区根目录重复建库，统一由 `Codex_Design/` 内对应目录管理。
 
 
 ---
