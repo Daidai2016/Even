@@ -87,6 +87,8 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 
 VS Code 任务还提供仓库级 Git 换行配置、仓库验证、个人 Codex 配置加固和本地工作流插件安装入口。每台电脑首次克隆后运行一次“配置本仓库 Git 规范”，会设置当前仓库的 `core.autocrlf=false`、`core.eol=lf` 和 `core.safecrlf=true`，不修改系统或其他项目。配置加固会先保存时间戳备份；插件安装使用仓库内 `.agents/plugins/marketplace.json`，不依赖远程市场。
 
+新电脑首次克隆后，优先在 VS Code 运行任务“首次部署本机 Codex Design”。该入口会验证仓库、配置当前克隆的 Git 换行规则、安装 `codex-design-workflows` 与 `codex-design-visuals`、应用系统及第三方 Skill 中文界面、创建桌面工作台，并执行本地环境检查。部署过程不安装系统软件、不访问 GitHub、不提交或推送；个人 Codex 全局配置加固仍保留为独立任务。完成后重新打开 Codex 或新建任务即可载入插件和中文名称。
+
 
 `Codex Design 终端` 会优先使用 Windows Terminal，并明确以 Windows PowerShell 作为命令行环境，默认进入当前仓库根目录。如果电脑没有安装或无法找到 Windows Terminal，快捷方式会自动回退为直接打开 Windows PowerShell。
 

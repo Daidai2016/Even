@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design 环境检查工具 V2.4.1
+# Codex Design 环境检查工具 V2.4.3
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 主要功能：
@@ -750,7 +750,7 @@ try {
     # 报告标题
     # --------------------------------------
 
-    Add-Report "Codex Design 环境检查 V2.4.1"
+    Add-Report "Codex Design 环境检查 V2.4.3"
     Add-Report "========================================"
     Add-Report "检查时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Add-Report "项目目录：$ProjectPath"
@@ -955,11 +955,22 @@ try {
 
     if ($null -ne $CodexCommand) {
         try {
-            $PluginListOutput = @(
-                & $CodexCommand.Source plugin list --json 2>$null
-            )
+            $PreviousErrorActionPreference = $ErrorActionPreference
 
-            if ($LASTEXITCODE -eq 0) {
+            try {
+                # Windows PowerShell 5.1 会把 Codex CLI 的普通 stderr
+                # 警告包装成 ErrorRecord，状态仍以真实退出码为准。
+                $ErrorActionPreference = "Continue"
+                $PluginListOutput = @(
+                    & $CodexCommand.Source plugin list --json 2>$null
+                )
+                $PluginListExitCode = $LASTEXITCODE
+            }
+            finally {
+                $ErrorActionPreference = $PreviousErrorActionPreference
+            }
+
+            if ($PluginListExitCode -eq 0) {
                 $PluginListData = ($PluginListOutput -join `
                     [Environment]::NewLine) |
                     ConvertFrom-Json
@@ -988,26 +999,38 @@ try {
             -Value "$($InstalledPlugins.Count) 个已安装，$($EnabledPlugins.Count) 个已启用" `
             -Status "Success"
 
-        $WorkspacePlugin = @(
-            $InstalledPlugins |
-                Where-Object {
-                    $_.pluginId -eq `
-                        "codex-design-workflows@codex-design" -and
-                    $_.enabled -eq $true
-                }
+        $WorkspacePlugins = @(
+            [pscustomobject]@{
+                Name = "项目工作流插件"
+                PluginId = "codex-design-workflows@codex-design"
+            },
+            [pscustomobject]@{
+                Name = "项目视觉插件"
+                PluginId = "codex-design-visuals@codex-design"
+            }
         )
 
-        if ($WorkspacePlugin.Count -gt 0) {
-            Add-Status `
-                -Name "项目工作流插件" `
-                -Value "已安装并启用" `
-                -Status "Success"
-        }
-        else {
-            Add-Status `
-                -Name "项目工作流插件" `
-                -Value "未安装或未启用" `
-                -Status "Warning"
+        foreach ($ExpectedPlugin in $WorkspacePlugins) {
+            $WorkspacePlugin = @(
+                $InstalledPlugins |
+                    Where-Object {
+                        $_.pluginId -eq $ExpectedPlugin.PluginId -and
+                        $_.enabled -eq $true
+                    }
+            )
+
+            if ($WorkspacePlugin.Count -gt 0) {
+                Add-Status `
+                    -Name $ExpectedPlugin.Name `
+                    -Value "已安装并启用" `
+                    -Status "Success"
+            }
+            else {
+                Add-Status `
+                    -Name $ExpectedPlugin.Name `
+                    -Value "未安装或未启用" `
+                    -Status "Warning"
+            }
         }
     }
     else {

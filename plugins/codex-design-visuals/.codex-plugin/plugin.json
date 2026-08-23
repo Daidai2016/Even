@@ -1,0 +1,27 @@
+{
+  "name": "codex-design-visuals",
+  "version": "0.4.0",
+  "description": "Codex Design 默认保留原图配色的完整花卉几何肌理静态完稿 Skill 本地测试版。",
+  "author": {
+    "name": "Codex Design"
+  },
+  "keywords": [
+    "visual-design",
+    "poster",
+    "floral-texture"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Design 视觉设计（测试版）",
+    "shortDescription": "默认保留原图配色，完成整株花卉几何化与 PS/AI 静态完稿。",
+    "longDescription": "提供花卉图片转肌理质感素材这一项初始示例 Skill。静态流程默认继承原图各部位的色相、明度、饱和度和渐变关系，只改变整株花卉的平面几何、透明叠印、纸张颗粒和丝网印刷语言；只有用户明确要求时才进入指定换色模式，再进入 Photoshop 或 Illustrator 完稿。当前版本用于本地样张验证，尚未通过正式生产门禁。",
+    "developerName": "Codex Design",
+    "category": "Design",
+    "capabilities": [
+      "Analysis",
+      "Write"
+    ],
+    "defaultPrompt": "请使用 Codex Design 视觉 Skill 分析我的花卉素材；默认保留原图完整配色，只改变整株花卉的几何造型、纸张颗粒和丝网印刷质感，确认生产规格并完成 Photoshop 或 Illustrator 静态完稿。",
+    "brandColor": "#C85B52"
+  }
+}

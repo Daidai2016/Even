@@ -111,6 +111,26 @@
       "problemMatcher": []
     },
     {
+      "label": "[环境] 首次部署本机 Codex Design",
+      "detail": "环境｜配置当前克隆、安装全部本地插件、应用中文 Skill 并完成验证",
+      "type": "process",
+      "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\setup_codex_design_workstation.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "[环境] 配置本仓库 Git 规范",
       "detail": "环境｜固定当前克隆的换行设置，不修改系统或其他项目",
       "type": "process",

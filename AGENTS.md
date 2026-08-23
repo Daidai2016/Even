@@ -78,6 +78,8 @@ Adobe、PowerPoint、Excel、Word、PDF 和其他创意工具都是两条主线�
 - AIGC Skill 源文件放在 `AI_Skills/` 下对应专业分类。处理平面或动态视觉任务时，先读取 `AI_Skills/Graphic_Design/AGENTS.md`，再按其路由读取共享规范与具体 Skill。
 - 未验证的 AIGC 方向测试放在 `experiments/`，可清理的临时文件放在 `work/`；两者都不得冒充正式成果。
 - 可复用 skill 按 `docs/AIGC_CREATIVE_RULES.md` 统一管理；只有通过晋级门禁的能力才封装到 `plugins/` 并进入本地插件市场。
+- 仓库自建 Skill 必须按 `docs/AIGC_CREATIVE_RULES.md` 使用稳定的英文内部 ID 和清晰的中文界面名称、功能说明及默认提示。不得为了中文显示而把 Skill 目录、`name`、继承标识或显式调用名改为中文。
+- 系统及第三方 Skill 的中文界面只通过 `tools/localize_codex_skills.ps1` 和 `tools/config/codex_skills_zh-CN.json` 管理；不得修改其内部 ID、核心指令、依赖或调用策略，不得把用户缓存和本地恢复备份提交到仓库。
 - 需要进入版本管理的大型设计、演示和思维导图文件（如 `.ai`、`.psd`、`.psb`、`.indd`、`.tif`、`.pptx`、`.xmind`）必须按 `.gitattributes` 中的 Git LFS 策略管理。
 - 桌面快捷方式和测试临时产物不得加入 Git。
 

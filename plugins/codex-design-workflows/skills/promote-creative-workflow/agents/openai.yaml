@@ -1,6 +1,6 @@
 interface:
-  display_name: "Promote Creative Workflow"
-  short_description: "把创意实验晋级为经过证据门禁的正式工作流"
-  default_prompt: "Use $promote-creative-workflow to review this experiment and promote only the evidence-backed parts."
+  display_name: "创意实验评审与能力晋级"
+  short_description: "评审 AIGC 实验证据，并晋级为提示词、工作流或可复用 Skill。"
+  default_prompt: "使用 $promote-creative-workflow 评审这个创意实验，仅将证据充分的内容晋级为正式能力。"
 policy:
   allow_implicit_invocation: true

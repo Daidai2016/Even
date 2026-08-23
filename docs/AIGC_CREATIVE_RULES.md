@@ -92,6 +92,36 @@
 
 提示词是 skill 的可能组成部分，但只有提示词而没有边界、步骤和评价方法的内容，不得称为完整 skill。
 
+### 4.1 Skill 内部命名与中文界面
+
+所有仓库自建 Skill 采用“稳定英文内部 ID + 中文用户界面”的双层命名方式。
+
+内部标识规则：
+
+- Skill 目录名与 `SKILL.md` frontmatter 的 `name` 必须一致，只使用小写英文字母、数字和连字符，并控制在 64 个字符以内。
+- 插件目录名、插件 manifest 的 `name`、Skill 继承字段和显式调用中的 `$skill-name` 继续使用稳定英文 ID。
+- 不得为了中文显示而把内部 ID、目录名或继承关系改成中文、空格或其他不受支持的字符。
+- 已发布或已被其他 Skill 继承的内部 ID 原则上不得重命名；确需变更时，必须检查所有调用方、升级插件版本并完成迁移验证。
+
+中文界面规则：
+
+- 每个自建 Skill 必须提供 `agents/openai.yaml`。
+- `interface.display_name` 使用简短、明确、可区分的中文功能名称，优先采用“对象 + 动作”或“任务 + 结果”的业务语言，避免音译、内部代号和空泛名称。
+- `interface.short_description` 使用中文说明核心能力、适用对象或主要结果，使使用者无需打开 `SKILL.md` 即可判断用途；建议保持在 25 至 64 个字符。
+- `interface.default_prompt` 使用自然中文写成一条可直接调用的示例，并包含与 frontmatter 完全一致的英文 `$skill-name`。
+- `SKILL.md` 的 frontmatter `description` 可使用中文，但必须同时说明能力、适用场景和必要边界，不能只重复显示名称。
+- 插件 manifest 中面向用户的 `displayName`、`shortDescription`、`longDescription` 和 `defaultPrompt` 默认使用中文；插件内部 `name` 保持英文。
+- 更新界面名称时，只修改目标字段，必须保留现有图标、品牌色、依赖、`policy` 和其他未授权配置。
+
+同步与验证规则：
+
+- 同一 Skill 同时存在于 `AI_Skills/` 源目录和 `plugins/` 可安装副本时，中文界面元数据必须保持一致。
+- 插件内 Skill 的界面元数据发生变化时，应递增插件版本、重新安装或刷新缓存，并在新会话中确认显示结果。
+- 新增或修改 Skill 后，运行 Skill 结构校验和 `tools/validate_repository.ps1`；不得把“界面显示成功”视为内容能力已经通过视觉或生产门禁。
+- 系统及第三方 Skill 只允许通过 `tools/config/codex_skills_zh-CN.json` 维护中文映射，并使用 `tools/localize_codex_skills.ps1` 进行可恢复的本地覆盖。覆盖前必须备份；升级或重装后可重新应用。
+- 不得修改系统或第三方 Skill 的内部 ID、核心 `SKILL.md` 指令、依赖和调用策略，也不得提交 `.codex` 缓存、运行时文件或本地恢复备份。
+- 第三方 Skill 若自身内部 ID 不符合当前校验器命名规则，应记录为上游兼容性问题，不得仅为通过本地校验而擅自重命名。
+
 ## 5. 评价标准
 
 每次生成或训练至少评估：

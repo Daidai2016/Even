@@ -24,7 +24,17 @@ Graphic_Design/
         └── references/        仅该 Skill 需要的详细规则与模板
 ```
 
-新增 Skill 使用小写英文连字符目录名，入口固定为 `SKILL.md`。中文业务名称、完整模板和示例可放在 `references/` 中。没有实际用途的空目录、README、脚本或资产不得创建。
+新增 Skill 使用小写英文连字符目录名，入口固定为 `SKILL.md`。完整模板和示例可放在 `references/` 中。没有实际用途的空目录、README、脚本或资产不得创建。
+
+### 2.1 中文命名与界面元数据
+
+- Skill 目录名、frontmatter `name`、继承字段和 `$skill-name` 使用一致的英文内部 ID，不得改成中文。
+- 每个视觉 Skill 必须提供 `agents/openai.yaml`，并使用中文 `display_name`、中文 `short_description` 和中文 `default_prompt`。
+- `display_name` 应直接说明视觉任务，例如“花卉图片转肌理质感素材”；不得使用“工具一”“海报助手”等无法判断边界的名称。
+- `short_description` 应说明输入、主要处理或输出，让设计师在 Skill 列表中快速判断用途。
+- `default_prompt` 必须包含准确的英文 `$skill-name`，其余内容使用自然中文。
+- 源 Skill 与插件副本的 `agents/openai.yaml` 必须一致；更新插件副本后递增插件版本并重新安装验证。
+- 界面中文化不得改变 Skill 的验证状态，也不得把 `initial-example` 自动视为已验证正式能力。
 
 ## 3. 继承规则
 

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "locale": "zh-CN",
+  "skills": [
+    {
+      "name": "imagegen",
+      "displayName": "图像生成与编辑",
+      "shortDescription": "生成或编辑照片、插画、纹理、素材及透明背景等位图视觉资产。",
+      "defaultPrompt": "使用 $imagegen 为当前项目生成或编辑所需的位图视觉素材。"
+    },
+    {
+      "name": "openai-docs",
+      "displayName": "OpenAI 官方文档查询",
+      "shortDescription": "检索并引用 OpenAI 官方文档，解答 Codex、ChatGPT 与 API 使用问题。",
+      "defaultPrompt": "使用 $openai-docs 查询官方文档并回答这个 OpenAI 或 Codex 问题。"
+    },
+    {
+      "name": "plugin-creator",
+      "displayName": "Codex 插件创建",
+      "shortDescription": "创建或更新 Codex 插件结构、插件清单及个人插件市场登记。",
+      "defaultPrompt": "使用 $plugin-creator 创建或更新一个结构合规的 Codex 插件并完成校验。"
+    },
+    {
+      "name": "review-agent",
+      "displayName": "代码变更审查",
+      "shortDescription": "审查代码变更，定位可复现、可操作且值得修复的具体缺陷。",
+      "defaultPrompt": "使用 $review-agent 审查这些代码变更，并返回可操作的缺陷清单。"
+    },
+    {
+      "name": "skill-creator",
+      "displayName": "Codex 技能创建",
+      "shortDescription": "创建或更新边界明确、结构合规且可复用的 Codex Skill。",
+      "defaultPrompt": "使用 $skill-creator 创建或更新一个边界明确、结构合规的 Codex Skill。"
+    },
+    {
+      "name": "skill-installer",
+      "displayName": "Codex 技能安装",
+      "shortDescription": "从官方精选列表或指定代码仓库安装可用的 Codex Skills。",
+      "defaultPrompt": "使用 $skill-installer 查看或安装我指定的 Codex Skill。"
+    },
+    {
+      "name": "control-in-app-browser",
+      "displayName": "应用内浏览器控制",
+      "shortDescription": "打开并控制 Codex 应用内浏览器，用于导航、交互、检查和截图。",
+      "defaultPrompt": "使用 $control-in-app-browser 打开或检查应用内浏览器中的当前页面。"
+    },
+    {
+      "name": "control-chrome",
+      "displayName": "Chrome 浏览器控制",
+      "shortDescription": "控制当前 Chrome 会话中的标签页、登录状态和扩展相关操作。",
+      "defaultPrompt": "使用 $control-chrome 在我当前的 Chrome 会话中完成这个浏览器任务。"
+    },
+    {
+      "name": "computer-use",
+      "displayName": "Windows 电脑操作",
+      "shortDescription": "控制 Windows 桌面应用，完成需要界面点击、输入和检查的任务。",
+      "defaultPrompt": "使用 $computer-use 在 Windows 桌面应用中完成并检查这个任务。"
+    },
+    {
+      "name": "documents",
+      "displayName": "Word 文档创建与编辑",
+      "shortDescription": "创建、编辑、修订并验证 Word 或面向 Google Docs 的文档。",
+      "defaultPrompt": "使用 $documents 创建、编辑、修订或检查这份 Word 文档。"
+    },
+    {
+      "name": "pdf",
+      "displayName": "PDF 读取、创建与校验",
+      "shortDescription": "读取、创建、渲染并验证 PDF 文件及其页面视觉效果。",
+      "defaultPrompt": "使用 $pdf 读取、创建、渲染或检查这份 PDF 文件。"
+    },
+    {
+      "name": "Presentations",
+      "displayName": "演示文稿创建与编辑",
+      "shortDescription": "创建或编辑 PowerPoint 与 Google Slides 演示文稿并完成视觉校验。",
+      "defaultPrompt": "使用 $Presentations 创建或编辑这份演示文稿并检查最终版式。"
+    },
+    {
+      "name": "sites-building",
+      "displayName": "网站与 Web 应用构建",
+      "shortDescription": "构建落地页、作品集、仪表盘、门户及其他网站或 Web 应用。",
+      "defaultPrompt": "使用 $sites-building 构建这个网站或 Web 应用。"
+    },
+    {
+      "name": "sites-hosting",
+      "displayName": "网站发布与托管",
+      "shortDescription": "发布和托管由 Sites 构建的网站，并管理相关部署状态。",
+      "defaultPrompt": "使用 $sites-hosting 发布或管理这个 Sites 网站。"
+    },
+    {
+      "name": "excel-live-control",
+      "displayName": "Excel 工作簿实时控制",
+      "shortDescription": "通过桌面版 Excel 实时控制、更新并检查当前打开的工作簿。",
+      "defaultPrompt": "使用 $excel-live-control 更新并检查我当前打开的 Excel 工作簿。"
+    },
+    {
+      "name": "Spreadsheets",
+      "displayName": "电子表格创建与分析",
+      "shortDescription": "创建、编辑、分析并验证 Excel、CSV 或 Google Sheets 文件。",
+      "defaultPrompt": "使用 $Spreadsheets 创建、分析或更新这份电子表格并完成校验。"
+    },
+    {
+      "name": "template-creator",
+      "displayName": "可复用模板创建",
+      "shortDescription": "依据参考文档、表格、演示、图片或消息创建可复用个人模板。",
+      "defaultPrompt": "使用 $template-creator 根据我提供的参考内容创建或更新可复用模板。"
+    },
+    {
+      "name": "visualize",
+      "displayName": "交互式可视化与工具",
+      "shortDescription": "把概念和数据转成图表、地图、流程、模拟器或交互式工具。",
+      "defaultPrompt": "使用 $visualize 把这个概念或数据制作成清晰的交互式可视化。"
+    }
+  ]
+}

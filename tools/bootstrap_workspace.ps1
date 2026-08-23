@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design 工作区恢复工具 V1.2.0
+# Codex Design 工作区恢复工具 V1.2.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 功能：
@@ -582,13 +582,13 @@ try {
 
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Cyan
-    Write-Host " Codex Design 工作区恢复工具 V1.1" -ForegroundColor Cyan
+    Write-Host " Codex Design 工作区恢复工具 V1.2.1" -ForegroundColor Cyan
     Write-Host "==============================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "项目目录：$script:ProjectPath"
     Write-Host "开始时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
-    Add-Report "Codex Design 工作区恢复工具 V1.1"
+    Add-Report "Codex Design 工作区恢复工具 V1.2.1"
     Add-Report "=============================================="
     Add-Report "项目目录：$script:ProjectPath"
     Add-Report "开始时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -644,7 +644,9 @@ try {
         "tools\stable",
         "tools\docs",
         "scripts",
-        "plugins\codex-design-workflows"
+        "plugins\codex-design-workflows",
+        "plugins\codex-design-visuals",
+        "AI_Skills\Graphic_Design"
     )
 
     foreach ($Directory in $RequiredDirectories) {
@@ -675,6 +677,9 @@ try {
         "tools\validate_repository.ps1",
         "tools\harden_codex_global_config.ps1",
         "tools\install_codex_design_plugin.ps1",
+        "tools\localize_codex_skills.ps1",
+        "tools\setup_codex_design_workstation.ps1",
+        "tools\config\codex_skills_zh-CN.json",
         "tools\lib\github_proxy_guard.ps1",
         "tools\create_desktop_shortcuts.ps1",
         "tools\bootstrap_workspace.ps1",
@@ -682,6 +687,8 @@ try {
         "tools\stable\README.md",
         "plugins\codex-design-workflows\.codex-plugin\plugin.json",
         "plugins\codex-design-workflows\skills\promote-creative-workflow\SKILL.md",
+        "plugins\codex-design-visuals\.codex-plugin\plugin.json",
+        "plugins\codex-design-visuals\skills\floral-texture-poster\SKILL.md",
         "prompts\creative_experiment_review.md",
         "workflows\creative_capability_promotion.md",
         "experiments\creative_experiment_record_template.md"
@@ -706,6 +713,8 @@ try {
         "tools\validate_repository.ps1",
         "tools\harden_codex_global_config.ps1",
         "tools\install_codex_design_plugin.ps1",
+        "tools\localize_codex_skills.ps1",
+        "tools\setup_codex_design_workstation.ps1",
         "tools\lib\github_proxy_guard.ps1",
         "tools\create_desktop_shortcuts.ps1",
         "tools\bootstrap_workspace.ps1",
