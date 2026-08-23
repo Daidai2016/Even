@@ -87,9 +87,9 @@
 
     // Git
 
-    "git.autofetch": true,
+    "git.autofetch": false,
 
-    "git.confirmSync": false,
+    "git.confirmSync": true,
 
 
     // 搜索排除

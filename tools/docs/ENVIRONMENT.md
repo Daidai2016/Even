@@ -42,7 +42,7 @@ tools/environment_check.ps1
 - Illustrator MCP：`adobe_illustrator` / `localhost:18412`
 - 仓库级 Git：`core.autocrlf=false`、`core.eol=lf`、`core.safecrlf=true`
 
-`environment_check.ps1 V2.4.1` 在该工作站最近一次记录的结果为：通过 28、警告 1、失败 0；警告来自当时尚未提交的仓库修改。Illustrator MCP 的配置、令牌变量存在状态和实时端口已通过检查，报告不记录令牌或代理凭据。
+`environment_check.ps1 V2.4.3` 在该工作站最近一次记录的结果为：通过 28、警告 1、失败 0；警告来自当时尚未提交的仓库修改。Illustrator MCP 的配置、令牌变量存在状态和实时端口已通过检查，报告不记录令牌或代理凭据。
 
 公司电脑未在本次记录中实际复验，不得标记为已验证。每个克隆都必须独立完成仓库 Git 配置、仓库验证和环境检查。
 
