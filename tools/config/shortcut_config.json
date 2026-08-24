@@ -1,5 +1,5 @@
 {
-    "version": "2.2",
+    "version": "2.3",
     "workspace": {
         "name": "Even Codex Design",
         "icon": "folder_workspace.ico"
@@ -61,6 +61,14 @@
             "group": "01_开发工具",
             "type": "environment_check",
             "icon": "environment_check.ico"
+        },
+
+        {
+            "name": "Codex 代理环境配置",
+            "group": "01_开发工具",
+            "type": "codex_env",
+            "icon": "environment_check.ico",
+            "description": "检测当前 HTTP 代理并生成 Codex 本地 .env"
         },
 
         {

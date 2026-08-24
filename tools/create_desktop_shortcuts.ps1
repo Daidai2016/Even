@@ -1,7 +1,7 @@
 ﻿# =============================================
 # Even Codex Design Desktop Workspace Generator
 #
-# Version: 2.3.0
+# Version: 2.3.1
 #
 # 功能：
 # 1. 自动识别当前项目根目录
@@ -31,7 +31,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ToolVersion = "2.3.0"
+$ToolVersion = "2.3.1"
 
 
 # =============================================
@@ -99,6 +99,11 @@ $GitPublishScript = Join-Path `
 $EnvironmentCheckScript = Join-Path `
     $ToolsPath `
     "environment_check.ps1"
+
+
+$CodexEnvScript = Join-Path `
+    $ToolsPath `
+    "create_codex_env.ps1"
 
 
 $BackupScript = Join-Path `
@@ -1421,7 +1426,9 @@ function New-PowerShellScriptShortcut {
 
         [string]$IconFileName,
 
-        [string]$Description
+        [string]$Description,
+
+        [string]$AdditionalArguments = ""
     )
 
 
@@ -1443,6 +1450,12 @@ function New-PowerShellScriptShortcut {
         '-NoProfile -ExecutionPolicy Bypass -File "' +
         $ScriptFile +
         '"'
+
+
+    if (-not [string]::IsNullOrWhiteSpace($AdditionalArguments)) {
+
+        $PowerShellArguments += " $AdditionalArguments"
+    }
 
 
     New-EvenShortcut `
@@ -1661,6 +1674,21 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -ScriptFile $EnvironmentCheckScript `
                 -IconFileName $ShortcutIcon `
                 -Description "检查 Even Codex Design 本机开发与 Adobe 环境"
+
+
+            break
+        }
+
+
+        "codex_env" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $CodexEnvScript `
+                -IconFileName $ShortcutIcon `
+                -Description $ShortcutDescription `
+                -AdditionalArguments "-Force"
 
 
             break
