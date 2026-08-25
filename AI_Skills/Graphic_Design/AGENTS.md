@@ -6,17 +6,18 @@
 
 处理本目录覆盖的平面视觉或动态视觉任务时：
 
-1. 先读取共享规范 `references/平面设计生图与动态视觉规范.md`。
-2. 再读取与任务匹配的 `skills/<skill-name>/SKILL.md`。
-3. 按该入口的路由读取必要 `references/`；不要无差别加载其他 Skill。
-4. 用户当前明确要求、真实品牌规范和已授权资产的优先级高于默认规则。
+1. 先读取任务调用规范 `references/Prompt_Framework.md`，把用户需求整理为可执行的 RCE 任务契约。
+2. 再读取共享规范 `references/平面设计生图与动态视觉规范.md`。
+3. 读取与任务匹配的 `skills/<skill-name>/SKILL.md`。
+4. 按该入口的路由读取必要 `references/`；不要无差别加载其他 Skill。
+5. 用户当前明确要求、真实品牌规范和已授权资产的优先级高于默认规则。
 
 ## 2. 目录职责
 
 ```text
 Graphic_Design/
 ├── AGENTS.md                  本分类的继承与管理规则
-├── references/               所有视觉 Skill 共用的单一规则来源
+├── references/               所有视觉 Skill 共用的任务协议与视觉规则来源
 └── skills/
     └── <skill-name>/
         ├── SKILL.md           标准 Skill 入口、边界与工作流
@@ -38,6 +39,7 @@ Graphic_Design/
 
 ## 3. 继承规则
 
+- `references/Prompt_Framework.md` 只定义 RCE 任务契约、输入澄清、约束优先级与输出结构；不重复具体 Skill 的领域方法、生成参数或验证状态。
 - 通用 Design Goal、Input、Design Analysis、Visual Language、Visual Composition、Visual Hierarchy、Typography、Color System、Static Image、Motion Design、MG Animation、Logo Meaning Animation、Output、Forbidden 和 Quality Check 只在共享规范维护。
 - 具体 Skill 只定义该任务特有的触发范围、输入、步骤、变量、Prompt、失败条件与人工审核点。
 - 动态延展 Skill 必须声明并读取其静态父 Skill；冲突时按“用户要求 > 动态专用规则 > 静态父 Skill > 共享规范”处理。
