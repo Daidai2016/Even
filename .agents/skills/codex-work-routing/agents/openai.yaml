@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex 工作衔接路由"
+  short_description: "判断任务应续接聊天、新开同项目聊天，还是使用 Git Worktree 隔离。"
+  default_prompt: "使用 $codex-work-routing，判断这个任务应续接原聊天、新建同项目聊天，还是使用 Git Worktree，并给出必要的交接摘要。"
