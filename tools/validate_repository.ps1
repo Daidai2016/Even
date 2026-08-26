@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design Repository Validator V1.2.0
+# Codex Design Repository Validator V1.2.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==========================================
 
@@ -57,7 +57,10 @@ function Get-CandidateFiles {
         @("ls-files", "--others", "--exclude-standard")
     )) {
         foreach ($Path in @(
-            & git -C $ProjectPath -c core.safecrlf=false @GitArgs 2>$null
+            & git -C $ProjectPath `
+                -c core.safecrlf=false `
+                -c core.quotepath=false `
+                @GitArgs 2>$null
         )) {
             if (-not [string]::IsNullOrWhiteSpace([string]$Path)) {
                 [void]$RelativePaths.Add(([string]$Path).Trim())
