@@ -169,6 +169,19 @@ AI_Workspace/
 
 # 工作方式
 
+## Visual Skill Architecture
+
+平面与动态视觉 Skill 的工程规范位于 `AI_Skills/Graphic_Design/standards/VISUAL_SKILL_ARCHITECTURE.md`。共享可审计规则放在 `AI_Skills/Graphic_Design/references/shared/`，Task / Style / Production / Motion 条件路由放在 `AI_Skills/Graphic_Design/references/routes/`，具体 Skill 只按当前任务加载必要规则。
+
+本地结构验证：
+
+```text
+python AI_Skills/Graphic_Design/scripts/validate_skills.py
+```
+
+验证会检查 frontmatter、必需章节、`LOCKED` 与冲突优先级、引用路径、界面元数据及 T01–T20 测试矩阵。结构验证通过后仍需真实素材与人工视觉评审，才能晋级为可安装插件。
+
+
 ```text
 需求
 ↓

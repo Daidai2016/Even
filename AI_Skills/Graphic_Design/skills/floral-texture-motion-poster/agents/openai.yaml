@@ -1,0 +1,5 @@
+interface:
+  display_name: "肌理质感花卉动态海报"
+  short_description: "将已确认的肌理花卉母版延展为可审计的分层动态海报方案。"
+  brand_color: "#C85B52"
+  default_prompt: "使用 $floral-texture-motion-poster，把我确认的肌理花卉静态母版延展为分层动态海报；锁定画幅、时长、帧率、首尾帧和镜头许可后再规划运动。"

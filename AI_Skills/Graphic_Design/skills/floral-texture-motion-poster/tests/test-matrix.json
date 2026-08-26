@@ -1,0 +1,30 @@
+{
+  "skill": "floral-texture-motion-poster",
+  "status": "cases-defined-not-automated-behavior-tests",
+  "cases": [
+    {"id":"T01","type":"直接点名","prompt":"使用 $floral-texture-motion-poster 制作动态方案。","expected_trigger":true,"expected":"命中 motion_poster + texture_graphic + after_effects。"},
+    {"id":"T02","type":"自然语言触发","prompt":"把我确认的几何丝印花卉母版做成动态海报。","expected_trigger":true,"expected":"触发并先检查静态母版门禁。"},
+    {"id":"T03","type":"模糊需求","prompt":"这张纸纹花卉海报想有一点有层次的动感。","expected_trigger":true,"expected":"主要目标为花卉动态时触发；询问时长、帧率和镜头许可。"},
+    {"id":"T04","type":"一句话创建","prompt":"让这张丝印花卉海报动起来。","expected_trigger":true,"expected":"可先给方案；缺少母版/生产参数时不宣称制作完成。"},
+    {"id":"T05","type":"完整参数创建","prompt":"9:16，6 秒，30 fps，不循环，固定镜头，标题渐显，MP4。","expected_trigger":true,"expected":"全部动态参数 LOCKED，建立 H/M 层级和帧表。"},
+    {"id":"T06","type":"优化已有视觉","prompt":"保留全部静态画面，只优化运动节奏和尾帧停留。","expected_trigger":true,"expected":"加载 optimization；静态参数全部 KEEP/LOCKED。"},
+    {"id":"T07","type":"诊断失败视觉","prompt":"诊断为什么循环接点闪一下、背景还在呼吸。","expected_trigger":true,"expected":"加载 diagnosis；返回连续性和镜头/背景 FAIL。"},
+    {"id":"T08","type":"参数硬锁","prompt":"必须 8 秒、24 fps、固定镜头、循环、首尾同帧。","expected_trigger":true,"expected":"五项动态参数均 LOCKED。"},
+    {"id":"T09","type":"参数冲突","prompt":"固定镜头，但又想要明显推近镜头。","expected_trigger":true,"expected":"报告冲突；固定镜头优先，给元素缩放替代建议。"},
+    {"id":"T10","type":"9:16 竖版","prompt":"9:16 竖版，文字在顶部安全区，花从下方进入。","expected_trigger":true,"expected":"画幅/安全区/方向 LOCKED。"},
+    {"id":"T11","type":"16:9 横版","prompt":"16:9 横版，左右两花错峰启动。","expected_trigger":true,"expected":"重建横版时序，不机械套竖版。"},
+    {"id":"T12","type":"超宽画幅","prompt":"32:9 展墙循环，三个屏幕接缝不能切到主花。","expected_trigger":true,"expected":"超宽与接缝 LOCKED，单独审计循环和安全区。"},
+    {"id":"T13","type":"中文标题","prompt":"中文标题春日花园必须准确，2 秒后渐显并停留。","expected_trigger":true,"expected":"文案/时间 LOCKED；可控文字图层。"},
+    {"id":"T14","type":"中西文混排","prompt":"春日花园 / SPRING GARDEN / 2026，分三层出现。","expected_trigger":true,"expected":"中文、西文、数字分别规划可读时窗。"},
+    {"id":"T15","type":"标题作为 H1","prompt":"标题是 H1，但背景花瓣承担 M1。","expected_trigger":true,"expected":"H1 与 M1 可不同；M1 不遮挡标题。"},
+    {"id":"T16","type":"主体作为 H1","prompt":"主花是 H1 和 M1，标题只轻微渐显。","expected_trigger":true,"expected":"主花运动主导，标题保持可读。"},
+    {"id":"T17","type":"品牌色硬锁","prompt":"品牌蓝 #0057B8 与 Logo 不能在动效中变色或变形。","expected_trigger":true,"expected":"品牌色/Logo LOCKED，逐帧复核。"},
+    {"id":"T18","type":"风格串味","prompt":"保持纸纹丝印，不要 3D 粒子、霓虹光和镜头漂移。","expected_trigger":true,"expected":"只加载 texture_graphic 与所需 motion 路由。"},
+    {"id":"T19","type":"精简输出","prompt":"只给 H/M 层级、时序、首尾帧和审计。","expected_trigger":true,"expected":"精简动态方案，不省略锁摘要。"},
+    {"id":"T20","type":"完整专业输出","prompt":"给 AE 完整方案，含图层、关键帧、循环、编码和风险。","expected_trigger":true,"expected":"完整专业输出，并标记未实际渲染项。"}
+  ],
+  "negative_triggers": [
+    {"prompt":"只把这张花卉图转成静态丝印素材。","expected_trigger":false,"expected_route":"floral-texture-poster"},
+    {"prompt":"做一个写实延时摄影花朵开放视频。","expected_trigger":false}
+  ]
+}

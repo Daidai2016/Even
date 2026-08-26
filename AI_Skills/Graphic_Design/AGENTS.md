@@ -52,3 +52,11 @@ Graphic_Design/
 - 没有代表性样本与人工视觉评审时，Skill 必须标记为初始示例或实验，不得宣称已验证或可直接作为品牌生产标准。
 - 通过多样例复测后，更新版本与实验记录；需要进入可安装插件时，再按仓库的插件市场与晋级流程封装。
 - 交付前运行 Skill 结构校验和仓库验证，并报告未完成的视觉、字体、版权、印刷或视频检查。
+
+## 5. Visual Skill Architecture
+
+- 视觉 Skill 开发必须遵循 [Visual Skill Architecture v1.0](standards/VISUAL_SKILL_ARCHITECTURE.md)。
+- 冲突优先级固定为：用户显式参数 > 品牌/项目硬约束 > Skill 专属规则 > 当前命中的路由规则 > 共享规则 > 默认值。
+- 用户明确的主体、颜色、画幅、背景、材质、文字、Logo、字体、输出与动态参数必须标记为 `LOCKED`；任何低优先级规则不得擅自修改。
+- `SKILL.md` 只保留边界、触发、输入、参数、路由、工作流、输出和审计；详细规则按需读取 `references/shared/` 与 `references/routes/`，不得全量加载。
+- 新建或修改视觉 Skill 后运行 `python scripts/validate_skills.py`，并对每个 Skill 运行 `skill-creator` 的 `quick_validate.py`；脚本通过不等于人工视觉门禁通过。
