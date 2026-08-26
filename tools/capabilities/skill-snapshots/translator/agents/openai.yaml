@@ -1,0 +1,4 @@
+interface:
+  display_name: "中英三版翻译"
+  short_description: "自动进行中英互译，并为每次翻译提供三种表达版本。"
+  default_prompt: "使用 $translator 翻译这段内容并给出三种版本。"

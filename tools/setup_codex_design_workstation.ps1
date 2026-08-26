@@ -89,7 +89,7 @@ try {
     Write-Host "项目目录：$ProjectPath"
     Write-Host "模式：$(if ($CheckOnly) { '只读检查' } else { '首次部署' })"
     Write-Host ""
-    Write-Host "本工具不会安装系统软件、访问 GitHub、提交或推送。" `
+    Write-Host "本工具不会安装系统软件、提交或推送；缺失 Skill 仅通过当前有效代理从 GitHub 获取。" `
         -ForegroundColor DarkGray
 
     Invoke-SetupStep `
@@ -98,6 +98,11 @@ try {
         -Arguments @("-NoPause")
 
     if ($CheckOnly) {
+        Invoke-SetupStep `
+            -Name "检查用户 Skills" `
+            -RelativeScriptPath "tools\sync_codex_capabilities.ps1" `
+            -Arguments @("-SkillsOnly", "-CheckOnly", "-NoPause")
+
         foreach ($PluginName in @(
             "codex-design-workflows",
             "codex-design-visuals"
@@ -114,7 +119,7 @@ try {
         }
 
         Invoke-SetupStep `
-            -Name "检查 Skill 中文界面" `
+            -Name "检查 Skill 与插件中文界面" `
             -RelativeScriptPath "tools\localize_codex_skills.ps1" `
             -Arguments @("-CheckOnly", "-NoPause")
 
@@ -127,6 +132,11 @@ try {
         -Name "配置当前仓库 Git 规范" `
         -RelativeScriptPath "tools\configure_repository_git.ps1" `
         -Arguments @("-NoPause")
+
+    Invoke-SetupStep `
+        -Name "同步用户 Skills" `
+        -RelativeScriptPath "tools\sync_codex_capabilities.ps1" `
+        -Arguments @("-SkillsOnly", "-NoPause")
 
     foreach ($PluginName in @(
         "codex-design-workflows",
@@ -143,7 +153,7 @@ try {
     }
 
     Invoke-SetupStep `
-        -Name "应用 Skill 中文界面" `
+        -Name "应用 Skill 与插件中文界面" `
         -RelativeScriptPath "tools\localize_codex_skills.ps1" `
         -Arguments @("-NoPause")
 
@@ -170,7 +180,7 @@ try {
     }
 
     Invoke-SetupStep `
-        -Name "验证 Skill 中文界面" `
+        -Name "验证 Skill 与插件中文界面" `
         -RelativeScriptPath "tools\localize_codex_skills.ps1" `
         -Arguments @("-CheckOnly", "-NoPause")
 

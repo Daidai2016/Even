@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "skills": [
+    { "name": "anysearch", "scope": "codex", "type": "github", "repository": "anysearch-ai/anysearch-skill", "sourcePath": "." },
+    { "name": "asset-import", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/asset-import" },
+    { "name": "browser-use", "scope": "codex", "type": "github", "repository": "browser-use/browser-use", "sourcePath": "skills/browser-use" },
+    { "name": "cangjie-skill", "scope": "codex", "type": "github", "repository": "kangarooking/cangjie-skill", "sourcePath": "." },
+    { "name": "chatcut-plugin-basics", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/chatcut-plugin-basics" },
+    { "name": "code-review", "scope": "codex", "type": "github", "repository": "vercel-labs/open-agents", "sourcePath": ".agents/skills/code-review" },
+    { "name": "create-motion-graphics", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/create-motion-graphics" },
+    { "name": "dws", "scope": "agents", "type": "github", "repository": "dingtalk-real-ai/dingtalk-workspace-cli", "sourcePath": "skills/mono" },
+    { "name": "export", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/export" },
+    { "name": "find-skills", "scope": "codex", "type": "github", "repository": "vercel-labs/skills", "sourcePath": "skills/find-skills" },
+    { "name": "firecrawl", "scope": "codex", "type": "github", "repository": "firecrawl/cli", "sourcePath": "skills/firecrawl" },
+    { "name": "frontend-design", "scope": "codex", "type": "github", "repository": "anthropics/skills", "sourcePath": "skills/frontend-design" },
+    { "name": "guizang-ppt-skill", "scope": "codex", "type": "github", "repository": "op7418/guizang-ppt-skill", "sourcePath": "." },
+    { "name": "humanizer", "scope": "codex", "type": "github", "repository": "blader/humanizer", "sourcePath": "." },
+    { "name": "known-errors", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/known-errors" },
+    { "name": "multicam-sync", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/multicam-sync" },
+    { "name": "music", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/music" },
+    { "name": "pdf", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/pdf" },
+    { "name": "planning-with-files", "scope": "codex", "type": "github", "repository": "othmanadi/planning-with-files", "sourcePath": "skills/planning-with-files" },
+    { "name": "playwright", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/playwright" },
+    { "name": "product-help", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/product-help" },
+    { "name": "shader-gen", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/shader-gen" },
+    { "name": "talking-head-guide", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/talking-head-guide" },
+    { "name": "transcription", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/transcription" },
+    { "name": "translator", "scope": "codex", "type": "snapshot", "sourcePath": "tools/capabilities/skill-snapshots/translator" },
+    { "name": "verification", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/verification" },
+    { "name": "video-depth-pose", "scope": "codex", "type": "snapshot", "sourcePath": "tools/capabilities/skill-snapshots/video-depth-pose" },
+    { "name": "video-gen", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/video-gen" },
+    { "name": "voice", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/voice" },
+    { "name": "widget-forms", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/widget-forms" },
+    { "name": "xianxia-visual-director", "scope": "codex", "type": "github", "repository": "liyue-aigc/xianxia-visual-director", "sourcePath": "xianxia-visual-director" }
+  ],
+  "repositoryPlugins": [
+    "codex-design-workflows",
+    "codex-design-visuals"
+  ],
+  "managedPlugins": [
+    "documents@openai-primary-runtime",
+    "pdf@openai-primary-runtime",
+    "spreadsheets@openai-primary-runtime",
+    "presentations@openai-primary-runtime",
+    "template-creator@openai-primary-runtime",
+    "codex-app-tools@openai-bundled",
+    "sites@openai-bundled",
+    "browser@openai-bundled",
+    "chrome@openai-bundled",
+    "computer-use@openai-bundled",
+    "visualize@openai-bundled"
+  ],
+  "optionalCommands": [
+    "browser-use",
+    "dws",
+    "firecrawl"
+  ]
+}

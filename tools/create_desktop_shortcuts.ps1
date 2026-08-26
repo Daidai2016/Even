@@ -106,6 +106,11 @@ $CodexEnvScript = Join-Path `
     "create_codex_env.ps1"
 
 
+$CodexCapabilitySyncScript = Join-Path `
+    $ToolsPath `
+    "sync_codex_workstation.ps1"
+
+
 $BackupScript = Join-Path `
     $ToolsPath `
     "backup_project.ps1"
@@ -1689,6 +1694,20 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -IconFileName $ShortcutIcon `
                 -Description $ShortcutDescription `
                 -AdditionalArguments "-Force"
+
+
+            break
+        }
+
+
+        "codex_capability_sync" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $CodexCapabilitySyncScript `
+                -IconFileName $ShortcutIcon `
+                -Description $ShortcutDescription
 
 
             break

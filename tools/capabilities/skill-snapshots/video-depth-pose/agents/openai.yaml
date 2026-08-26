@@ -1,0 +1,4 @@
+interface:
+  display_name: "视频深度与姿态转换"
+  short_description: "把人物动作视频转换为时间对齐的深度图和人体关键点视频。"
+  default_prompt: "使用 $video-depth-pose 转换这段人物动作视频的深度与姿态数据。"

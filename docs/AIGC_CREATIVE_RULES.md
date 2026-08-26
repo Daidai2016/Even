@@ -118,7 +118,7 @@
 - 同一 Skill 同时存在于 `AI_Skills/` 源目录和 `plugins/` 可安装副本时，中文界面元数据必须保持一致。
 - 插件内 Skill 的界面元数据发生变化时，应递增插件版本、重新安装或刷新缓存，并在新会话中确认显示结果。
 - 新增或修改 Skill 后，运行 Skill 结构校验和 `tools/validate_repository.ps1`；不得把“界面显示成功”视为内容能力已经通过视觉或生产门禁。
-- 系统及第三方 Skill 只允许通过 `tools/config/codex_skills_zh-CN.json` 维护中文映射，并使用 `tools/localize_codex_skills.ps1` 进行可恢复的本地覆盖。覆盖前必须备份；升级或重装后可重新应用。
+- 系统及第三方 Skill 与插件展示层只允许通过 `tools/config/codex_skills_zh-CN.json` 维护中文映射，并使用 `tools/localize_codex_skills.ps1` 进行可恢复的本地覆盖。覆盖前必须备份；升级或重装后可重新应用。
 - 不得修改系统或第三方 Skill 的内部 ID、核心 `SKILL.md` 指令、依赖和调用策略，也不得提交 `.codex` 缓存、运行时文件或本地恢复备份。
 - 第三方 Skill 若自身内部 ID 不符合当前校验器命名规则，应记录为上游兼容性问题，不得仅为通过本地校验而擅自重命名。
 

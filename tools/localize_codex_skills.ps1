@@ -1,5 +1,5 @@
 ﻿# ==============================================
-# Codex Skills Chinese UI Localizer V1.0.2
+# Codex Skills and Plugins Chinese UI Localizer V1.1.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==============================================
 
@@ -16,7 +16,9 @@ $UserProfilePath = [Environment]::GetFolderPath("UserProfile")
 $BackupRoot = Join-Path `
     $UserProfilePath `
     ".codex\backups\skill-localization"
-$SystemSkillsRoot = Join-Path $UserProfilePath ".codex\skills\.system"
+$SkillsRoot = Join-Path $UserProfilePath ".codex\skills"
+$SystemSkillsRoot = Join-Path $SkillsRoot ".system"
+$AgentsSkillsRoot = Join-Path $UserProfilePath ".agents\skills"
 $PluginCacheRoot = Join-Path $UserProfilePath ".codex\plugins\cache"
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
@@ -86,56 +88,18 @@ function Get-CurrentSkillTargets {
         }
     }
 
-    $CodexCommand = Get-Command "codex.cmd" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
+    if (Test-Path -LiteralPath $SkillsRoot -PathType Container) {
+        foreach ($Directory in Get-ChildItem -LiteralPath $SkillsRoot -Directory) {
+            if ($Directory.Name -eq ".system") {
+                continue
+            }
 
-    if ($null -eq $CodexCommand) {
-        throw "未检测到 codex.cmd，无法读取当前插件版本。"
-    }
-
-    $PreviousErrorActionPreference = $ErrorActionPreference
-
-    try {
-        # Windows PowerShell 5.1 会把原生命令写入 stderr 的普通警告
-        # 包装成 ErrorRecord。插件发现仍以真实退出码为准。
-        $ErrorActionPreference = "Continue"
-        $Output = @(
-            & $CodexCommand.Source plugin list --available --json 2>$null
-        )
-        $CodexExitCode = $LASTEXITCODE
-    }
-    finally {
-        $ErrorActionPreference = $PreviousErrorActionPreference
-    }
-
-    if ($CodexExitCode -ne 0) {
-        throw "无法读取当前已安装插件列表。"
-    }
-
-    $PluginData = ($Output -join [Environment]::NewLine) |
-        ConvertFrom-Json
-
-    foreach ($Plugin in $PluginData.installed) {
-        if ([string]$Plugin.marketplaceName -eq "codex-design") {
-            continue
-        }
-
-        $PluginPath = Join-Path `
-            $PluginCacheRoot `
-            "$($Plugin.marketplaceName)\$($Plugin.name)\$($Plugin.version)"
-        $SkillsPath = Join-Path $PluginPath "skills"
-
-        if (-not (Test-Path -LiteralPath $SkillsPath -PathType Container)) {
-            continue
-        }
-
-        foreach ($Directory in Get-ChildItem -LiteralPath $SkillsPath -Directory) {
             $SkillName = Get-SkillName -SkillPath $Directory.FullName
 
             if ($null -ne $SkillName) {
                 $Targets += [pscustomobject]@{
-                    Scope = "plugin"
-                    Owner = [string]$Plugin.pluginId
+                    Scope = "user"
+                    Owner = "user"
                     SkillName = $SkillName
                     SkillPath = $Directory.FullName
                     UiPath = Join-Path $Directory.FullName "agents\openai.yaml"
@@ -144,21 +108,120 @@ function Get-CurrentSkillTargets {
         }
     }
 
-    return $Targets
+    if (Test-Path -LiteralPath $AgentsSkillsRoot -PathType Container) {
+        foreach ($Directory in Get-ChildItem -LiteralPath $AgentsSkillsRoot -Directory) {
+            $SkillName = Get-SkillName -SkillPath $Directory.FullName
+
+            if ($null -ne $SkillName) {
+                $Targets += [pscustomobject]@{
+                    Scope = "agents-user"
+                    Owner = "agents-user"
+                    SkillName = $SkillName
+                    SkillPath = $Directory.FullName
+                    UiPath = Join-Path $Directory.FullName "agents\openai.yaml"
+                }
+            }
+        }
+    }
+
+    if (Test-Path -LiteralPath $PluginCacheRoot -PathType Container) {
+        $SkillFiles = Get-ChildItem `
+            -LiteralPath $PluginCacheRoot `
+            -Filter "SKILL.md" `
+            -File `
+            -Recurse |
+            Where-Object { $_.Directory.Parent.Name -eq "skills" }
+
+        foreach ($SkillFile in $SkillFiles) {
+            $Directory = $SkillFile.Directory
+            $SkillName = Get-SkillName -SkillPath $Directory.FullName
+
+            if ($null -eq $SkillName) {
+                continue
+            }
+
+            $PluginPath = $Directory.Parent.Parent.FullName
+            $PluginManifestPath = Join-Path `
+                $PluginPath `
+                ".codex-plugin\plugin.json"
+            $Owner = Split-Path $PluginPath -Leaf
+
+            if (Test-Path -LiteralPath $PluginManifestPath -PathType Leaf) {
+                $PluginManifest = Get-Content `
+                    -LiteralPath $PluginManifestPath `
+                    -Raw `
+                    -Encoding UTF8 |
+                    ConvertFrom-Json
+                $Owner = [string]$PluginManifest.name
+            }
+
+            $Targets += [pscustomobject]@{
+                Scope = "plugin"
+                Owner = $Owner
+                SkillName = $SkillName
+                SkillPath = $Directory.FullName
+                UiPath = Join-Path $Directory.FullName "agents\openai.yaml"
+            }
+        }
+    }
+
+    return @($Targets | Sort-Object UiPath -Unique)
 }
 
 
-function Assert-TrustedUiPath {
+function Get-CurrentPluginTargets {
+    $Targets = @()
+
+    if (-not (Test-Path -LiteralPath $PluginCacheRoot -PathType Container)) {
+        return $Targets
+    }
+
+    $ManifestFiles = Get-ChildItem `
+        -LiteralPath $PluginCacheRoot `
+        -Filter "plugin.json" `
+        -File `
+        -Recurse |
+        Where-Object { $_.Directory.Name -eq ".codex-plugin" }
+
+    foreach ($ManifestFile in $ManifestFiles) {
+        $Manifest = Get-Content `
+            -LiteralPath $ManifestFile.FullName `
+            -Raw `
+            -Encoding UTF8 |
+            ConvertFrom-Json
+
+        if ($null -eq $Manifest.interface) {
+            continue
+        }
+
+        $Targets += [pscustomobject]@{
+            PluginName = [string]$Manifest.name
+            UiPath = $ManifestFile.FullName
+        }
+    }
+
+    return @($Targets | Sort-Object UiPath -Unique)
+}
+
+
+function Assert-TrustedLocalizationPath {
     param([string]$Path)
 
     $FullPath = [IO.Path]::GetFullPath($Path)
-    $SystemAllowedRoot = (
-        [IO.Path]::GetFullPath($SystemSkillsRoot).TrimEnd("\") + "\"
+    $SkillsAllowedRoot = (
+        [IO.Path]::GetFullPath($SkillsRoot).TrimEnd("\") + "\"
+    )
+    $AgentsSkillsAllowedRoot = (
+        [IO.Path]::GetFullPath($AgentsSkillsRoot).TrimEnd("\") + "\"
     )
     $PluginAllowedRoot = (
         [IO.Path]::GetFullPath($PluginCacheRoot).TrimEnd("\") + "\"
     )
-    $AllowedRoots = @($SystemAllowedRoot, $PluginAllowedRoot)
+    $AllowedRoots = @(
+        $SkillsAllowedRoot,
+        $AgentsSkillsAllowedRoot,
+        $PluginAllowedRoot
+    )
     $Allowed = $false
 
     foreach ($Root in $AllowedRoots) {
@@ -168,7 +231,18 @@ function Assert-TrustedUiPath {
         }
     }
 
-    if (-not $Allowed -or (Split-Path $FullPath -Leaf) -ne "openai.yaml") {
+    $Leaf = Split-Path $FullPath -Leaf
+    $IsSkillUi = $Leaf -eq "openai.yaml"
+    $IsPluginUi = (
+        $Leaf -eq "plugin.json" -and
+        (Split-Path (Split-Path $FullPath -Parent) -Leaf) -eq ".codex-plugin" -and
+        $FullPath.StartsWith(
+            $PluginAllowedRoot,
+            [StringComparison]::OrdinalIgnoreCase
+        )
+    )
+
+    if (-not $Allowed -or (-not $IsSkillUi -and -not $IsPluginUi)) {
         throw "拒绝修改不受信任的路径：$FullPath"
     }
 }
@@ -284,6 +358,66 @@ function Get-LocalizedYaml {
 }
 
 
+function Set-ObjectProperty {
+    param(
+        [object]$Object,
+        [string]$Name,
+        [object]$Value
+    )
+
+    if ($null -ne $Object.PSObject.Properties[$Name]) {
+        $Object.$Name = $Value
+    }
+    else {
+        $Object | Add-Member `
+            -MemberType NoteProperty `
+            -Name $Name `
+            -Value $Value
+    }
+}
+
+
+function Get-LocalizedPluginJson {
+    param(
+        [string]$Original,
+        [object]$Translation,
+        [string]$NewLine
+    )
+
+    $Plugin = $Original | ConvertFrom-Json
+
+    if ($null -eq $Plugin.interface) {
+        throw "插件缺少 interface 展示配置：$($Plugin.name)"
+    }
+
+    Set-ObjectProperty `
+        -Object $Plugin.interface `
+        -Name "displayName" `
+        -Value ([string]$Translation.displayName)
+    Set-ObjectProperty `
+        -Object $Plugin.interface `
+        -Name "shortDescription" `
+        -Value ([string]$Translation.shortDescription)
+    Set-ObjectProperty `
+        -Object $Plugin.interface `
+        -Name "longDescription" `
+        -Value ([string]$Translation.longDescription)
+    Set-ObjectProperty `
+        -Object $Plugin.interface `
+        -Name "defaultPrompt" `
+        -Value @($Translation.defaultPrompts | ForEach-Object { [string]$_ })
+
+    $Result = $Plugin | ConvertTo-Json -Depth 30
+    $Result = $Result.Replace("`r`n", "`n").Replace("`r", "`n")
+
+    if ($Original.EndsWith("`n") -or $Original.EndsWith("`r")) {
+        $Result += "`n"
+    }
+
+    return $Result.Replace("`n", $NewLine)
+}
+
+
 function Get-EncodedBytes {
     param(
         [string]$Text,
@@ -331,7 +465,7 @@ function Restore-Localization {
 
     foreach ($Item in $Manifest.items) {
         $UiPath = [string]$Item.path
-        Assert-TrustedUiPath -Path $UiPath
+        Assert-TrustedLocalizationPath -Path $UiPath
 
         if (Test-Path -LiteralPath $UiPath -PathType Leaf) {
             $CurrentBytes = [IO.File]::ReadAllBytes($UiPath)
@@ -355,7 +489,7 @@ function Restore-Localization {
         $Restored++
     }
 
-    Write-Host "已恢复 $Restored 个 Skill 界面配置。" -ForegroundColor Green
+    Write-Host "已恢复 $Restored 个 Skill 或插件界面配置。" -ForegroundColor Green
 }
 
 
@@ -374,32 +508,102 @@ try {
         -Raw `
         -Encoding UTF8 |
         ConvertFrom-Json
-    $Translations = @{}
+    $SkillTranslations = @{}
 
     foreach ($Translation in $Catalog.skills) {
-        $Translations[[string]$Translation.name] = $Translation
+        $Owner = "*"
+
+        if ($null -ne $Translation.PSObject.Properties["owner"] -and
+            -not [string]::IsNullOrWhiteSpace([string]$Translation.owner)) {
+            $Owner = [string]$Translation.owner
+        }
+
+        $Key = [string]::Concat($Owner, "::", [string]$Translation.name)
+
+        if ($SkillTranslations.ContainsKey($Key)) {
+            throw "Skill 中文映射重复：$Key"
+        }
+
+        $SkillTranslations[$Key] = $Translation
     }
 
-    $Targets = @(
-        Get-CurrentSkillTargets |
-            Where-Object { $Translations.ContainsKey($_.SkillName) }
+    $MatchedSkillTargets = @()
+    $FoundSkillKeys = @{}
+
+    foreach ($Target in @(Get-CurrentSkillTargets)) {
+        $ExactKey = [string]::Concat(
+            [string]$Target.Owner,
+            "::",
+            [string]$Target.SkillName
+        )
+        $GenericKey = [string]::Concat("*::", [string]$Target.SkillName)
+        $MatchedKey = $null
+
+        if ($SkillTranslations.ContainsKey($ExactKey)) {
+            $MatchedKey = $ExactKey
+        }
+        elseif ($SkillTranslations.ContainsKey($GenericKey)) {
+            $MatchedKey = $GenericKey
+        }
+
+        if ($null -eq $MatchedKey) {
+            continue
+        }
+
+        $FoundSkillKeys[$MatchedKey] = $true
+        $MatchedSkillTargets += [pscustomobject]@{
+            Target = $Target
+            Translation = $SkillTranslations[$MatchedKey]
+        }
+    }
+
+    $MissingSkillKeys = @(
+        $SkillTranslations.Keys |
+            Where-Object { -not $FoundSkillKeys.ContainsKey($_) } |
+            Sort-Object
     )
-    $FoundNames = @($Targets | ForEach-Object { $_.SkillName } | Select-Object -Unique)
-    $MissingNames = @(
-        $Catalog.skills |
-            Where-Object { $FoundNames -notcontains [string]$_.name } |
+
+    if ($MissingSkillKeys.Count -gt 0) {
+        throw "未找到以下已登记 Skill：$($MissingSkillKeys -join ', ')"
+    }
+
+    $PluginTranslations = @{}
+
+    foreach ($Translation in $Catalog.plugins) {
+        $Name = [string]$Translation.name
+
+        if ($PluginTranslations.ContainsKey($Name)) {
+            throw "插件中文映射重复：$Name"
+        }
+
+        $PluginTranslations[$Name] = $Translation
+    }
+
+    $MatchedPluginTargets = @(
+        Get-CurrentPluginTargets |
+            Where-Object { $PluginTranslations.ContainsKey($_.PluginName) }
+    )
+    $FoundPluginNames = @(
+        $MatchedPluginTargets |
+            ForEach-Object { $_.PluginName } |
+            Select-Object -Unique
+    )
+    $MissingPluginNames = @(
+        $Catalog.plugins |
+            Where-Object { $FoundPluginNames -notcontains [string]$_.name } |
             ForEach-Object { [string]$_.name }
     )
 
-    if ($MissingNames.Count -gt 0) {
-        throw "未找到以下已登记 Skill：$($MissingNames -join ', ')"
+    if ($MissingPluginNames.Count -gt 0) {
+        throw "未找到以下已登记插件：$($MissingPluginNames -join ', ')"
     }
 
     $Updates = @()
 
-    foreach ($Target in $Targets) {
-        $Translation = $Translations[$Target.SkillName]
-        Assert-TrustedUiPath -Path $Target.UiPath
+    foreach ($Match in $MatchedSkillTargets) {
+        $Target = $Match.Target
+        $Translation = $Match.Translation
+        Assert-TrustedLocalizationPath -Path $Target.UiPath
         $Existed = Test-Path -LiteralPath $Target.UiPath -PathType Leaf
         $BeforeBytes = if ($Existed) {
             [IO.File]::ReadAllBytes($Target.UiPath)
@@ -433,7 +637,10 @@ try {
 
         if ($Changed) {
             $Updates += [pscustomobject]@{
-                Target = $Target
+                Kind = "skill"
+                Name = [string]$Target.SkillName
+                Owner = [string]$Target.Owner
+                Path = [string]$Target.UiPath
                 Existed = $Existed
                 BeforeBytes = $BeforeBytes
                 AfterBytes = $AfterBytes
@@ -441,7 +648,47 @@ try {
         }
     }
 
-    Write-Host "已发现：$($Targets.Count)；需要更新：$($Updates.Count)。"
+    $SkillUpdateCount = $Updates.Count
+
+    foreach ($Target in $MatchedPluginTargets) {
+        $Translation = $PluginTranslations[$Target.PluginName]
+        Assert-TrustedLocalizationPath -Path $Target.UiPath
+        $BeforeBytes = [IO.File]::ReadAllBytes($Target.UiPath)
+        $Original = [IO.File]::ReadAllText($Target.UiPath)
+        $WithBom = (
+            $BeforeBytes.Length -ge 3 -and
+            $BeforeBytes[0] -eq 239 -and
+            $BeforeBytes[1] -eq 187 -and
+            $BeforeBytes[2] -eq 191
+        )
+        $LineEnding = if ($Original.Contains("`r`n")) { "`r`n" } else { "`n" }
+        $Localized = Get-LocalizedPluginJson `
+            -Original $Original `
+            -Translation $Translation `
+            -NewLine $LineEnding
+        $AfterBytes = Get-EncodedBytes -Text $Localized -WithBom $WithBom
+        $Changed = (Get-Sha256 -Bytes $BeforeBytes) -ne (
+            Get-Sha256 -Bytes $AfterBytes
+        )
+
+        Write-Host "[$(if ($Changed) { '需更新' } else { '已中文' })] 插件 $($Target.PluginName) -> $($Translation.displayName)"
+
+        if ($Changed) {
+            $Updates += [pscustomobject]@{
+                Kind = "plugin"
+                Name = [string]$Target.PluginName
+                Owner = [string]$Target.PluginName
+                Path = [string]$Target.UiPath
+                Existed = $true
+                BeforeBytes = $BeforeBytes
+                AfterBytes = $AfterBytes
+            }
+        }
+    }
+
+    $PluginUpdateCount = $Updates.Count - $SkillUpdateCount
+    Write-Host "Skill 已发现：$($MatchedSkillTargets.Count)；需要更新：$SkillUpdateCount。"
+    Write-Host "插件已发现：$($MatchedPluginTargets.Count)；需要更新：$PluginUpdateCount。"
 
     if ($CheckOnly) {
         if ($Updates.Count -gt 0) {
@@ -452,7 +699,7 @@ try {
     }
 
     if ($Updates.Count -eq 0) {
-        Write-Host "所有已登记 Skill 均已使用中文界面。" -ForegroundColor Green
+        Write-Host "所有已登记 Skill 与插件均已使用中文界面。" -ForegroundColor Green
         exit 0
     }
 
@@ -465,9 +712,10 @@ try {
 
     foreach ($Update in $Updates) {
         $ManifestItems += [pscustomobject]@{
-            skillName = [string]$Update.Target.SkillName
-            owner = [string]$Update.Target.Owner
-            path = [string]$Update.Target.UiPath
+            kind = [string]$Update.Kind
+            name = [string]$Update.Name
+            owner = [string]$Update.Owner
+            path = [string]$Update.Path
             existed = [bool]$Update.Existed
             beforeSha256 = Get-Sha256 -Bytes $Update.BeforeBytes
             afterSha256 = Get-Sha256 -Bytes $Update.AfterBytes
@@ -476,7 +724,7 @@ try {
     }
 
     $Manifest = [pscustomobject]@{
-        schemaVersion = 1
+        schemaVersion = 2
         locale = [string]$Catalog.locale
         createdAt = (Get-Date).ToString("o")
         items = $ManifestItems
@@ -486,17 +734,17 @@ try {
     [IO.File]::WriteAllText($ManifestPath, $ManifestText, $Utf8NoBom)
 
     foreach ($Update in $Updates) {
-        $Parent = Split-Path $Update.Target.UiPath -Parent
+        $Parent = Split-Path $Update.Path -Parent
         New-Item -ItemType Directory -Force -Path $Parent | Out-Null
-        [IO.File]::WriteAllBytes($Update.Target.UiPath, $Update.AfterBytes)
+        [IO.File]::WriteAllBytes($Update.Path, $Update.AfterBytes)
     }
 
-    Write-Host "中文化完成：$($Updates.Count) 个 Skill。" -ForegroundColor Green
+    Write-Host "中文化完成：$SkillUpdateCount 个 Skill，$PluginUpdateCount 个插件。" -ForegroundColor Green
     Write-Host "恢复清单：$ManifestPath"
     Write-Host "重新打开 Codex 会话后显示新名称。"
 }
 catch {
-    Write-Host "Skill 中文化失败：$($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Skill 或插件中文化失败：$($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
 finally {

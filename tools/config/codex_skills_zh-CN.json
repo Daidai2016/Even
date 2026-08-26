@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "locale": "zh-CN",
   "skills": [
     {
@@ -109,6 +109,899 @@
       "displayName": "交互式可视化与工具",
       "shortDescription": "把概念和数据转成图表、地图、流程、模拟器或交互式工具。",
       "defaultPrompt": "使用 $visualize 把这个概念或数据制作成清晰的交互式可视化。"
+    },
+    {
+      "name": "anysearch",
+      "displayName": "实时聚合搜索",
+      "shortDescription": "执行实时 Web 搜索、垂直领域搜索、批量检索和网页内容提取。",
+      "defaultPrompt": "使用 $anysearch 搜索并整理这个主题的最新可靠信息。"
+    },
+    {
+      "name": "asset-import",
+      "displayName": "ChatCut 素材导入",
+      "shortDescription": "把本地、附件或下载的媒体素材导入 ChatCut 项目。",
+      "defaultPrompt": "使用 $asset-import 把这些媒体素材导入当前 ChatCut 项目。"
+    },
+    {
+      "name": "browser-use",
+      "displayName": "浏览器自动化",
+      "shortDescription": "通过 CDP 控制浏览器，完成网页交互、抓取、测试和截图。",
+      "defaultPrompt": "使用 $browser-use 在浏览器中完成并检查这个任务。"
+    },
+    {
+      "name": "cangjie-skill",
+      "displayName": "长内容知识提炼",
+      "shortDescription": "把书籍、课程、播客、访谈或长视频整理成可执行的知识体系。",
+      "defaultPrompt": "使用 $cangjie-skill 提炼这份长内容并形成结构化知识。"
+    },
+    {
+      "name": "chatcut-plugin-basics",
+      "displayName": "ChatCut 可编辑视频基础",
+      "shortDescription": "在 ChatCut 中创建或编辑可继续调整的视频项目。",
+      "defaultPrompt": "使用 $chatcut-plugin-basics 在 ChatCut 中完成这个可编辑视频任务。"
+    },
+    {
+      "name": "code-review",
+      "displayName": "代码审查",
+      "shortDescription": "审查代码或 PR 变更并给出具体、可操作的缺陷与改进建议。",
+      "defaultPrompt": "使用 $code-review 审查这些代码变更并列出可操作问题。"
+    },
+    {
+      "name": "create-motion-graphics",
+      "displayName": "ChatCut 动态图形制作",
+      "shortDescription": "在 ChatCut 中创建、编排和完善可编辑的动态视觉图形。",
+      "defaultPrompt": "使用 $create-motion-graphics 为当前 ChatCut 项目制作动态视觉。"
+    },
+    {
+      "name": "export",
+      "displayName": "ChatCut 项目导出",
+      "shortDescription": "导出或交付 ChatCut 项目中的视频、音频、字幕及相关成果。",
+      "defaultPrompt": "使用 $export 导出并检查当前 ChatCut 项目的交付文件。"
+    },
+    {
+      "name": "find-skills",
+      "displayName": "Skill 查找与安装建议",
+      "shortDescription": "查找适合当前任务的 Agent Skills，并提供安装与使用建议。",
+      "defaultPrompt": "使用 $find-skills 帮我找到适合完成这个任务的 Skill。"
+    },
+    {
+      "name": "firecrawl",
+      "displayName": "Firecrawl 网页检索",
+      "shortDescription": "使用 Firecrawl 搜索、抓取、爬取和结构化提取实时网页内容。",
+      "defaultPrompt": "使用 $firecrawl 搜索并提取这个主题的网页信息。"
+    },
+    {
+      "name": "frontend-design",
+      "displayName": "前端视觉设计",
+      "shortDescription": "为新建或重塑的前端界面提供有辨识度、目标明确的视觉设计。",
+      "defaultPrompt": "使用 $frontend-design 设计并实现这个前端界面。"
+    },
+    {
+      "name": "guizang-ppt-skill",
+      "displayName": "横向网页 PPT 生成",
+      "shortDescription": "生成带 WebGL 背景、演讲者视图和多种页面模板的单文件网页 PPT。",
+      "defaultPrompt": "使用 $guizang-ppt-skill 制作这份横向翻页网页 PPT。"
+    },
+    {
+      "name": "humanizer",
+      "displayName": "自然语言润色",
+      "shortDescription": "在不改变原意的前提下减少 AI 腔，让文字更自然、更像人工表达。",
+      "defaultPrompt": "使用 $humanizer 把这段文字润色得自然流畅。"
+    },
+    {
+      "name": "known-errors",
+      "displayName": "ChatCut 已知错误诊断",
+      "shortDescription": "诊断 ChatCut 插件失败、编辑被拒、响应异常和阻塞问题。",
+      "defaultPrompt": "使用 $known-errors 诊断这个 ChatCut 插件错误。"
+    },
+    {
+      "name": "multicam-sync",
+      "displayName": "多机位素材同步",
+      "shortDescription": "同步多台摄像机与独立录音设备拍摄的素材。",
+      "defaultPrompt": "使用 $multicam-sync 同步这些多机位视频和录音素材。"
+    },
+    {
+      "name": "music",
+      "displayName": "ChatCut 背景音乐生成",
+      "shortDescription": "为 ChatCut 项目生成、选择和配置适合的背景音乐。",
+      "defaultPrompt": "使用 $music 为当前 ChatCut 项目生成并配置背景音乐。"
+    },
+    {
+      "name": "planning-with-files",
+      "displayName": "文件化持续规划",
+      "shortDescription": "使用持久化计划、发现和进度文件管理复杂的长期任务。",
+      "defaultPrompt": "使用 $planning-with-files 为这个复杂任务建立并维护文件化计划。"
+    },
+    {
+      "name": "playwright",
+      "displayName": "Playwright 浏览器自动化",
+      "shortDescription": "从终端自动控制真实浏览器，完成导航、表单、截图和页面测试。",
+      "defaultPrompt": "使用 $playwright 自动完成并验证这个浏览器任务。"
+    },
+    {
+      "name": "product-help",
+      "displayName": "ChatCut 产品帮助",
+      "shortDescription": "解答 ChatCut 的界面、功能、额度、订阅、价格和支付问题。",
+      "defaultPrompt": "使用 $product-help 解答这个 ChatCut 产品使用问题。"
+    },
+    {
+      "name": "shader-gen",
+      "displayName": "WebGL Shader 生成",
+      "shortDescription": "生成用于视频特效、转场、遮罩和调色的 WebGL Shader。",
+      "defaultPrompt": "使用 $shader-gen 为这个视觉效果生成 WebGL Shader。"
+    },
+    {
+      "name": "talking-head-guide",
+      "displayName": "口播视频剪辑指导",
+      "shortDescription": "指导以讲话、访谈或对话为主线的口播视频剪辑。",
+      "defaultPrompt": "使用 $talking-head-guide 规划并完成这段口播视频的剪辑。"
+    },
+    {
+      "name": "transcription",
+      "displayName": "ChatCut 转录与字幕",
+      "shortDescription": "处理 ChatCut 转录、字幕、字幕修复和相关文件准备。",
+      "defaultPrompt": "使用 $transcription 为当前 ChatCut 项目生成或修复转录字幕。"
+    },
+    {
+      "name": "translator",
+      "displayName": "中英三版翻译",
+      "shortDescription": "自动进行中英互译，并为每次翻译提供三种表达版本。",
+      "defaultPrompt": "使用 $translator 翻译这段内容并给出三种版本。"
+    },
+    {
+      "name": "verification",
+      "displayName": "ChatCut 编辑验证",
+      "shortDescription": "验证 ChatCut 插件修改是否已反映到项目结构和可见时间线。",
+      "defaultPrompt": "使用 $verification 检查这些 ChatCut 编辑是否已正确生效。"
+    },
+    {
+      "name": "video-depth-pose",
+      "displayName": "视频深度与姿态转换",
+      "shortDescription": "把人物动作视频转换为时间对齐的深度图和人体关键点视频。",
+      "defaultPrompt": "使用 $video-depth-pose 转换这段人物动作视频的深度与姿态数据。"
+    },
+    {
+      "name": "video-gen",
+      "displayName": "AI 视频生成",
+      "shortDescription": "使用 Seedance、Kling 或 Gemini Omni 生成和扩展 AI 视频。",
+      "defaultPrompt": "使用 $video-gen 根据这个创意要求生成 AI 视频。"
+    },
+    {
+      "name": "voice",
+      "displayName": "配音与音效生成",
+      "shortDescription": "处理 TTS、声音克隆、旁白同步和自定义音效生成。",
+      "defaultPrompt": "使用 $voice 为当前内容生成并同步配音或音效。"
+    },
+    {
+      "name": "widget-forms",
+      "displayName": "ChatCut 结构化表单",
+      "shortDescription": "通过当前插件宿主支持的表单界面收集结构化 ChatCut 输入。",
+      "defaultPrompt": "使用 $widget-forms 收集完成这个 ChatCut 任务所需的信息。"
+    },
+    {
+      "name": "xianxia-visual-director",
+      "displayName": "东方仙侠视觉导演",
+      "shortDescription": "生成、优化和诊断明亮电影感东方仙侠场景的结构化图像提示词。",
+      "defaultPrompt": "使用 $xianxia-visual-director 为这个仙侠场景设计视觉提示词。"
+    },
+    {
+      "name": "dws",
+      "displayName": "钉钉工作空间管理",
+      "shortDescription": "管理钉钉文档、云盘、日历、群聊、待办、审批、表格和其他工作能力。",
+      "defaultPrompt": "使用 $dws 在钉钉中完成这个工作空间任务。"
+    },
+    {
+      "name": "adobe-batch-edit-photos",
+      "displayName": "Adobe 批量照片编辑",
+      "shortDescription": "对一组照片应用一致的色彩、光线、色调和构图调整。",
+      "defaultPrompt": "使用 $adobe-batch-edit-photos 批量编辑这些照片并统一视觉效果。"
+    },
+    {
+      "name": "adobe-create-mockups",
+      "displayName": "Adobe 场景样机制作",
+      "shortDescription": "把 Logo、设计稿或草图放入产品与场景样机中进行展示。",
+      "defaultPrompt": "使用 $adobe-create-mockups 为这个设计制作场景样机。"
+    },
+    {
+      "name": "adobe-create-social-variations",
+      "displayName": "Adobe 社交媒体适配",
+      "shortDescription": "把图片或视频裁切、缩放并导出为各平台适用的社交媒体素材。",
+      "defaultPrompt": "使用 $adobe-create-social-variations 生成这些平台需要的社交媒体版本。"
+    },
+    {
+      "name": "adobe-design-from-template",
+      "displayName": "Adobe 模板设计制作",
+      "shortDescription": "使用 Adobe Express 模板制作海报、传单和社交媒体视觉。",
+      "defaultPrompt": "使用 $adobe-design-from-template 根据模板制作这个视觉设计。"
+    },
+    {
+      "name": "adobe-edit-quick-cut",
+      "displayName": "Adobe Quick Cut 快剪",
+      "shortDescription": "使用 Adobe Quick Cut 把视频剪成节奏紧凑的精彩短片。",
+      "defaultPrompt": "使用 $adobe-edit-quick-cut 把这段视频剪成精彩短片。"
+    },
+    {
+      "name": "adobe-retouch-portraits",
+      "displayName": "Adobe 人像批量精修",
+      "shortDescription": "批量精修人像照片，统一肤色、光线、色彩和整体质感。",
+      "defaultPrompt": "使用 $adobe-retouch-portraits 批量精修并统一这些人像照片。"
+    },
+    {
+      "name": "canva-brand-check",
+      "displayName": "Canva 品牌规范检查",
+      "shortDescription": "检查 Canva 设计的配色、字体、Logo 和文案是否符合 Brand Kit。",
+      "defaultPrompt": "使用 $canva-brand-check 检查这个 Canva 设计是否符合品牌规范。"
+    },
+    {
+      "name": "canva-branded-presentation",
+      "displayName": "Canva 品牌演示文稿",
+      "shortDescription": "根据提纲或简报创建符合 Brand Kit 的 Canva 演示文稿。",
+      "defaultPrompt": "使用 $canva-branded-presentation 根据这份内容创建品牌演示文稿。"
+    },
+    {
+      "name": "canva-bulk-create",
+      "displayName": "Canva 批量创建设计",
+      "shortDescription": "使用品牌模板和表格数据批量生成 Canva 设计。",
+      "defaultPrompt": "使用 $canva-bulk-create 根据这份数据批量创建 Canva 设计。"
+    },
+    {
+      "name": "canva-design-feedback",
+      "displayName": "Canva 设计反馈",
+      "shortDescription": "从视觉层级、版式、可读性、一致性和无障碍角度评审设计。",
+      "defaultPrompt": "使用 $canva-design-feedback 评审这个 Canva 设计并给出改进建议。"
+    },
+    {
+      "name": "canva-edit-design",
+      "displayName": "Canva 设计编辑",
+      "shortDescription": "修改 Canva 设计中的文字、图片、视频、格式、位置和尺寸。",
+      "defaultPrompt": "使用 $canva-edit-design 按照这些要求修改 Canva 设计。"
+    },
+    {
+      "name": "canva-implement-feedback",
+      "displayName": "Canva 反馈实施",
+      "shortDescription": "读取评论线程、归纳可执行反馈并应用到 Canva 设计。",
+      "defaultPrompt": "使用 $canva-implement-feedback 落实这个 Canva 设计中的评审意见。"
+    },
+    {
+      "name": "canva-resize-for-social-media",
+      "displayName": "Canva 社交媒体改版",
+      "shortDescription": "把 Canva 设计调整为 Facebook、Instagram、LinkedIn 等平台尺寸。",
+      "defaultPrompt": "使用 $canva-resize-for-social-media 生成这些社交媒体平台需要的版本。"
+    },
+    {
+      "name": "canva-translate-design",
+      "displayName": "Canva 设计翻译",
+      "shortDescription": "翻译 Canva 设计中的全部文字并创建对应语言的副本。",
+      "defaultPrompt": "使用 $canva-translate-design 把这个 Canva 设计翻译成目标语言。"
+    },
+    {
+      "name": "intake",
+      "owner": "creative-production",
+      "displayName": "创意制作需求收集",
+      "shortDescription": "在 Creative Production 需求尚不明确时收集创意目标与必要输入。",
+      "defaultPrompt": "使用 $intake 梳理并补全这个 Creative Production 需求。"
+    },
+    {
+      "name": "produce",
+      "owner": "creative-production",
+      "displayName": "视觉创意制作",
+      "shortDescription": "创建、探索、适配、完善或评审活动和营销视觉创意。",
+      "defaultPrompt": "使用 $produce 制作并完善这个视觉创意。"
+    },
+    {
+      "name": "index",
+      "owner": "data-analytics",
+      "displayName": "数据分析任务入口",
+      "shortDescription": "把综合数据分析需求路由到合适的专业分析工作流。",
+      "defaultPrompt": "使用 $index 判断并执行这个数据分析任务。"
+    },
+    {
+      "name": "analyze-data-quality",
+      "displayName": "数据质量分析",
+      "shortDescription": "评估结构化数据、查询结果和分析证据是否可靠可用。",
+      "defaultPrompt": "使用 $analyze-data-quality 检查这份数据的质量与可信度。"
+    },
+    {
+      "name": "build-dashboard",
+      "displayName": "数据仪表盘构建",
+      "shortDescription": "构建有数据来源支撑、可监控和探索业务驱动因素的仪表盘。",
+      "defaultPrompt": "使用 $build-dashboard 根据这些数据构建可用的仪表盘。"
+    },
+    {
+      "name": "build-report",
+      "displayName": "数据分析报告构建",
+      "shortDescription": "为管理、产品、业务或技术受众制作精炼的数据分析报告。",
+      "defaultPrompt": "使用 $build-report 根据这些证据制作数据分析报告。"
+    },
+    {
+      "name": "create-data-context",
+      "displayName": "数据语义上下文创建",
+      "shortDescription": "创建、更新、检查或修复 Data Analytics 语义层。",
+      "defaultPrompt": "使用 $create-data-context 为这些数据建立或修复语义上下文。"
+    },
+    {
+      "name": "design-kpis",
+      "displayName": "KPI 体系设计",
+      "shortDescription": "设计 KPI 框架、指标定义、目标值、护栏和衡量计划。",
+      "defaultPrompt": "使用 $design-kpis 为这个业务目标设计 KPI 体系。"
+    },
+    {
+      "name": "gather-business-context",
+      "displayName": "业务上下文收集",
+      "shortDescription": "从连接或提供的来源收集下游分析需要的业务背景。",
+      "defaultPrompt": "使用 $gather-business-context 收集这项分析所需的业务上下文。"
+    },
+    {
+      "name": "jupyter-notebooks",
+      "displayName": "Jupyter Notebook 分析",
+      "shortDescription": "创建、编辑和验证可复现的 SQL 或 Python Notebook。",
+      "defaultPrompt": "使用 $jupyter-notebooks 创建或检查这个可复现分析 Notebook。"
+    },
+    {
+      "name": "kpi-reporting",
+      "displayName": "KPI 汇报与记分卡",
+      "shortDescription": "制作 KPI 读数、记分卡、WBR、MBR、QBR 和管理摘要。",
+      "defaultPrompt": "使用 $kpi-reporting 根据这些指标制作 KPI 汇报。"
+    },
+    {
+      "name": "market-sizing",
+      "displayName": "市场规模测算",
+      "shortDescription": "以透明假设和不确定性估算市场、细分市场或机会规模。",
+      "defaultPrompt": "使用 $market-sizing 测算这个市场机会的规模。"
+    },
+    {
+      "name": "metric-diagnostics",
+      "displayName": "指标变化诊断",
+      "shortDescription": "诊断指标为何变化、偏离预期或在不同口径间不一致。",
+      "defaultPrompt": "使用 $metric-diagnostics 诊断这个指标变化的原因。"
+    },
+    {
+      "name": "product-business-analysis",
+      "displayName": "产品与业务分析",
+      "shortDescription": "分析产品或业务数据，为具体决策提供证据和建议。",
+      "defaultPrompt": "使用 $product-business-analysis 分析这些数据并支持当前决策。"
+    },
+    {
+      "name": "publish-artifact-to-sites",
+      "displayName": "分析成果发布到 Sites",
+      "shortDescription": "把已验证的数据分析报告或仪表盘通过 Sites 发布。",
+      "defaultPrompt": "使用 $publish-artifact-to-sites 发布这份已验证的分析成果。"
+    },
+    {
+      "name": "validate-data",
+      "displayName": "数据分析验证",
+      "shortDescription": "验证分析是否准确、有充分证据并适合分享或决策。",
+      "defaultPrompt": "使用 $validate-data 验证这份分析是否准确可靠。"
+    },
+    {
+      "name": "visualize-data",
+      "displayName": "数据图表设计",
+      "shortDescription": "设计、制作、修改或检查定量图表与数据视觉。",
+      "defaultPrompt": "使用 $visualize-data 把这些数据制作成清晰准确的图表。"
+    },
+    {
+      "name": "deep-research",
+      "displayName": "深度研究",
+      "shortDescription": "使用权威来源开展多轮研究并形成有引用支撑的结论。",
+      "defaultPrompt": "使用 $deep-research 深入研究这个主题并给出来源明确的结论。"
+    },
+    {
+      "name": "figma-code-connect",
+      "displayName": "Figma Code Connect 维护",
+      "shortDescription": "创建和维护把 Figma 组件映射到代码片段的 Code Connect 模板。",
+      "defaultPrompt": "使用 $figma-code-connect 创建或更新这个组件的 Code Connect 映射。"
+    },
+    {
+      "name": "figma-create-new-file",
+      "displayName": "Figma 新文件创建准备",
+      "shortDescription": "在调用 Figma 新建文件工具前执行必需的结构与参数准备。",
+      "defaultPrompt": "使用 $figma-create-new-file 准备并创建新的 Figma 文件。"
+    },
+    {
+      "name": "figma-design-to-code",
+      "displayName": "Figma 设计转代码准备",
+      "shortDescription": "在读取 Figma 设计上下文并转换为代码前执行必需流程。",
+      "defaultPrompt": "使用 $figma-design-to-code 把这个 Figma 设计转换成代码。"
+    },
+    {
+      "name": "figma-generate-design",
+      "displayName": "Figma 设计生成",
+      "shortDescription": "把应用页面、视觉需求或设计简报转成 Figma 设计。",
+      "defaultPrompt": "使用 $figma-generate-design 根据这个需求生成 Figma 设计。"
+    },
+    {
+      "name": "figma-generate-diagram",
+      "displayName": "Figma 图表生成准备",
+      "shortDescription": "在调用 Figma 图表生成工具前执行必需的结构与内容准备。",
+      "defaultPrompt": "使用 $figma-generate-diagram 在 Figma 中生成这个图表。"
+    },
+    {
+      "name": "figma-generate-library",
+      "displayName": "Figma 设计系统库生成",
+      "shortDescription": "根据代码库构建或更新专业级 Figma 设计系统。",
+      "defaultPrompt": "使用 $figma-generate-library 根据这个代码库生成 Figma 设计系统。"
+    },
+    {
+      "name": "figma-implement-motion",
+      "displayName": "Figma 动效代码实现",
+      "shortDescription": "把 Figma 中的动效和动画转换为生产可用的实现代码。",
+      "defaultPrompt": "使用 $figma-implement-motion 实现这个 Figma 设计中的动效。"
+    },
+    {
+      "name": "figma-swiftui",
+      "displayName": "SwiftUI 与 Figma 转换",
+      "shortDescription": "在 SwiftUI、iOS 界面与 Figma 设计之间进行双向转换。",
+      "defaultPrompt": "使用 $figma-swiftui 转换这个 SwiftUI 或 Figma 界面。"
+    },
+    {
+      "name": "figma-use",
+      "displayName": "Figma 操作准备",
+      "shortDescription": "在调用 Figma 操作工具前加载必需的执行规则与安全约束。",
+      "defaultPrompt": "使用 $figma-use 在 Figma 中完成这个设计任务。"
+    },
+    {
+      "name": "figma-use-figjam",
+      "displayName": "FigJam 操作支持",
+      "shortDescription": "在 FigJam 场景中配合 Figma 工具完成白板与协作内容操作。",
+      "defaultPrompt": "使用 $figma-use-figjam 在 FigJam 中完成这个任务。"
+    },
+    {
+      "name": "figma-use-motion",
+      "displayName": "Figma 动效操作支持",
+      "shortDescription": "为 Figma 工具提供关键帧、动画和动效编辑上下文。",
+      "defaultPrompt": "使用 $figma-use-motion 在 Figma 中制作或修改这个动效。"
+    },
+    {
+      "name": "figma-use-slides",
+      "displayName": "Figma Slides 操作支持",
+      "shortDescription": "在 Slides 场景中配合 Figma 工具创建和编辑演示内容。",
+      "defaultPrompt": "使用 $figma-use-slides 在 Figma Slides 中完成这个任务。"
+    },
+    {
+      "name": "google-docs",
+      "displayName": "Google Docs 文档",
+      "shortDescription": "使用完整提示与模板创建和编辑 Google Docs 文档。",
+      "defaultPrompt": "使用 $google-docs 创建或编辑这份 Google Docs 文档。"
+    },
+    {
+      "name": "google-drive",
+      "displayName": "Google Drive 文件管理",
+      "shortDescription": "以 Google Drive 为统一入口处理 Drive、Docs、Sheets 和 Slides。",
+      "defaultPrompt": "使用 $google-drive 查找或管理这些 Google Drive 文件。"
+    },
+    {
+      "name": "google-drive-comments",
+      "displayName": "Google Drive 评论管理",
+      "shortDescription": "在 Google Docs、Sheets、Slides 和 Drive 文件中写入、回复或解决评论。",
+      "defaultPrompt": "使用 $google-drive-comments 处理这个 Google Drive 评论任务。"
+    },
+    {
+      "name": "google-sheets",
+      "displayName": "Google Sheets 表格",
+      "shortDescription": "精确分析和编辑已连接的 Google Sheets 范围与数据。",
+      "defaultPrompt": "使用 $google-sheets 分析或更新这份 Google Sheets 表格。"
+    },
+    {
+      "name": "google-slides",
+      "displayName": "Google Slides 演示文稿",
+      "shortDescription": "创建和编辑 Google Slides，并从原生模板或参考设计中提炼设计系统。",
+      "defaultPrompt": "使用 $google-slides 创建或编辑这份 Google Slides 演示文稿。"
+    },
+    {
+      "name": "gsap",
+      "displayName": "GSAP 动画参考",
+      "shortDescription": "提供 HyperFrames 使用的 GSAP 动画、缓动、错列和时间线参考。",
+      "defaultPrompt": "使用 $gsap 为这个 HyperFrames 动画选择并实现 GSAP 方案。"
+    },
+    {
+      "name": "hyperframes",
+      "displayName": "HyperFrames 视频制作",
+      "shortDescription": "创建视频合成、动画、标题、字幕、配音和音频响应视觉。",
+      "defaultPrompt": "使用 $hyperframes 创建这个可渲染的视频合成。"
+    },
+    {
+      "name": "hyperframes-cli",
+      "displayName": "HyperFrames CLI",
+      "shortDescription": "使用 HyperFrames CLI 初始化、检查、预览、渲染、转录和配音。",
+      "defaultPrompt": "使用 $hyperframes-cli 运行并检查这个 HyperFrames 项目。"
+    },
+    {
+      "name": "hyperframes-registry",
+      "displayName": "HyperFrames 组件库",
+      "shortDescription": "安装并连接 HyperFrames Registry 中的区块和组件。",
+      "defaultPrompt": "使用 $hyperframes-registry 为当前合成安装并接入所需组件。"
+    },
+    {
+      "name": "website-to-hyperframes",
+      "displayName": "网站转 HyperFrames 视频",
+      "shortDescription": "采集网站画面并创建可编辑、可渲染的 HyperFrames 视频。",
+      "defaultPrompt": "使用 $website-to-hyperframes 把这个网站制作成 HyperFrames 视频。"
+    },
+    {
+      "name": "notion-knowledge-capture",
+      "displayName": "Notion 知识沉淀",
+      "shortDescription": "把对话和决策整理为结构清晰的 Notion 知识页面。",
+      "defaultPrompt": "使用 $notion-knowledge-capture 把这些内容沉淀到 Notion。"
+    },
+    {
+      "name": "notion-meeting-intelligence",
+      "displayName": "Notion 会议准备",
+      "shortDescription": "结合 Notion 上下文与补充研究准备会议材料。",
+      "defaultPrompt": "使用 $notion-meeting-intelligence 为这次会议准备材料。"
+    },
+    {
+      "name": "notion-research-documentation",
+      "displayName": "Notion 研究与文档",
+      "shortDescription": "跨 Notion 内容开展研究并综合为结构化文档。",
+      "defaultPrompt": "使用 $notion-research-documentation 在 Notion 中研究并整理这个主题。"
+    },
+    {
+      "name": "notion-spec-to-implementation",
+      "displayName": "Notion 规格转实施",
+      "shortDescription": "把 Notion 规格转成实施计划、任务和进度跟踪。",
+      "defaultPrompt": "使用 $notion-spec-to-implementation 把这份 Notion 规格转成实施任务。"
+    },
+    {
+      "name": "agents-sdk",
+      "displayName": "OpenAI Agents SDK 开发",
+      "shortDescription": "构建、运行、部署和评估基于 OpenAI Agents SDK 的应用。",
+      "defaultPrompt": "使用 $agents-sdk 构建或调试这个 OpenAI Agents SDK 应用。"
+    },
+    {
+      "name": "build-chatgpt-app",
+      "displayName": "ChatGPT App 构建",
+      "shortDescription": "搭建、重构和排查结合 MCP 服务与界面的 ChatGPT Apps SDK 应用。",
+      "defaultPrompt": "使用 $build-chatgpt-app 构建或修复这个 ChatGPT App。"
+    },
+    {
+      "name": "chatgpt-app-submission",
+      "displayName": "ChatGPT App 提交准备",
+      "shortDescription": "检查 ChatGPT Apps MCP 服务并生成合规的应用提交清单。",
+      "defaultPrompt": "使用 $chatgpt-app-submission 检查并准备这个 ChatGPT App 的提交文件。"
+    },
+    {
+      "name": "openai-api-troubleshooting",
+      "displayName": "OpenAI API 故障排查",
+      "shortDescription": "分类 OpenAI API 请求失败原因并给出针对性的排查与修复建议。",
+      "defaultPrompt": "使用 $openai-api-troubleshooting 排查这个 OpenAI API 错误。"
+    },
+    {
+      "name": "openai-platform-api-key",
+      "displayName": "OpenAI API Key 配置",
+      "shortDescription": "为 OpenAI 支持的应用安全配置、检查和使用 API Key。",
+      "defaultPrompt": "使用 $openai-platform-api-key 配置或检查这个项目的 OpenAI API Key。"
+    },
+    {
+      "name": "index",
+      "owner": "product-design",
+      "displayName": "产品设计任务入口",
+      "shortDescription": "确认产品设计简报并把需求路由到合适的专业工作流。",
+      "defaultPrompt": "使用 $index 判断并执行这个产品设计任务。"
+    },
+    {
+      "name": "audit",
+      "displayName": "产品流程审计",
+      "shortDescription": "审计产品流程、旅程、漏斗、入门、结账或设置体验。",
+      "defaultPrompt": "使用 $audit 审计这个产品流程并提出改进建议。"
+    },
+    {
+      "name": "ideate",
+      "displayName": "产品设计方向探索",
+      "shortDescription": "根据产品设计简报生成图像化替代方案、重混或新方向。",
+      "defaultPrompt": "使用 $ideate 为这个产品设计需求探索多个视觉方向。"
+    },
+    {
+      "name": "image-to-code",
+      "displayName": "设计图转前端代码",
+      "shortDescription": "把选定图片、截图或视觉稿忠实实现为响应式前端。",
+      "defaultPrompt": "使用 $image-to-code 把这张设计参考实现成响应式前端。"
+    },
+    {
+      "name": "url-to-code",
+      "displayName": "网页 URL 转前端代码",
+      "shortDescription": "把在线网页 URL 复刻为可运行的本地前端应用。",
+      "defaultPrompt": "使用 $url-to-code 把这个网页复刻为本地前端应用。"
+    },
+    {
+      "name": "plugin-management",
+      "displayName": "插件发现与管理",
+      "shortDescription": "发现合适插件并检查、管理应用连接、权限和依赖。",
+      "defaultPrompt": "使用 $plugin-management 查找或管理完成这个任务所需的插件。"
+    }
+  ],
+  "plugins": [
+    {
+      "name": "browser",
+      "displayName": "应用内浏览器",
+      "shortDescription": "在 Codex 中打开、控制和检查网页",
+      "longDescription": "控制 ChatGPT 应用内浏览器，完成网页打开、导航、点击、输入、检查和截图。适合 localhost、127.0.0.1、file:// URL 及当前应用内标签页；保留 @browser、@browser-use、browser-use 和 Browser 等调用别名。",
+      "defaultPrompts": [
+        "打开并检查这个本地网页"
+      ]
+    },
+    {
+      "name": "chrome",
+      "displayName": "Chrome",
+      "shortDescription": "控制当前 Chrome 会话和登录状态",
+      "longDescription": "控制用户现有 Chrome 会话中的标签页、登录状态、Cookie、扩展和 ChatGPT Chrome Extension。优先使用专用连接器、API 或 CLI；只有在用户同意时才把 Chrome 作为需要登录状态的后备方案。",
+      "defaultPrompts": [
+        "在我当前登录的 Chrome 会话中完成这个任务",
+        "检查当前 Chrome 标签页中的页面状态",
+        "使用现有 Chrome 登录状态执行这个网页操作"
+      ]
+    },
+    {
+      "name": "computer-use",
+      "displayName": "Windows 电脑操作",
+      "shortDescription": "控制 Windows 桌面应用",
+      "longDescription": "通过 Computer Use 控制 Windows 桌面应用，完成需要可视界面点击、输入、滚动和检查的任务。适合没有更直接 API、连接器或 CLI 的本机应用操作。",
+      "defaultPrompts": [
+        "在 Windows 桌面应用中完成这个任务",
+        "打开并检查这个 Windows 应用",
+        "按照这些步骤操作当前桌面界面"
+      ]
+    },
+    {
+      "name": "sites",
+      "displayName": "Sites",
+      "shortDescription": "使用 Sites 构建和发布网站",
+      "longDescription": "使用 Sites 创建、预览和部署网站、落地页、作品集、仪表盘及交互式 Web 应用。使用时须遵守 ChatGPT Sites Terms，并由用户对网站内容负责。",
+      "defaultPrompts": [
+        "使用 Sites 构建这个网站",
+        "把这个 Sites 网站发布上线",
+        "检查并更新当前 Sites 项目"
+      ]
+    },
+    {
+      "name": "visualize",
+      "displayName": "交互式可视化",
+      "shortDescription": "创建可交互的图表、地图和模拟器",
+      "longDescription": "直接在 Codex 对话中创建交互式图表、地图、关系图、模拟器、3D 模型、数据探索器和 UI 预览。支持筛选、选择、对比和参数调整。",
+      "defaultPrompts": [
+        "把这份数据制作成带筛选器的交互式探索工具",
+        "用可调节的 3D 模拟展示这个原理",
+        "把这个数据结构可视化为交互式关系图"
+      ]
+    },
+    {
+      "name": "documents",
+      "displayName": "文档",
+      "shortDescription": "创建和编辑 Word 与 Google Docs 文档",
+      "longDescription": "在 Codex 中创建、编辑、修订、批注并验证文档成果，包括 Word 文件和面向 Google Docs 的文档。适合需要专业结构、样式和版式检查的交付。",
+      "defaultPrompts": [
+        "创建一份结构清晰的 Word 文档",
+        "编辑并校对这份文档",
+        "检查这份 Word 文档的内容和版式"
+      ]
+    },
+    {
+      "name": "pdf",
+      "displayName": "PDF",
+      "shortDescription": "读取、创建、渲染和验证 PDF",
+      "longDescription": "在 Codex 中读取、创建、检查、渲染和验证 PDF 文件。适合页面布局、表单、转换、视觉 QA 和最终交付检查。",
+      "defaultPrompts": [
+        "读取并总结这份 PDF",
+        "创建并渲染这份 PDF",
+        "检查这份 PDF 的页面布局"
+      ]
+    },
+    {
+      "name": "presentations",
+      "displayName": "演示文稿",
+      "shortDescription": "创建、编辑和验证演示文稿",
+      "longDescription": "创建、编辑、渲染、验证和导出演示文稿，包括 PowerPoint、Google Slides、PPT 和 PPTX。适合从内容策划到最终版式检查的完整幻灯片工作。",
+      "defaultPrompts": [
+        "根据这份提纲创建 PowerPoint 演示文稿",
+        "编辑并统一这份演示文稿的版式",
+        "渲染并检查这份 PPTX 的最终效果"
+      ]
+    },
+    {
+      "name": "spreadsheets",
+      "displayName": "电子表格",
+      "shortDescription": "创建、分析和验证 Excel 与 Google Sheets",
+      "longDescription": "在 Codex 中创建、编辑、分析、可视化、渲染和导出电子表格，包括 Microsoft Excel、CSV 和面向 Google Sheets 的工作簿。",
+      "defaultPrompts": [
+        "分析这份 Excel 数据并总结关键发现",
+        "创建包含公式和图表的电子表格",
+        "检查并修复这份工作簿"
+      ]
+    },
+    {
+      "name": "template-creator",
+      "displayName": "模板创建",
+      "shortDescription": "从参考内容创建可复用个人模板",
+      "longDescription": "根据文件、Google Docs、Slides、Sheets 链接、ImageGen 或 Product Design 图片、邮件、Slack 消息和 Sites 项目，创建或更新可复用的个人模板。",
+      "defaultPrompts": [
+        "根据这个参考文件创建可复用模板",
+        "把这份内容整理成个人模板",
+        "更新现有模板以匹配这个新示例"
+      ]
+    },
+    {
+      "name": "app-69312da8e4dc81919370cb86fd172b6c",
+      "displayName": "Adobe",
+      "shortDescription": "使用 Adobe 编辑照片、视频、设计和文档",
+      "longDescription": "在对话中使用 Adobe Creative Cloud 与 Acrobat 能力完成创意和生产工作，包括批量修图、人像精修、模板设计、社交媒体适配、视频快剪、Creative Cloud 素材搜索、PDF 处理和数据驱动文档制作。可作为访客开始使用，连接 Adobe 账户后可获得更多工具、存储与跨会话工作能力。",
+      "defaultPrompts": [
+        "使用 Adobe 批量统一这些照片的色彩和光线",
+        "使用 Adobe 模板制作这套社交媒体视觉",
+        "使用 Adobe 调整并导出这段视频的平台版本"
+      ]
+    },
+    {
+      "name": "app-6938a7d323f48191aeabaf579802bf45",
+      "displayName": "Adobe Acrobat",
+      "shortDescription": "整理、转换和编辑 PDF 文档",
+      "longDescription": "使用 Adobe Acrobat 编辑、重排、旋转、拆分和合并 PDF 页面，转换格式、隐去敏感信息、通过 OCR 提取扫描文字、压缩文件并快速制作有序文档包。",
+      "defaultPrompts": [
+        "使用 Adobe Acrobat 整理并合并这些 PDF",
+        "使用 OCR 提取这份扫描 PDF 的文字"
+      ]
+    },
+    {
+      "name": "canva",
+      "displayName": "Canva",
+      "shortDescription": "创建、修改和评审 Canva 设计",
+      "longDescription": "把 Canva 设计流程带入 Codex，通过自然语言完成社交媒体尺寸适配、品牌模板批量创建、文字与媒体编辑、视觉设计反馈、评审意见实施、品牌规范检查和设计翻译。使用前需连接 Canva 账户，部分批量功能需要符合条件的 Canva Enterprise 方案。",
+      "defaultPrompts": [
+        "使用 Canva 把这个设计适配到多个社交媒体平台",
+        "使用 Canva 根据表格数据批量创建设计",
+        "使用 Canva 检查这个设计是否符合 Brand Kit"
+      ]
+    },
+    {
+      "name": "creative-production",
+      "displayName": "创意制作",
+      "shortDescription": "探索并制作营销与产品视觉创意",
+      "longDescription": "探索和制作活动创意、概念图、Mood Board、产品植入、广告方向、商品图、社交媒体内容和发布素材，并支持视觉方向的适配、完善与评审。",
+      "defaultPrompts": [
+        "为这个活动探索三套视觉创意方向",
+        "制作这款产品的发布视觉素材",
+        "评审并完善这套营销创意"
+      ]
+    },
+    {
+      "name": "data-analytics",
+      "displayName": "数据分析",
+      "shortDescription": "用数据回答产品和业务问题",
+      "longDescription": "围绕产品和业务决策完成数据质量检查、指标诊断、KPI 设计与汇报、市场规模测算、Notebook 分析、图表设计、仪表盘和报告构建，并验证最终结论是否可靠可分享。",
+      "defaultPrompts": [
+        "分析这些数据并解释指标变化原因",
+        "根据这份数据制作管理层仪表盘",
+        "验证这份分析是否准确且证据充分"
+      ]
+    },
+    {
+      "name": "deep-research-work",
+      "displayName": "深度研究",
+      "shortDescription": "在当前会话中开展多轮引用研究",
+      "longDescription": "在当前 Work 或 Codex 会话中使用权威来源开展多轮研究，比较证据、记录不确定性，并产出带准确引用的综合结论。",
+      "defaultPrompts": [
+        "深入研究这个主题并给出带引用的结论",
+        "比较不同权威来源对这个问题的看法",
+        "核实这些说法并整理证据"
+      ]
+    },
+    {
+      "name": "figma",
+      "displayName": "Figma",
+      "shortDescription": "连接 Figma 设计、代码与设计系统流程",
+      "longDescription": "支持 Figma 设计实现、Code Connect 模板、设计系统规则生成、SwiftUI 转换、动效实现以及 Figma、FigJam 和 Slides 场景中的专业工作流。",
+      "defaultPrompts": [
+        "把这个 Figma 设计实现为前端代码",
+        "根据代码库生成 Figma 设计系统",
+        "在 Figma 中创建并完善这个设计"
+      ]
+    },
+    {
+      "name": "github",
+      "displayName": "GitHub",
+      "shortDescription": "检查仓库、PR、Issue 和 CI",
+      "longDescription": "通过 GitHub 连接器与 CLI 工作流检查代码仓库、分类处理 PR 和 Issue、诊断 CI，并在获得明确授权后发布变更。所有 GitHub 网络操作仍遵守当前环境的代理与安全规则。",
+      "defaultPrompts": [
+        "检查这个 GitHub 仓库并总结当前状态"
+      ]
+    },
+    {
+      "name": "gmail",
+      "displayName": "Gmail",
+      "shortDescription": "使用已连接的 Gmail 处理邮件",
+      "longDescription": "通过已配置的 Gmail 应用连接器查找、阅读、整理和处理邮件；涉及发送、回复或其他外部写入时遵循明确授权。",
+      "defaultPrompts": [
+        "在 Gmail 中查找并整理这些邮件"
+      ]
+    },
+    {
+      "name": "google-drive",
+      "displayName": "Google Drive",
+      "shortDescription": "统一处理 Drive、Docs、Sheets 和 Slides",
+      "longDescription": "以 Google Drive 为单一入口查找、读取、创建和编辑 Drive 文件、Google Docs、Google Sheets 与 Google Slides，并按任务选择合适的专用工作流。",
+      "defaultPrompts": [
+        "在 Google Drive 中查找并处理这些文件"
+      ]
+    },
+    {
+      "name": "hyperframes",
+      "displayName": "HyperFrames by HeyGen",
+      "shortDescription": "用 HTML 与 GSAP 制作可渲染视频",
+      "longDescription": "使用 HyperFrames 编写 HTML 并渲染视频，支持合成、GSAP 动画、字幕、配音、音频响应视觉和网站转视频采集。",
+      "defaultPrompts": [
+        "使用 HyperFrames 制作这个动态图形视频",
+        "把这个网站制作成 HyperFrames 视频",
+        "为这个合成添加字幕、配音和 GSAP 动画"
+      ]
+    },
+    {
+      "name": "notion",
+      "displayName": "Notion",
+      "shortDescription": "在 Notion 中规划、研究和沉淀知识",
+      "longDescription": "使用 Notion 完成实施规划、研究综合、会议准备和知识沉淀，把规格、对话、决策与资料转成结构化页面、任务和可跟踪计划。",
+      "defaultPrompts": [
+        "把这些讨论和决策整理到 Notion"
+      ]
+    },
+    {
+      "name": "openai-developers",
+      "displayName": "OpenAI Developers",
+      "shortDescription": "构建 OpenAI API、Agents SDK 与 ChatGPT Apps",
+      "longDescription": "使用 OpenAI API、Agents SDK 和 ChatGPT Apps 构建、调试、部署和评估应用，排查 API 错误，并在获得授权后安全配置 OpenAI API Key。",
+      "defaultPrompts": [
+        "使用 OpenAI API 构建这个功能",
+        "创建并调试这个 Agents SDK 应用",
+        "检查这个 ChatGPT App 的实现与提交材料"
+      ]
+    },
+    {
+      "name": "openai-templates",
+      "displayName": "默认模板",
+      "shortDescription": "OpenAI 文档、演示和表格默认模板",
+      "longDescription": "提供 OpenAI 默认文档、演示文稿和电子表格模板，用于快速创建结构完整、风格统一的常见专业成果。",
+      "defaultPrompts": [
+        "使用默认模板创建这份文档",
+        "使用默认模板制作这份演示文稿",
+        "使用默认模板生成这份电子表格"
+      ]
+    },
+    {
+      "name": "outlook-email",
+      "displayName": "Outlook 邮件",
+      "shortDescription": "使用已连接的 Outlook 处理邮件",
+      "longDescription": "通过已配置的 Microsoft Outlook 应用连接器查找、阅读、整理和处理邮件；涉及发送、回复或其他外部写入时遵循明确授权。",
+      "defaultPrompts": [
+        "在 Outlook 中查找并整理这些邮件"
+      ]
+    },
+    {
+      "name": "plugin-management",
+      "displayName": "插件管理",
+      "shortDescription": "发现插件并管理连接、权限和依赖",
+      "longDescription": "发现适合当前任务的插件，检查应用连接、权限与依赖，并在用户明确要求时安装、启用或管理插件。",
+      "defaultPrompts": [
+        "查找适合完成这个任务的插件",
+        "检查当前插件的连接和权限",
+        "管理这个插件及其依赖"
+      ]
+    },
+    {
+      "name": "product-design",
+      "displayName": "产品设计",
+      "shortDescription": "把早期想法转成可评审产品原型",
+      "longDescription": "从确认设计简报开始，探索产品方向、审计用户流程、根据在线 URL 构建原型，并把静态截图转成可交互、可评审的前端体验。",
+      "defaultPrompts": [
+        "为这个产品需求探索多个设计方向",
+        "审计这个用户流程并提出改进方案",
+        "把这个设计参考实现成可交互原型"
+      ]
+    },
+    {
+      "name": "slack",
+      "displayName": "Slack",
+      "shortDescription": "使用已配置的 Slack 集成处理消息",
+      "longDescription": "通过已配置的 Slack 集成查找、阅读、整理和处理频道与消息；涉及发送、回复或其他外部写入时遵循明确授权。",
+      "defaultPrompts": [
+        "在 Slack 中查找并整理这些消息"
+      ]
     }
   ]
 }

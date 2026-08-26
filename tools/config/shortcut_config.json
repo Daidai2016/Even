@@ -72,6 +72,14 @@
         },
 
         {
+            "name": "Codex Skills 与插件同步",
+            "group": "01_开发工具",
+            "type": "codex_capability_sync",
+            "icon": "git_sync.ico",
+            "description": "安全更新仓库并补齐 Codex Skills、插件与本机代理环境"
+        },
+
+        {
             "name": "Photoshop JSX脚本",
             "group": "02_Adobe脚本",
             "type": "folder",

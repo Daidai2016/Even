@@ -14,6 +14,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ProxyGuardPath = Join-Path $PSScriptRoot "lib\github_proxy_guard.ps1"
+$RepositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
 
 function Get-PersistentProxyValues {
@@ -49,6 +50,69 @@ function Get-PersistentProxyValues {
 }
 
 
+function Get-ProcessProxyValues {
+    $Values = New-Object "System.Collections.Generic.List[string]"
+
+    foreach ($VariableName in @(
+        "HTTPS_PROXY",
+        "HTTP_PROXY",
+        "https_proxy",
+        "http_proxy"
+    )) {
+        try {
+            $Value = [Environment]::GetEnvironmentVariable(
+                $VariableName,
+                [System.EnvironmentVariableTarget]::Process
+            )
+
+            if (-not [string]::IsNullOrWhiteSpace([string]$Value)) {
+                [void]$Values.Add([string]$Value)
+            }
+        }
+        catch {
+            # 继续检查下一个进程环境变量。
+        }
+    }
+
+    return @($Values)
+}
+
+
+function Get-GitProxyValues {
+    $Values = New-Object "System.Collections.Generic.List[string]"
+    $GitCommand = Get-Command "git.exe" -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+
+    if ($null -eq $GitCommand) {
+        return @($Values)
+    }
+
+    $UrlMatchOutput = @(
+        & $GitCommand.Source `
+            -C $RepositoryRoot `
+            config --get-urlmatch http.proxy https://github.com 2>$null
+    )
+
+    if ($LASTEXITCODE -eq 0 -and $UrlMatchOutput.Count -gt 0) {
+        [void]$Values.Add(([string]$UrlMatchOutput[0]).Trim())
+    }
+
+    foreach ($GitProxyKey in @("https.proxy", "http.proxy")) {
+        $GitProxyOutput = @(
+            & $GitCommand.Source `
+                -C $RepositoryRoot `
+                config --get $GitProxyKey 2>$null
+        )
+
+        if ($LASTEXITCODE -eq 0 -and $GitProxyOutput.Count -gt 0) {
+            [void]$Values.Add(([string]$GitProxyOutput[0]).Trim())
+        }
+    }
+
+    return @($Values)
+}
+
+
 function Resolve-CurrentHttpProxy {
     $Candidates = New-Object "System.Collections.Generic.List[object]"
 
@@ -59,12 +123,26 @@ function Resolve-CurrentHttpProxy {
         })
     }
 
+    foreach ($Value in @(Get-GitProxyValues)) {
+        [void]$Candidates.Add([PSCustomObject]@{
+            Source = "当前 Git 配置"
+            Value  = $Value
+        })
+    }
+
     $WindowsProxy = Get-WindowsProxyValue
 
     if (-not [string]::IsNullOrWhiteSpace($WindowsProxy)) {
         [void]$Candidates.Add([PSCustomObject]@{
             Source = "Windows 系统代理"
             Value  = $WindowsProxy
+        })
+    }
+
+    foreach ($Value in @(Get-ProcessProxyValues)) {
+        [void]$Candidates.Add([PSCustomObject]@{
+            Source = "当前进程环境变量"
+            Value  = $Value
         })
     }
 
