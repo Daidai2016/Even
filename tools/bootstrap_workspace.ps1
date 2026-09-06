@@ -1,12 +1,12 @@
 ﻿# ==========================================
-# Codex Design 工作区恢复工具 V1.2.1
+# Codex Design 工作区恢复工具 V1.2.3
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 功能：
 # 1. 检查仓库结构
 # 2. 检查开发工具
 # 3. 检查 VS Code 工作区
-# 4. 检查 Adobe Beta
+# 4. 检查 Adobe（正式版 / Beta）
 # 5. 检查 Illustrator MCP
 # 6. 生成桌面工作台
 # 7. 运行完整环境检查
@@ -20,7 +20,15 @@
 # - 不显示或记录任何 Token 的真实值
 # ==========================================
 
+param(
+    [switch]$ValidationMode
+)
+
 $ErrorActionPreference = "Stop"
+
+. (Join-Path $PSScriptRoot "lib\adobe_installation.ps1")
+
+. (Join-Path $PSScriptRoot "lib\codex_cli.ps1")
 
 
 # ==========================================
@@ -468,7 +476,8 @@ function Test-TcpPort {
 
 function Invoke-ChildPowerShellScript {
     param(
-        [string]$ScriptPath
+        [string]$ScriptPath,
+        [string[]]$Arguments = @()
     )
 
     $PowerShellExe = Join-Path `
@@ -497,6 +506,10 @@ function Invoke-ChildPowerShellScript {
         "-ExecutionPolicy Bypass " +
         "-File `"$ScriptPath`""
     )
+
+    foreach ($Argument in $Arguments) {
+        $ArgumentLine += ' "' + $Argument.Replace('"', '\"') + '"'
+    }
 
     try {
         $Process = Start-Process `
@@ -582,13 +595,13 @@ try {
 
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Cyan
-    Write-Host " Codex Design 工作区恢复工具 V1.2.1" -ForegroundColor Cyan
+    Write-Host " Codex Design 工作区恢复工具 V1.2.3" -ForegroundColor Cyan
     Write-Host "==============================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "项目目录：$script:ProjectPath"
     Write-Host "开始时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
-    Add-Report "Codex Design 工作区恢复工具 V1.2.1"
+    Add-Report "Codex Design 工作区恢复工具 V1.2.3"
     Add-Report "=============================================="
     Add-Report "项目目录：$script:ProjectPath"
     Add-Report "开始时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -840,14 +853,10 @@ try {
     }
 
 
-    $CodexVersion = Get-CommandVersionResult `
-        -CommandName "codex.cmd"
+    $CodexVersion = Get-CodexVersionResult
 
     if ($CodexVersion.Success) {
-        $CodexCommand = Get-FirstCommand `
-            -CommandName "codex.cmd"
-
-        $script:CodexExe = $CodexCommand.Source
+        $script:CodexExe = $CodexVersion.Path
 
         Add-Status `
             -Name "Codex" `
@@ -1043,7 +1052,10 @@ try {
                     -Status "Success"
 
 
-                if (-not $ProxyGuardAvailable) {
+                if ($ValidationMode) {
+                    Add-Status -Name "GitHub连接" -Value "验证模式：跳过远程检查" -Status "Warning"
+                }
+                elseif (-not $ProxyGuardAvailable) {
                     Add-Status `
                         -Name "GitHub连接" `
                         -Value "已停止：缺少代理守卫" `
@@ -1321,50 +1333,15 @@ try {
 
 
     # ======================================
-    # 6. Adobe Beta 检查
+    # 6. Adobe（正式版 / Beta） 检查
     # ======================================
 
-    Write-Section "[6/9] 检查 Adobe Beta"
+    Write-Section "[6/9] 检查 Adobe（正式版 / Beta）"
 
-    $ProgramFilesX86 = [Environment]::GetEnvironmentVariable(
-        "ProgramFiles(x86)"
-    )
-
-    $PhotoshopCandidates = @(
-        (
-            Join-Path `
-                $env:ProgramFiles `
-                "Adobe\Adobe Photoshop (Beta)"
-        )
-    )
-
-    $IllustratorCandidates = @(
-        (
-            Join-Path `
-                $env:ProgramFiles `
-                "Adobe\Adobe Illustrator (Beta)"
-        )
-    )
-
-    if (
-        -not [string]::IsNullOrWhiteSpace(
-            $ProgramFilesX86
-        )
-    ) {
-        $PhotoshopCandidates += Join-Path `
-            $ProgramFilesX86 `
-            "Adobe\Adobe Photoshop (Beta)"
-
-        $IllustratorCandidates += Join-Path `
-            $ProgramFilesX86 `
-            "Adobe\Adobe Illustrator (Beta)"
-    }
-
-    $PhotoshopPath = Find-FirstExistingPath `
-        -Candidates $PhotoshopCandidates
-
-    $IllustratorPath = Find-FirstExistingPath `
-        -Candidates $IllustratorCandidates
+    $PhotoshopInstallation = Get-AdobeInstallation -Product Photoshop
+    $IllustratorInstallation = Get-AdobeInstallation -Product Illustrator
+    $PhotoshopPath = $PhotoshopInstallation.Path
+    $IllustratorPath = $IllustratorInstallation.Path
 
     if (
         -not [string]::IsNullOrWhiteSpace(
@@ -1372,19 +1349,13 @@ try {
         )
     ) {
         Add-Status `
-            -Name "Photoshop Beta" `
+            -Name "Photoshop" `
             -Value $PhotoshopPath `
             -Status "Success"
 
-        $PhotoshopScriptsPath = Join-Path `
-            $PhotoshopPath `
-            "Presets\Scripts"
+        $PhotoshopScriptsPath = $PhotoshopInstallation.ScriptsPath
 
-        if (
-            Test-Path `
-                -LiteralPath $PhotoshopScriptsPath `
-                -PathType Container
-        ) {
+        if (-not [string]::IsNullOrWhiteSpace($PhotoshopScriptsPath)) {
             Add-Status `
                 -Name "Photoshop脚本目录" `
                 -Value $PhotoshopScriptsPath `
@@ -1395,15 +1366,15 @@ try {
                 -Name "Photoshop脚本目录" `
                 -Value "未找到" `
                 -Status "Warning" `
-                -Action "检查 Photoshop Beta 安装和脚本目录"
+                -Action "检查 Photoshop 安装和脚本目录"
         }
     }
     else {
         Add-Status `
-            -Name "Photoshop Beta" `
+            -Name "Photoshop" `
             -Value "未安装或未在默认位置找到" `
             -Status "Warning" `
-            -Action "安装 Adobe Photoshop Beta，或检查实际安装目录"
+            -Action "安装 Adobe Photoshop，或检查实际安装目录"
     }
 
 
@@ -1413,19 +1384,13 @@ try {
         )
     ) {
         Add-Status `
-            -Name "Illustrator Beta" `
+            -Name "Illustrator" `
             -Value $IllustratorPath `
             -Status "Success"
 
-        $IllustratorScriptsPath = Join-Path `
-            $IllustratorPath `
-            "Presets\zh_CN\脚本"
+        $IllustratorScriptsPath = $IllustratorInstallation.ScriptsPath
 
-        if (
-            Test-Path `
-                -LiteralPath $IllustratorScriptsPath `
-                -PathType Container
-        ) {
+        if (-not [string]::IsNullOrWhiteSpace($IllustratorScriptsPath)) {
             Add-Status `
                 -Name "Illustrator脚本目录" `
                 -Value $IllustratorScriptsPath `
@@ -1436,15 +1401,15 @@ try {
                 -Name "Illustrator脚本目录" `
                 -Value "未找到" `
                 -Status "Warning" `
-                -Action "检查 Illustrator Beta 中文脚本目录"
+                -Action "检查 Illustrator 中文脚本目录"
         }
     }
     else {
         Add-Status `
-            -Name "Illustrator Beta" `
+            -Name "Illustrator" `
             -Value "未安装或未在默认位置找到" `
             -Status "Warning" `
-            -Action "安装 Adobe Illustrator Beta，或检查实际安装目录"
+            -Action "安装 Adobe Illustrator，或检查实际安装目录"
     }
 
 
@@ -1610,7 +1575,7 @@ try {
             -Name "MCP本地端口" `
             -Value "18412 当前未监听，Illustrator 可能尚未启动" `
             -Status "Warning" `
-            -Action "需要使用 MCP 时，启动 Illustrator Beta 并确认 MCP 功能已开启"
+            -Action "需要使用 MCP 时，启动 Illustrator 并确认 MCP 功能已开启"
     }
 
 
@@ -1644,8 +1609,17 @@ try {
             Write-Host "子工具出现提示时，请按提示完成。" -ForegroundColor Cyan
             Add-Report "正在运行桌面工作台生成工具。"
 
+            $DesktopArguments = @()
+            if ($ValidationMode) {
+                # Reuse the desktop tool's isolated validation output path.
+                $DesktopArguments = @(
+                    "-ValidationMode", "-OutputRoot",
+                    (Join-Path $script:ProjectPath "work\bootstrap_validation")
+                )
+            }
+
             $DesktopExitCode = Invoke-ChildPowerShellScript `
-                -ScriptPath $DesktopScript
+                -ScriptPath $DesktopScript -Arguments $DesktopArguments
 
             if ($DesktopExitCode -eq 0) {
                 Add-Status `
@@ -1701,8 +1675,13 @@ try {
             Write-Host "环境检查结束后，请按 Enter 返回恢复工具。" -ForegroundColor Cyan
             Add-Report "正在运行完整环境检查。"
 
+            $EnvironmentArguments = @()
+            if ($ValidationMode) {
+                $EnvironmentArguments = @("-NoPause", "-SkipRemoteCheck")
+            }
+
             $EnvironmentExitCode = Invoke-ChildPowerShellScript `
-                -ScriptPath $EnvironmentScript
+                -ScriptPath $EnvironmentScript -Arguments $EnvironmentArguments
 
             if ($EnvironmentExitCode -ne 0) {
                 Add-Status `
@@ -1912,6 +1891,6 @@ catch {
 }
 
 Write-Host ""
-[void](
-    Read-Host "按 Enter 键关闭窗口"
-)
+if (-not $ValidationMode) {
+    [void](Read-Host "按 Enter 键关闭窗口")
+}

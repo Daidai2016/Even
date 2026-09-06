@@ -1,5 +1,5 @@
 ﻿# ==================================================
-# Codex Skills and Plugins Reconciler V1.0.0
+# Codex Skills and Plugins Reconciler V1.0.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==================================================
 
@@ -10,6 +10,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+. (Join-Path $PSScriptRoot "lib\codex_cli.ps1")
 $ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $ManifestPath = Join-Path $ProjectPath "tools\config\codex_capabilities.json"
 $ProxyGuardPath = Join-Path $ProjectPath "tools\lib\github_proxy_guard.ps1"
@@ -363,14 +365,13 @@ function Get-InstalledPluginIds {
 function Sync-Plugins {
     param([object]$Manifest)
 
-    $CodexCommand = Get-Command "codex.cmd" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
+    $CodexVersion = Get-CodexVersionResult
 
-    if ($null -eq $CodexCommand) {
-        throw "未检测到 codex.cmd。"
+    if (-not $CodexVersion.Success) {
+        throw "Codex：$($CodexVersion.Value)"
     }
 
-    $script:CodexExe = $CodexCommand.Source
+    $script:CodexExe = $CodexVersion.Path
 
     foreach ($PluginName in @($Manifest.repositoryPlugins)) {
         $Arguments = @("-PluginName", [string]$PluginName, "-NoPause")

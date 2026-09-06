@@ -96,14 +96,14 @@
         },
 
         {
-            "name": "Photoshop Beta安装脚本目录",
+            "name": "Photoshop 安装脚本目录",
             "group": "02_Adobe脚本",
             "type": "photoshop_beta",
             "icon": "photoshop_beta_scripts.ico"
         },
 
         {
-            "name": "Illustrator Beta安装脚本目录",
+            "name": "Illustrator 安装脚本目录",
             "group": "02_Adobe脚本",
             "type": "illustrator_beta",
             "icon": "illustrator_beta_scripts.ico"

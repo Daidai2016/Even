@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design Local Plugin Installer V1.1.1
+# Codex Design Local Plugin Installer V1.1.2
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==========================================
 
@@ -11,6 +11,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+. (Join-Path $PSScriptRoot "lib\codex_cli.ps1")
 $ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $MarketplaceName = "codex-design"
 $PluginId = "$PluginName@$MarketplaceName"
@@ -56,14 +58,13 @@ function Get-CodexJson {
 
 
 try {
-    $CodexCommand = Get-Command "codex.cmd" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
+    $CodexVersion = Get-CodexVersionResult
 
-    if ($null -eq $CodexCommand) {
-        throw "未检测到 codex.cmd。"
+    if (-not $CodexVersion.Success) {
+        throw "Codex：$($CodexVersion.Value)"
     }
 
-    $script:CodexExe = $CodexCommand.Source
+    $script:CodexExe = $CodexVersion.Path
 
     if (-not (Test-Path -LiteralPath $PluginManifestPath -PathType Leaf)) {
         throw "缺少插件 manifest：$PluginName"

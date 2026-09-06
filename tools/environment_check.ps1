@@ -1,12 +1,12 @@
 ﻿# ==========================================
-# Codex Design 环境检查工具 V2.4.3
+# Codex Design 环境检查工具 V2.4.5
 # Windows PowerShell 5.1 / UTF-8 with BOM
 #
 # 主要功能：
 # - 检查 Windows 和 PowerShell
 # - 检查 Git、Node.js、npm、Python、Codex、VS Code
 # - 检查 VS Code 工作区配置
-# - 检查 Adobe Beta 和 JSX 目录
+# - 检查 Adobe（正式版 / Beta） 和 JSX 目录
 # - 检查 Illustrator MCP 配置、令牌变量和实时端口
 # - 检查 Git 仓库和 GitHub 连接
 # - 强制检查 GitHub 当前代理及其可达性
@@ -35,6 +35,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+. (Join-Path $PSScriptRoot "lib\adobe_installation.ps1")
+
+. (Join-Path $PSScriptRoot "lib\codex_cli.ps1")
 
 $ProxyGuardScript = Join-Path `
     $PSScriptRoot `
@@ -750,7 +754,7 @@ try {
     # 报告标题
     # --------------------------------------
 
-    Add-Report "Codex Design 环境检查 V2.4.3"
+    Add-Report "Codex Design 环境检查 V2.4.5"
     Add-Report "========================================"
     Add-Report "检查时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Add-Report "项目目录：$ProjectPath"
@@ -799,8 +803,7 @@ try {
 
     $PythonVersion = Get-PythonVersionResult
 
-    $CodexVersion = Get-CommandVersionResult `
-        -CommandName "codex.cmd"
+    $CodexVersion = Get-CodexVersionResult
 
     $VSCodeVersion = Get-CommandVersionResult `
         -CommandName "code"
@@ -950,10 +953,7 @@ try {
 
     $InstalledPlugins = @()
     $PluginQuerySucceeded = $false
-    $CodexCommand = Get-Command "codex.cmd" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-
-    if ($null -ne $CodexCommand) {
+    if ($CodexVersion.Success) {
         try {
             $PreviousErrorActionPreference = $ErrorActionPreference
 
@@ -962,7 +962,7 @@ try {
                 # 警告包装成 ErrorRecord，状态仍以真实退出码为准。
                 $ErrorActionPreference = "Continue"
                 $PluginListOutput = @(
-                    & $CodexCommand.Source plugin list --json 2>$null
+                    & $CodexVersion.Path plugin list --json 2>$null
                 )
                 $PluginListExitCode = $LASTEXITCODE
             }
@@ -1089,76 +1089,40 @@ try {
 
 
     # ======================================
-    # Adobe Beta
+    # Adobe（正式版 / Beta）
     # ======================================
 
-    $ProgramFilesX86 =
-        [Environment]::GetEnvironmentVariable(
-            "ProgramFiles(x86)"
-        )
+    $PhotoshopInstallation = Get-AdobeInstallation -Product Photoshop
+    $IllustratorInstallation = Get-AdobeInstallation -Product Illustrator
+    $PhotoshopPath = $PhotoshopInstallation.Path
+    $IllustratorPath = $IllustratorInstallation.Path
 
-    $PhotoshopCandidates = @(
-        (
-            Join-Path `
-                $env:ProgramFiles `
-                "Adobe\Adobe Photoshop (Beta)"
-        )
-    )
-
-    $IllustratorCandidates = @(
-        (
-            Join-Path `
-                $env:ProgramFiles `
-                "Adobe\Adobe Illustrator (Beta)"
-        )
-    )
-
-    if (
-        -not [string]::IsNullOrWhiteSpace(
-            $ProgramFilesX86
-        )
-    ) {
-        $PhotoshopCandidates += Join-Path `
-            $ProgramFilesX86 `
-            "Adobe\Adobe Photoshop (Beta)"
-
-        $IllustratorCandidates += Join-Path `
-            $ProgramFilesX86 `
-            "Adobe\Adobe Illustrator (Beta)"
-    }
-
-    $PhotoshopBetaPath = Find-FirstExistingPath `
-        -Candidates $PhotoshopCandidates
-
-    $IllustratorBetaPath = Find-FirstExistingPath `
-        -Candidates $IllustratorCandidates
-
-    Add-Report "Adobe Beta"
+    Add-Report "Adobe（正式版 / Beta）"
     Add-Report "----------------------------------------"
 
-    if ($PhotoshopBetaPath -eq "未找到") {
+    if ([string]::IsNullOrWhiteSpace($PhotoshopPath)) {
         Add-Status `
-            -Name "Photoshop Beta" `
+            -Name "Photoshop" `
             -Value "未找到" `
             -Status "Failure"
     }
     else {
         Add-Status `
-            -Name "Photoshop Beta" `
-            -Value $PhotoshopBetaPath `
+            -Name "Photoshop" `
+            -Value $PhotoshopPath `
             -Status "Success"
     }
 
-    if ($IllustratorBetaPath -eq "未找到") {
+    if ([string]::IsNullOrWhiteSpace($IllustratorPath)) {
         Add-Status `
-            -Name "Illustrator Beta" `
+            -Name "Illustrator" `
             -Value "未找到" `
             -Status "Failure"
     }
     else {
         Add-Status `
-            -Name "Illustrator Beta" `
-            -Value $IllustratorBetaPath `
+            -Name "Illustrator" `
+            -Value $IllustratorPath `
             -Status "Success"
     }
 
@@ -1167,21 +1131,8 @@ try {
     # Adobe 脚本目录
     # --------------------------------------
 
-    $PhotoshopJSXPath = ""
-
-    if ($PhotoshopBetaPath -ne "未找到") {
-        $PhotoshopJSXPath = Join-Path `
-            $PhotoshopBetaPath `
-            "Presets\Scripts"
-    }
-
-    $IllustratorJSXPath = ""
-
-    if ($IllustratorBetaPath -ne "未找到") {
-        $IllustratorJSXPath = Join-Path `
-            $IllustratorBetaPath `
-            "Presets\zh_CN\脚本"
-    }
+    $PhotoshopJSXPath = $PhotoshopInstallation.ScriptsPath
+    $IllustratorJSXPath = $IllustratorInstallation.ScriptsPath
 
     if (
         -not [string]::IsNullOrWhiteSpace(
@@ -1195,7 +1146,7 @@ try {
     ) {
         Add-Status `
             -Name "Photoshop JSX目录" `
-            -Value "存在" `
+            -Value $PhotoshopJSXPath `
             -Status "Success"
     }
     else {
@@ -1217,7 +1168,7 @@ try {
     ) {
         Add-Status `
             -Name "Illustrator JSX目录" `
-            -Value "存在" `
+            -Value $IllustratorJSXPath `
             -Status "Success"
     }
     else {
@@ -1225,6 +1176,14 @@ try {
             -Name "Illustrator JSX目录" `
             -Value "缺失" `
             -Status "Failure"
+    }
+
+    foreach ($Product in @("Photoshop", "Illustrator")) {
+        $Installation = if ($Product -eq "Photoshop") { $PhotoshopInstallation } else { $IllustratorInstallation }
+        $PluginPath = $Installation.PluginsPath
+        Add-Status -Name "$Product 插件目录" `
+            -Value $(if ($PluginPath) { $PluginPath } else { "未找到" }) `
+            -Status $(if ($PluginPath) { "Success" } else { "Warning" })
     }
 
     Add-Report ""

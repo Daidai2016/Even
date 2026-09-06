@@ -1,13 +1,13 @@
 ﻿# =============================================
 # Even Codex Design Desktop Workspace Generator
 #
-# Version: 2.3.1
+# Version: 2.3.3
 #
 # 功能：
 # 1. 自动识别当前项目根目录
 # 2. 读取 tools/config/shortcut_config.json
 # 3. 根据 JSON 配置创建桌面快捷方式
-# 4. 自动检测 Photoshop Beta 与 Illustrator Beta
+# 4. 自动检测 Photoshop 与 Illustrator
 # 5. 自动匹配仓库中的 ICO 图标
 # 6. 创建 Even Codex Design 桌面工作台
 # 7. 生成详细安装日志
@@ -31,7 +31,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ToolVersion = "2.3.1"
+. (Join-Path $PSScriptRoot "lib\adobe_installation.ps1")
+
+$ToolVersion = "2.3.3"
 
 
 # =============================================
@@ -819,7 +821,7 @@ else {
 
 
 # =============================================
-# 二十二、Adobe Beta 环境检测
+# 二十二、Adobe（正式版 / Beta） 环境检测
 # =============================================
 
 
@@ -829,32 +831,19 @@ $AdobeRoot = Join-Path `
 
 
 # ---------------------------------------------
-# Photoshop Beta
+# Photoshop
 # ---------------------------------------------
 
 
-$PhotoshopBetaRoot = Join-Path `
-    $AdobeRoot `
-    "Adobe Photoshop (Beta)"
+$PhotoshopInstallation = Get-AdobeInstallation -Product Photoshop
+$PhotoshopInstallRoot = $PhotoshopInstallation.Path
+# A non-existing fallback keeps the existing directory-opening behavior.
+if ([string]::IsNullOrWhiteSpace($PhotoshopInstallRoot)) {
+    $PhotoshopInstallRoot = Join-Path $AdobeRoot "Adobe Photoshop"
+}
+$PhotoshopScriptCandidates = @($PhotoshopInstallation.ScriptsPath) | Where-Object { $_ }
 
-
-$PhotoshopScriptCandidates = @(
-
-    (Join-Path `
-        $PhotoshopBetaRoot `
-        "Presets\Scripts"),
-
-    (Join-Path `
-        $PhotoshopBetaRoot `
-        "Presets\zh_CN\Scripts"),
-
-    (Join-Path `
-        $PhotoshopBetaRoot `
-        "Presets\zh_CN\脚本")
-)
-
-
-$PhotoshopBetaScriptPath = $null
+$PhotoshopInstallScriptPath = $null
 
 
 foreach ($PhotoshopCandidate in $PhotoshopScriptCandidates) {
@@ -865,30 +854,30 @@ foreach ($PhotoshopCandidate in $PhotoshopScriptCandidates) {
             -PathType Container
     ) {
 
-        $PhotoshopBetaScriptPath = $PhotoshopCandidate
+        $PhotoshopInstallScriptPath = $PhotoshopCandidate
 
         break
     }
 }
 
 
-if ($PhotoshopBetaScriptPath) {
+if ($PhotoshopInstallScriptPath) {
 
     Write-SetupLog `
-        "Photoshop Beta脚本目录：$PhotoshopBetaScriptPath" `
+        "Photoshop脚本目录：$PhotoshopInstallScriptPath" `
         "SUCCESS"
 }
 elseif (
     Test-Path `
-        -LiteralPath $PhotoshopBetaRoot `
+        -LiteralPath $PhotoshopInstallRoot `
         -PathType Container
 ) {
 
-    $PhotoshopBetaScriptPath = $PhotoshopBetaRoot
+    $PhotoshopInstallScriptPath = $PhotoshopInstallRoot
 
 
     Write-SetupLog `
-        "找到 Photoshop Beta，但未找到 Presets\Scripts；将打开安装目录。" `
+        "找到 Photoshop，但未找到 Presets\Scripts；将打开安装目录。" `
         "WARNING"
 }
 elseif (
@@ -897,16 +886,16 @@ elseif (
         -PathType Container
 ) {
 
-    $PhotoshopBetaScriptPath = $AdobeRoot
+    $PhotoshopInstallScriptPath = $AdobeRoot
 
 
     Write-SetupLog `
-        "未找到 Photoshop Beta；将打开 Adobe 安装目录。" `
+        "未找到 Photoshop；将打开 Adobe 安装目录。" `
         "WARNING"
 }
 else {
 
-    $PhotoshopBetaScriptPath = $env:ProgramFiles
+    $PhotoshopInstallScriptPath = $env:ProgramFiles
 
 
     Write-SetupLog `
@@ -916,36 +905,19 @@ else {
 
 
 # ---------------------------------------------
-# Illustrator Beta
+# Illustrator
 # ---------------------------------------------
 
 
-$IllustratorBetaRoot = Join-Path `
-    $AdobeRoot `
-    "Adobe Illustrator (Beta)"
+$IllustratorInstallation = Get-AdobeInstallation -Product Illustrator
+$IllustratorInstallRoot = $IllustratorInstallation.Path
+# A non-existing fallback keeps the existing directory-opening behavior.
+if ([string]::IsNullOrWhiteSpace($IllustratorInstallRoot)) {
+    $IllustratorInstallRoot = Join-Path $AdobeRoot "Adobe Illustrator"
+}
+$IllustratorScriptCandidates = @($IllustratorInstallation.ScriptsPath) | Where-Object { $_ }
 
-
-$IllustratorScriptCandidates = @(
-
-    (Join-Path `
-        $IllustratorBetaRoot `
-        "Presets\zh_CN\脚本"),
-
-    (Join-Path `
-        $IllustratorBetaRoot `
-        "Presets\zh_CN\Scripts"),
-
-    (Join-Path `
-        $IllustratorBetaRoot `
-        "Presets\en_US\Scripts"),
-
-    (Join-Path `
-        $IllustratorBetaRoot `
-        "Presets\Scripts")
-)
-
-
-$IllustratorBetaScriptPath = $null
+$IllustratorInstallScriptPath = $null
 
 
 foreach ($IllustratorCandidate in $IllustratorScriptCandidates) {
@@ -956,30 +928,30 @@ foreach ($IllustratorCandidate in $IllustratorScriptCandidates) {
             -PathType Container
     ) {
 
-        $IllustratorBetaScriptPath = $IllustratorCandidate
+        $IllustratorInstallScriptPath = $IllustratorCandidate
 
         break
     }
 }
 
 
-if ($IllustratorBetaScriptPath) {
+if ($IllustratorInstallScriptPath) {
 
     Write-SetupLog `
-        "Illustrator Beta脚本目录：$IllustratorBetaScriptPath" `
+        "Illustrator脚本目录：$IllustratorInstallScriptPath" `
         "SUCCESS"
 }
 elseif (
     Test-Path `
-        -LiteralPath $IllustratorBetaRoot `
+        -LiteralPath $IllustratorInstallRoot `
         -PathType Container
 ) {
 
-    $IllustratorBetaScriptPath = $IllustratorBetaRoot
+    $IllustratorInstallScriptPath = $IllustratorInstallRoot
 
 
     Write-SetupLog `
-        "找到 Illustrator Beta，但未找到语言脚本目录；将打开安装目录。" `
+        "找到 Illustrator，但未找到语言脚本目录；将打开安装目录。" `
         "WARNING"
 }
 elseif (
@@ -988,16 +960,16 @@ elseif (
         -PathType Container
 ) {
 
-    $IllustratorBetaScriptPath = $AdobeRoot
+    $IllustratorInstallScriptPath = $AdobeRoot
 
 
     Write-SetupLog `
-        "未找到 Illustrator Beta；将打开 Adobe 安装目录。" `
+        "未找到 Illustrator；将打开 Adobe 安装目录。" `
         "WARNING"
 }
 else {
 
-    $IllustratorBetaScriptPath = $env:ProgramFiles
+    $IllustratorInstallScriptPath = $env:ProgramFiles
 
 
     Write-SetupLog `
@@ -1335,6 +1307,20 @@ function New-EvenShortcut {
             $ShortcutFolder `
             "$ShortcutName.lnk"
 
+
+        # Rename only the legacy links created by this tool, avoiding duplicates.
+        if ($ShortcutName -match "^(Photoshop|Illustrator) 安装脚本目录$") {
+            $Product = $Matches[1]
+            $LegacyFile = Join-Path $ShortcutFolder "$Product Beta安装脚本目录.lnk"
+            if ((Test-Path -LiteralPath $LegacyFile -PathType Leaf) -and
+                -not (Test-Path -LiteralPath $ShortcutFile)) {
+                $LegacyLink = $WScriptShell.CreateShortcut($LegacyFile)
+                if ($LegacyLink.Description -eq "打开 $Product Beta 安装脚本目录" -and
+                    $LegacyLink.TargetPath -eq $TargetPath) {
+                    Move-Item -LiteralPath $LegacyFile -Destination $ShortcutFile -ErrorAction Stop
+                }
+            }
+        }
 
         # 使用 $LinkObject，避免与 JSON 循环变量重名
 
@@ -1789,11 +1775,11 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -ShortcutName $ShortcutName `
                 -TargetPath $ExplorerExe `
                 -Arguments (
-                    Quote-Argument $PhotoshopBetaScriptPath
+                    Quote-Argument $PhotoshopInstallScriptPath
                 ) `
-                -WorkingDirectory $PhotoshopBetaScriptPath `
+                -WorkingDirectory $PhotoshopInstallScriptPath `
                 -IconFileName $ShortcutIcon `
-                -Description "打开 Photoshop Beta 安装脚本目录"
+                -Description "打开 Photoshop 安装脚本目录"
 
 
             break
@@ -1807,11 +1793,11 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -ShortcutName $ShortcutName `
                 -TargetPath $ExplorerExe `
                 -Arguments (
-                    Quote-Argument $IllustratorBetaScriptPath
+                    Quote-Argument $IllustratorInstallScriptPath
                 ) `
-                -WorkingDirectory $IllustratorBetaScriptPath `
+                -WorkingDirectory $IllustratorInstallScriptPath `
                 -IconFileName $ShortcutIcon `
-                -Description "打开 Illustrator Beta 安装脚本目录"
+                -Description "打开 Illustrator 安装脚本目录"
 
 
             break
@@ -1925,9 +1911,9 @@ Write-Host $WorkspacePath
 Write-Host ""
 
 
-Write-Host "成功创建：$ShortcutSuccessCount 个"
+Write-Host "快捷方式成功：$ShortcutSuccessCount 个"
 
-Write-Host "创建失败：$ShortcutFailureCount 个"
+Write-Host "快捷方式失败：$ShortcutFailureCount 个"
 
 Write-Host "警告数量：$WarningCount 个"
 
@@ -1965,20 +1951,23 @@ Write-SetupLog `
     "文件夹图标失败数量：$FolderIconFailureCount"
 
 
-if (
-    ($ShortcutFailureCount -eq 0) -and
-    ($FolderIconFailureCount -eq 0)
-) {
+if ($ShortcutFailureCount -eq 0) {
 
     Write-SetupLog `
-        "桌面工作台生成完成。" `
+        "桌面工作台快捷方式全部创建成功。" `
         "SUCCESS"
 }
 else {
 
     Write-SetupLog `
-        "桌面工作台生成结束，但存在创建失败的快捷方式。" `
+        "桌面工作台生成结束，$ShortcutFailureCount 个快捷方式创建失败，请查看日志。" `
         "WARNING"
+}
+
+
+if ($FolderIconFailureCount -gt 0) {
+    # Individual failures already contribute to WarningCount; do not count twice.
+    Write-SetupLog "文件夹图标警告：$FolderIconFailureCount 个设置失败，不影响已创建快捷方式的使用。"
 }
 
 
