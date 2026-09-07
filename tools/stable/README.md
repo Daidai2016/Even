@@ -12,3 +12,5 @@
 - `bootstrap_workspace_v1.1.ps1`
 - `environment_check_v2.4.0.ps1`
 - `validate_repository_v1.1.0.ps1`
+
+- `validate_repository_v1.2.1.ps1`：加入视觉源文件与插件一致性检查前的验证器，仅供回退比对。

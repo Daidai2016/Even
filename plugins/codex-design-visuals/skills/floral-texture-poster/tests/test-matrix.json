@@ -1,0 +1,30 @@
+{
+  "skill": "floral-texture-poster",
+  "status": "cases-defined-not-automated-behavior-tests",
+  "cases": [
+    {"id":"T01","type":"直接点名","prompt":"使用 $floral-texture-poster 转绘这张花卉图。","expected_trigger":true,"expected":"命中 material_redraw + texture_graphic。"},
+    {"id":"T02","type":"自然语言触发","prompt":"把这整株花做成纸张颗粒和丝网印刷的几何素材。","expected_trigger":true,"expected":"触发并锁定完整花卉主体。"},
+    {"id":"T03","type":"模糊需求","prompt":"这朵花想做得更像有印刷肌理的平面图形。","expected_trigger":true,"expected":"任务主旨落在花卉肌理转绘时触发；先确认参考与用途。"},
+    {"id":"T04","type":"一句话创建","prompt":"把这朵粉色虞美人转成几何丝印素材。","expected_trigger":true,"expected":"默认保色；缺省白底无字仅在未指定时生效。"},
+    {"id":"T05","type":"完整参数创建","prompt":"两支粉色虞美人，4:5，透明背景，标题春日花园，保留原色，分层 PSD + AI。","expected_trigger":true,"expected":"主体、4:5、透明背景、标题、颜色与交付全部 LOCKED。"},
+    {"id":"T06","type":"优化已有视觉","prompt":"优化这张几何花卉：保留构图和颜色，只修脏底与过强颗粒。","expected_trigger":true,"expected":"加载 optimization；KEEP/CHANGE/LOCKED 清楚。"},
+    {"id":"T07","type":"诊断失败视觉","prompt":"诊断为什么这张花卉转绘看起来像噪点且花茎还是照片。","expected_trigger":true,"expected":"加载 diagnosis；返回 E10_TEXTURE/E11_STYLE。"},
+    {"id":"T08","type":"参数硬锁","prompt":"必须保留两朵花、粉色原色、3:4 和透明背景。","expected_trigger":true,"expected":"四项均 LOCKED，不被白底默认覆盖。"},
+    {"id":"T09","type":"参数冲突","prompt":"品牌色必须蓝色，但参考花必须严格保留粉色原色。","expected_trigger":true,"expected":"分别保留品牌与主体色角色，报告冲突，不静默换色。"},
+    {"id":"T10","type":"9:16 竖版","prompt":"做 9:16 竖版，顶部留标题安全区。","expected_trigger":true,"expected":"9:16 LOCKED；重排安全区。"},
+    {"id":"T11","type":"16:9 横版","prompt":"做 16:9 横版，花在右侧。","expected_trigger":true,"expected":"16:9 与右侧构图 LOCKED。"},
+    {"id":"T12","type":"超宽画幅","prompt":"做 32:9 展墙素材，主体不能被拉伸。","expected_trigger":true,"expected":"32:9 LOCKED；重新构图而非机械拉伸。"},
+    {"id":"T13","type":"中文标题","prompt":"标题必须是春日花园，用中文标题作为版式结构。","expected_trigger":true,"expected":"准确文案 LOCKED；加载 typography，后期排字。"},
+    {"id":"T14","type":"中西文混排","prompt":"标题春日花园，英文 SPRING GARDEN，日期 2026.04。","expected_trigger":true,"expected":"中文、西文、数字分别定义角色并逐字复核。"},
+    {"id":"T15","type":"标题作为 H1","prompt":"标题是 H1，花卉退为 H2。","expected_trigger":true,"expected":"保持指定层级，不默认主体 H1。"},
+    {"id":"T16","type":"主体作为 H1","prompt":"花卉是 H1，标题只作辅助。","expected_trigger":true,"expected":"花卉 H1、标题 H2/H3。"},
+    {"id":"T17","type":"品牌色硬锁","prompt":"品牌蓝 #0057B8 必须原值保留，用于标题和强调线。","expected_trigger":true,"expected":"品牌色 LOCKED，不被风格滤镜漂移。"},
+    {"id":"T18","type":"风格串味","prompt":"保持几何丝印，不要 3D、Y2K、霓虹和写实摄影。","expected_trigger":true,"expected":"只加载 texture_graphic；串味为 FAIL。"},
+    {"id":"T19","type":"精简输出","prompt":"只给我精简参数、Prompt、负面约束和审计。","expected_trigger":true,"expected":"输出精简模式但保留锁摘要。"},
+    {"id":"T20","type":"完整专业输出","prompt":"给完整专业方案，含路由、PS/AI 分层、生产规格和审计。","expected_trigger":true,"expected":"输出完整专业模式与未验证项。"}
+  ],
+  "negative_triggers": [
+    {"prompt":"把花卉照片做自然写实修图。","expected_trigger":false},
+    {"prompt":"让这张花卉海报动起来。","expected_trigger":false,"expected_route":"floral-texture-motion-poster"}
+  ]
+}

@@ -1,5 +1,5 @@
 ﻿# ==========================================
-# Codex Design Repository Validator V1.3.0
+# Codex Design Repository Validator V1.2.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==========================================
 
@@ -367,69 +367,6 @@ function Test-SkillFolder {
 }
 
 
-function Test-VisualPluginSources {
-    # 安装包是源文件的分发副本；即使 ChangedOnly 也检查完整引用闭包。
-    $SourceRoot = Join-Path $ProjectPath "AI_Skills\Graphic_Design"
-    $PackageRoot = Join-Path $ProjectPath "plugins\codex-design-visuals"
-    $SourcePrefix = $SourceRoot.TrimEnd("\") + "\"
-    $Pending = New-Object "System.Collections.Generic.Queue[string]"
-    $Seen = New-Object "System.Collections.Generic.HashSet[string]" `
-        ([System.StringComparer]::OrdinalIgnoreCase)
-
-    $Pending.Enqueue("skills\floral-texture-poster\SKILL.md")
-    $Pending.Enqueue("skills\floral-texture-poster\agents\openai.yaml")
-    foreach ($File in @(Get-ChildItem -LiteralPath (
-        Join-Path $SourceRoot "skills\floral-texture-poster"
-    ) -Recurse -File)) {
-        $Pending.Enqueue($File.FullName.Substring($SourcePrefix.Length))
-    }
-    # 也核对包中现存文件，避免遗留副本脱离维护来源。
-    foreach ($Folder in @("skills", "references")) {
-        foreach ($File in @(Get-ChildItem -LiteralPath (
-            Join-Path $PackageRoot $Folder
-        ) -Recurse -File)) {
-            $Pending.Enqueue($File.FullName.Substring($PackageRoot.Length + 1))
-        }
-    }
-
-    while ($Pending.Count -gt 0) {
-        $RelativePath = $Pending.Dequeue()
-        if (-not $Seen.Add($RelativePath)) { continue }
-        $script:Checks++
-        $Source = Join-Path $SourceRoot $RelativePath
-        $Copy = Join-Path $PackageRoot $RelativePath
-        if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
-            Add-ValidationError "视觉插件缺少维护源：$RelativePath"
-            continue
-        }
-        if (-not (Test-Path -LiteralPath $Copy -PathType Leaf)) {
-            Add-ValidationError "视觉插件缺少分发文件：$RelativePath"
-        }
-        elseif ((Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash -ne
-                (Get-FileHash -LiteralPath $Copy -Algorithm SHA256).Hash) {
-            Add-ValidationError "视觉插件与源文件不一致：$RelativePath"
-        }
-        if ([IO.Path]::GetExtension($Source) -ne ".md") { continue }
-        $Text = Get-Content -LiteralPath $Source -Raw -Encoding UTF8
-        foreach ($Link in [regex]::Matches($Text, '\[[^\]]*\]\(([^)]+)\)')) {
-            $Target = $Link.Groups[1].Value.Trim().Trim('<', '>').Split('#')[0]
-            if (-not $Target -or $Target -match '^[a-zA-Z][a-zA-Z0-9+.-]*:') {
-                continue
-            }
-            $Resolved = [IO.Path]::GetFullPath((Join-Path (
-                Split-Path $Source -Parent
-            ) $Target))
-            if (-not $Resolved.StartsWith($SourcePrefix,
-                    [StringComparison]::OrdinalIgnoreCase)) {
-                Add-ValidationError "视觉插件引用超出可分发源目录：$RelativePath -> $Target"
-                continue
-            }
-            $Pending.Enqueue($Resolved.Substring($SourcePrefix.Length))
-        }
-    }
-}
-
-
 try {
     Set-Location -LiteralPath $ProjectPath
     $CandidateFiles = @(Get-CandidateFiles)
@@ -471,8 +408,6 @@ try {
             Test-SkillFolder -File $File
         }
     }
-
-    Test-VisualPluginSources
 
     $TrackedSensitive = @(
         & git -C $ProjectPath -c core.safecrlf=false `

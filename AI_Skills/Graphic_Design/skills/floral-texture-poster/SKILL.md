@@ -52,7 +52,7 @@ metadata:
 
 ## 路由 / Routes
 
-只读取当前需要的文件：
+任务契约使用 [RCE](../../references/Prompt_Framework.md)，通用原则继承 [共享视觉规范](../../references/平面设计生图与动态视觉规范.md)。当前任务已读取时直接复用；以下只加载命中的详细规则：
 
 1. 始终读取 [主体](../../references/shared/subject.md)、[层级](../../references/shared/hierarchy.md)、[构图](../../references/shared/composition.md)、[色彩](../../references/shared/color.md)、[肌理](../../references/shared/texture.md) 与 [共享审计](../../references/shared/audit.md)。
 2. 读取 [material_redraw](../../references/routes/task/material-redraw.md) 与 [texture_graphic](../../references/routes/style/texture-graphic.md)。

@@ -7,7 +7,7 @@
 处理本目录覆盖的平面视觉或动态视觉任务时：
 
 1. 先读取任务调用规范 `references/Prompt_Framework.md`，把用户需求整理为可执行的 RCE 任务契约。
-2. 再读取共享规范 `references/平面设计生图与动态视觉规范.md`。
+2. 通过共享规范 `references/平面设计生图与动态视觉规范.md` 确认通用原则；已加载的内容不重复读取。
 3. 读取与任务匹配的 `skills/<skill-name>/SKILL.md`。
 4. 按该入口的路由读取必要 `references/`；不要无差别加载其他 Skill。
 5. 用户当前明确要求、真实品牌规范和已授权资产的优先级高于默认规则。
@@ -40,9 +40,9 @@ Graphic_Design/
 ## 3. 继承规则
 
 - `references/Prompt_Framework.md` 只定义 RCE 任务契约、输入澄清、约束优先级与输出结构；不重复具体 Skill 的领域方法、生成参数或验证状态。
-- 通用 Design Goal、Input、Design Analysis、Visual Language、Visual Composition、Visual Hierarchy、Typography、Color System、Static Image、Motion Design、MG Animation、Logo Meaning Animation、Output、Forbidden 和 Quality Check 只在共享规范维护。
+- 共享总规范维护跨任务原则；可执行的字体、层级、色彩、参数硬锁和审计细则在 `references/shared/`、条件规则在 `references/routes/` 维护。已有详细规则时总规范引用它，不另写冲突版本。
 - 具体 Skill 只定义该任务特有的触发范围、输入、步骤、变量、Prompt、失败条件与人工审核点。
-- 动态延展 Skill 必须声明并读取其静态父 Skill；冲突时按“用户要求 > 动态专用规则 > 静态父 Skill > 共享规范”处理。
+- 动态延展 Skill 必须声明并读取其静态父 Skill；按第 5 节完整优先级处理，动态专用路由可细化运动方式，但不得覆盖继承的静态 `LOCKED`。
 - 不得把视觉层级固定为“主体永远高于标题”；第一视觉由传播目标决定。
 - 涉及准确文字、Logo、品牌色、人物、产品和数据时，不得让生成模型擅自改写。
 

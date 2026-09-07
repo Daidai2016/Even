@@ -1,5 +1,9 @@
 # Codex Design Workspace
 
+[AI视觉设计工作台：总指令、八模块与规范接入](docs/VISUAL_WORKBENCH.md)
+
+本仓库是工作台唯一的本地根目录。八个设计主题复用现有规范、素材和脚本，不另建平行工作区。
+
 
 ## 项目定位
 
@@ -61,7 +65,7 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 
 详细结构、运行链路和安全边界见 `docs/CODEX_ARCHITECTURE.md`。
 
-`AI_Skills/` 保存按专业分类维护的 Skill 源文件和共享规范；`plugins/` 只保存通过证据门禁、可供 Codex 安装的正式插件。两者不得混为同一层。
+`AI_Skills/` 保存 Skill 源文件和共享规范；`plugins/` 保存安装分发包。正式能力须通过证据门禁；现有静态视觉测试包的边界见 `docs/AIGC_CREATIVE_RULES.md` 第 8.1 节，安装成功不代表生产验证通过。
 
 
 
@@ -122,7 +126,7 @@ Codex_Design/
 │   按专业分类维护的 Skill 源文件、共享规则和初始版本
 │
 ├── plugins/
-│   通过验证后封装的 Codex Design 可安装插件与 skills
+│   正式能力与已登记本地测试包的安装分发副本
 │
 ├── scripts/
 │   Adobe 及其他生产自动化脚本
@@ -155,16 +159,7 @@ Codex_Design/
     可清理的分析、生成和测试中间文件
 ```
 
-仓库外层工作区建议只保留三个明确入口：
-
-```text
-AI_Workspace/
-├── Codex_Design/       创意能力、规范、工具和插件仓库
-├── Client_Projects/    客户或生产项目，与平台仓库分开
-└── Shared_Assets/      跨项目共用且有来源记录的大型素材
-```
-
-脚本、模板、MCP 配置和设计自动化不在工作区根目录重复建库，统一由 `Codex_Design/` 内对应目录管理。
+云端项目沿用“AI视觉设计工作台”；主题与本地文件的对应关系见 [工作台导航](docs/VISUAL_WORKBENCH.md)。本地内容统一保留在当前仓库，已有客户原件只登记来源位置，不另建外层工作区或平行资源库。
 
 
 ---
