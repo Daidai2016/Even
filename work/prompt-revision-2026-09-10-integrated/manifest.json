@@ -1,0 +1,18 @@
+[
+  {
+    "source": "AI_Skills/Graphic_Design/references/Prompt_Framework.md",
+    "sha256": "093680e3a58024104aba10755639f7b15ac1b71f82eaa9c47f9ad35591f1e6a2"
+  },
+  {
+    "source": "AI_Skills/Graphic_Design/references/routes/production/image-generation.md",
+    "sha256": "49d198e26ec7eae85df2f458551eb620f61f26bbb76522a4c7c30bd7e69e3e57"
+  },
+  {
+    "source": "docs/VISUAL_WORKBENCH.md",
+    "sha256": "84ca7d90916d512cf0717969f811d903d9dbeec4f87233c7ac81b282306e7b7c"
+  },
+  {
+    "source": "docs/AIGC_CREATIVE_RULES.md",
+    "sha256": "3f69db4254188904fc48311240e5b99ab388309c05f2d14956fe5d8aa66e71c3"
+  }
+]

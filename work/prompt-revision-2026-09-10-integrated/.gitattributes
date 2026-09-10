@@ -1,0 +1,2 @@
+# Preserve the space marker on empty context lines in this exported patch.
+changes.diff whitespace=-blank-at-eol
