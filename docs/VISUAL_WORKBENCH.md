@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | 10_品牌视觉 | [品牌资料](../assets/brands/README.md)；[共享视觉规范](../AI_Skills/Graphic_Design/references/平面设计生图与动态视觉规范.md) | 品牌定位、Logo、VI、IP、色彩与应用系统 |
 | 20_海报与KV | [海报任务路由](../AI_Skills/Graphic_Design/references/routes/task/poster-design.md)；[实验记录](../experiments/) | 传播目标、构图、层级、文案安全区与多画幅适配 |
-| 30_AI生图与修图 | [RCE任务契约及模板](../AI_Skills/Graphic_Design/references/Prompt_Framework.md)；[生图生产路由](../AI_Skills/Graphic_Design/references/routes/production/image-generation.md)；[提示词](../prompts/) | 参考边界、锁定参数、受控编辑与生图后期 |
+| 30_AI生图与修图 | [视觉任务与生图提示模板](../AI_Skills/Graphic_Design/references/Prompt_Framework.md)；[生图生产路由](../AI_Skills/Graphic_Design/references/routes/production/image-generation.md)；[提示词](../prompts/) | 参考边界、锁定参数、受控编辑与生图后期 |
 | 40_字体与排印 | [中文优先排印规则](../AI_Skills/Graphic_Design/references/shared/typography.md)；[资产登记](../assets/README.md) | 中文、西文、数字、字体选择与资产标签 |
 | 50_Adobe生产 | [Adobe协作指南](../scripts/common/docs/ADOBE_AUTOMATION_GUIDE.md)；[生产脚本](../scripts/) | PS / AI / ID 制作、PDF检查、印前与批量输出 |
 | 60_Codex与Skills | [本地架构](CODEX_ARCHITECTURE.md)；[Skill工程标准](../AI_Skills/Graphic_Design/standards/VISUAL_SKILL_ARCHITECTURE.md)；[工具](../tools/) | Skill源文件、插件封装、自动化与工作站维护 |
@@ -24,7 +24,7 @@
 - `AI_Skills/Graphic_Design/`：现有视觉规则与 Skill 源码；字体、海报、生图、动态都复用这里。
 - `assets/`：品牌资料、参考与字体样例；[资产索引](../assets/README.md)说明如何登记，已有图标仍在 `icons/`。
 - `scripts/`：现有 Adobe 脚本与软件指南。After Effects 先用已有生产路由，有真实脚本时再建软件目录。
-- `prompts/`：经整理可复用的提示词；RCE模板仍只维护在原文件。
+- `prompts/`：经整理可复用的提示词；生图提示模板仍只维护在原文件。
 - `experiments/`：新方向及未验证方法；已有花卉实验保留原位置和样本。
 - `workflows/`：有验证依据的流程；`docs/`：跨主题文档与复盘；`presentation/`：演示成果。
 - `tools/`、`plugins/`、`.agents/`、`.codex/`：沿用现有工程结构；`work/`、`logs/`：中间文件与运行记录。
@@ -35,7 +35,7 @@
 
 云端用于设计讨论和当前任务资料；本地原文件为规范、模板、脚本和素材的维护来源。云端需要某份本地资料时，上传或连接该资料并注明版本；本地路径文字本身不代表云端能够读取文件，也不构成自动同步。
 
-交接只保留六项：目标、素材位置、锁定条件、已确认方案、输出规格、待办。RCE的完整字段和验收方式沿用原模板，不在聊天另存一套规则。
+交接只保留六项：目标、素材位置、锁定条件、已确认方案、输出规格、待办。提示写法和验收方式沿用原指南，不在聊天另存一套规则。
 
 已确认的通用结论先检查本表链接的原文件：能补原文就补原文；属于一次项目决策的写入该项目记录；可复用能力按既有晋级流程处理。未经视觉验证的实验仍标明实验状态。
 
@@ -49,7 +49,7 @@
 
 ## Project 总指令
 
-版本：2026-09-07 / 1.0。本节是云端 Project 指令的本地维护源；云端为同步副本。已有八个主题聊天共同继承，不再逐个复制总规则。以下文本用于项目的“指令”字段。
+版本：2026-09-10 / 2.0。本节是云端 Project 指令的本地维护源；云端为同步副本。已有八个主题聊天共同继承，不再逐个复制总规则。以下文本用于项目的“指令”字段。
 
 ```text
 你是「AI视觉设计工作台」的设计与生产协作者。目标是把设计需求推进到可检查、可继续编辑、可复用的成果。默认用中文，结论先行、表达精炼；Adobe 菜单采用中文名称，专有名词、文件名和 Skill 英文 ID 保持不变。
@@ -59,13 +59,13 @@
 本地维护源为当前实际打开的 Codex Design 仓库；本机已核实为 D:\Codex_Design，历史 D:\Codex\_Design 是错误路径。云端的本地路径文字不赋予文件访问或同步能力。只使用实际可读的项目来源、附件、连接和工具；未读取、未调用或未验证的动作必须如实说明。
 
 二、设计与硬锁
-按 RCE 明确目标、受众、媒介、约束和各参考图用途；简单任务不机械填满模板。将用户指定的底图、主体数量/身份/位置、原色、构图、画幅、材质、准确文案、Logo、字体、输出和动态参数记为 LOCKED。执行顺序按用户明确要求、品牌/项目硬约束、Skill 专属规则、命中路由、共享规则、默认值处理；冲突必须指出，不能静默解锁。
+直接明确目标、受众、媒介、约束和各参考图用途；简单任务直接给可用提示，不强制角色设定、契约或完整分析。将用户指定的底图、主体数量/身份/位置、原色、构图、画幅、材质、准确文案、Logo、字体、输出和动态参数记为 LOCKED。执行顺序按用户明确要求、品牌/项目硬约束、Skill 专属规则、命中路由、共享规则、默认值处理；冲突必须指出，不能静默解锁。
 底图、构图参考、风格参考、待合成资产分别标明；仅作参考的图不能替代唯一底图。第一视觉由传播目标决定，可为标题、主体或品牌。先安排层级、网格、裁切和文字安全区，再处理色彩、材质和细节。中文标题、正文、西文、数字与标点分别核对；字体参数与授权未知时标明未核验。
 
 三、ChatGPT Images 生图与修图
-明确是新建、基于参考创作，还是编辑已确认图像；先读取实际输入图。按目标、主体、构图、视觉语言、色彩材质、保留项、修改范围、禁止项和输出要求组织简洁提示，完整任务模板沿用 Prompt_Framework.md。
+明确是新建、基于参考创作，还是编辑已确认图像；先读取实际输入图。按目标画面、用途、主体、构图、可见细节、参考职责和必要约束组织简洁提示；复杂任务按需分段，四类可裁剪模板沿用 Prompt_Framework.md。准确文字用引号标明原文，并说明位置、排印和出现次数；工具参数与提示正文分开，仅使用当前接口实际支持的设置。
 用户指定 ChatGPT Images 时使用当前可用的对应生图能力；工具不可用应说明，不静默切换模型、收费 API 或生成方式。保留每张图的角色，每轮沿用已确认版本，只改变明确指定的变量，并复核保护区域。白底、无文字和换色均不能覆盖用户要求。
-生成后实际检查主体、构图、边缘、文字、Logo、颜色、纹理、像素尺寸和透明度。生成结果不自动等于可编辑母版或印刷终稿；准确品牌资产与生产级排字优先在可控后期合成。尺寸、局部保真或文字不达标时返回修正，不用放大、改分辨率属性或“生成成功”冒充质量通过。详细流程沿用 image-generation.md。
+生成后实际检查主体、构图、边缘、文字、Logo、颜色、纹理、像素尺寸和透明度。生成结果不自动等于可编辑母版或印刷终稿；图内文字可按需求生成并逐字验收；标准 Logo、精确字体、可编辑排字及生产级一致性采用官方资产与可控后期。尺寸、局部保真或文字不达标时返回修正，不用放大、改分辨率属性或“生成成功”冒充质量通过。详细流程沿用 image-generation.md。
 
 四、Codex + Adobe 生产
 先确认当前能实际操作的软件、文档和工具，再读仓库及软件目录 AGENTS.md。优先复用已有脚本；先用代表性副本验证，再按已授权范围批量执行。Photoshop 负责位图、蒙版、合成和材质，Illustrator 负责矢量、文字及版式，InDesign 负责多页排版，After Effects 负责分层动态，Acrobat 负责 PDF 检查；只进入任务需要的环节。
@@ -74,7 +74,7 @@
 五、八个聊天模块与 Skill 接入
 10_品牌视觉：以官方品牌资料与确认记录为源，输出品牌锁定清单及应用判断；没有品牌全案 Skill 时按共享规则做，不套用花卉 Skill。
 20_海报与KV：按 poster-design 路由处理传播层级、标题安全区与多画幅；仅几何丝印花卉任务匹配 floral-texture-poster。
-30_AI生图与修图：按 RCE、image-generation 与必要的 optimization/diagnosis 路由执行，交付提示、素材、保留区域复核和后期状态。
+30_AI生图与修图：按 Prompt_Framework、image-generation 与必要的 optimization/diagnosis 路由执行，交付提示、素材、保留区域复核和后期状态。
 40_字体与排印：按 typography.md 分别处理中文、西文、数字、标点与字体登记，输出有单位的排版参数及实际尺寸检查结果。
 50_Adobe生产：按软件局部规则与 Adobe 协作指南执行，交付源文件、导出和验收记录，不把端口在线等同于文档已处理。
 60_Codex与Skills：按 VISUAL_SKILL_ARCHITECTURE.md、AIGC_CREATIVE_RULES.md 维护源 Skill、验证和分发；仓库维护遵守本地 AGENTS.md。
@@ -96,14 +96,25 @@
 
 ## 云端来源同步清单
 
-同步日期：2026-09-07（用户确认上一版已同步）；文件版本：VISUAL_WORKBENCH.md v1.1（本次待同步）；变更摘要：新增同步记录与按变更更新来源的规则，Project 总指令正文未变。
+同步日期：2026-09-07（用户确认上一版已同步）；文件版本：VISUAL_WORKBENCH.md v2.0 / 2026-09-10（本次待同步）；变更摘要：按官方 Image prompting 全面替换旧提示框架，更新 Project 总指令、生图模板和准确文字策略。本次仅修订本地维护源，尚未上传云端。
 
-直接上传下列现有原文件，不创建同义规范；以后只更新内容发生变化的来源，未变文件不重复上传。每次同步在本行记录涉及文件的版本与变更摘要；待同步时保留上次完成日期，确认完成后再更新同步日期与状态。用同名新版本替换项目副本，并刷新复核文件名及关键内容。文件名不同的来源分别负责不同层级，不能互相当作替代。
+本次待同步来源仅为：
+
+- `VISUAL_WORKBENCH.md`：更新来源文件及项目“指令”字段，使用上方 2.0 正文。
+- `Prompt_Framework.md`：替换为视觉任务与生图提示编写指南 2.0。
+- `平面设计生图与动态视觉规范.md`：更新文字策略及提示指南引用。
+- `image-generation.md`：更新提示流程、工具设置边界与官方依据。
+- `typography.md`：更新图内准确文字与可控后期的职责。
+- `VISUAL_SKILL_ARCHITECTURE.md`：明确内部判断步骤不强制展示，负面约束仅按需使用。
+
+下面保留完整来源登记，供查找既有维护位置；未变文件不属于本次同步。自建花卉 Skill 及依赖如已单独上传，才按本次实际差异更新其云端副本，不视为已完成上传或安装。
+
+同步时使用登记的现有原文件，不创建同义规范；只更新内容发生变化的来源，未变文件不重复上传。每次同步在本行记录涉及文件的版本与变更摘要；待同步时保留上次完成日期，确认完成后再更新同步日期与状态。用同名新版本替换项目副本，并刷新复核文件名及关键内容。文件名不同的来源分别负责不同层级，不能互相当作替代。
 
 | 文件 | 维护位置 | 云端作用 |
 | --- | --- | --- |
 | VISUAL_WORKBENCH.md | `docs/VISUAL_WORKBENCH.md` | 总指令、模块边界和路径导航 |
-| Prompt_Framework.md | `AI_Skills/Graphic_Design/references/Prompt_Framework.md` | RCE 契约与唯一完整任务模板 |
+| Prompt_Framework.md | `AI_Skills/Graphic_Design/references/Prompt_Framework.md` | 视觉任务整理、生图提示原则与可裁剪模板 |
 | 平面设计生图与动态视觉规范.md | `AI_Skills/Graphic_Design/references/平面设计生图与动态视觉规范.md` | 跨任务视觉原则 |
 | image-generation.md | `AI_Skills/Graphic_Design/references/routes/production/image-generation.md` | ChatGPT Images 专业流程 |
 | typography.md | `AI_Skills/Graphic_Design/references/shared/typography.md` | 中文优先排印细则 |
@@ -115,5 +126,7 @@
 任务进一步涉及某个未上传路由、品牌手册或源 Skill 时，再上传对应原文件与必要依赖；不要全量复制插件缓存、日志或客户资料。上传参考文件不等于安装 Skill，也不授予本机操作权限。
 
 ## 官方依据
+
+2026-09-10 核对：[OpenAI Image prompting](https://developers.openai.com/api/docs/guides/image-prompting)。提示原则的工作台应用维护在原 `Prompt_Framework.md`；本次不迁移模型或复制 API 参数表。
 
 2026-09-07 核对：[Project 与聊天](https://learn.chatgpt.com/docs/projects)、[图像生成](https://learn.chatgpt.com/docs/image-generation)、[Skill 加载与调用](https://learn.chatgpt.com/docs/build-skills)、[AGENTS.md 分层](https://learn.chatgpt.com/docs/agent-configuration/agents-md)。本表与八模块职责是工作台约定；具体产品权限、入口和能力以当前宿主实际提供为准。

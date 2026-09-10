@@ -6,7 +6,7 @@
 
 处理本目录覆盖的平面视觉或动态视觉任务时：
 
-1. 先读取任务调用规范 `references/Prompt_Framework.md`，把用户需求整理为可执行的 RCE 任务契约。
+1. 先读取视觉任务与生图提示编写指南 `references/Prompt_Framework.md`，明确目标、参考用途与关键约束；简单任务直接组织提示，不强制展示角色或任务契约。
 2. 通过共享规范 `references/平面设计生图与动态视觉规范.md` 确认通用原则；已加载的内容不重复读取。
 3. 读取与任务匹配的 `skills/<skill-name>/SKILL.md`。
 4. 按该入口的路由读取必要 `references/`；不要无差别加载其他 Skill。
@@ -39,7 +39,7 @@ Graphic_Design/
 
 ## 3. 继承规则
 
-- `references/Prompt_Framework.md` 只定义 RCE 任务契约、输入澄清、约束优先级与输出结构；不重复具体 Skill 的领域方法、生成参数或验证状态。
+- `references/Prompt_Framework.md` 维护需求整理、生图提示原则与可裁剪模板；不重复具体 Skill 的领域方法、工具执行或验证状态。
 - 共享总规范维护跨任务原则；可执行的字体、层级、色彩、参数硬锁和审计细则在 `references/shared/`、条件规则在 `references/routes/` 维护。已有详细规则时总规范引用它，不另写冲突版本。
 - 具体 Skill 只定义该任务特有的触发范围、输入、步骤、变量、Prompt、失败条件与人工审核点。
 - 动态延展 Skill 必须声明并读取其静态父 Skill；按第 5 节完整优先级处理，动态专用路由可细化运动方式，但不得覆盖继承的静态 `LOCKED`。

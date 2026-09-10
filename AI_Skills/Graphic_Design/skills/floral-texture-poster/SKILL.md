@@ -52,7 +52,7 @@ metadata:
 
 ## 路由 / Routes
 
-任务契约使用 [RCE](../../references/Prompt_Framework.md)，通用原则继承 [共享视觉规范](../../references/平面设计生图与动态视觉规范.md)。当前任务已读取时直接复用；以下只加载命中的详细规则：
+需求整理和提示写法使用 [提示编写指南](../../references/Prompt_Framework.md)，通用原则继承 [共享视觉规范](../../references/平面设计生图与动态视觉规范.md)。当前任务已读取时直接复用；以下只加载命中的详细规则：
 
 1. 始终读取 [主体](../../references/shared/subject.md)、[层级](../../references/shared/hierarchy.md)、[构图](../../references/shared/composition.md)、[色彩](../../references/shared/color.md)、[肌理](../../references/shared/texture.md) 与 [共享审计](../../references/shared/audit.md)。
 2. 读取 [material_redraw](../../references/routes/task/material-redraw.md) 与 [texture_graphic](../../references/routes/style/texture-graphic.md)。
@@ -76,9 +76,9 @@ metadata:
 
 ## 输出 / Output
 
-精简模式：参数锁摘要、H1/H2/H3、主 Prompt、负面约束、后期与审计结论。
+精简模式：直接给主 Prompt，必要时补关键硬锁、当前任务的排除项及后期与审计结论。只要提示词时不强制展示角色、契约或完整分析。
 
-完整专业模式：任务契约、参数来源与状态、路由记录、视觉策略、主 Prompt/负面约束、候选筛选、PS/AI 图层与制作清单、尺寸/色彩/格式、审计证据、版权与未验证项。
+完整专业模式：按交付需要提供目标与约束、参数来源与状态、路由记录、视觉策略、主 Prompt 与必要约束、候选筛选、PS/AI 图层与制作清单、尺寸/色彩/格式、审计证据、版权与未验证项；不机械展示空章节。
 
 若只完成生图，状态写为“生成素材完成，后期未完成”。未实际执行 Photoshop/Illustrator 时不得声称成品已完成。
 

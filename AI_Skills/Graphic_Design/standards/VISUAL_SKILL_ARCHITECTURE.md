@@ -105,8 +105,10 @@ RECEIVE → BOUNDARY → PARSE → LOCK → CONFLICT
 → TASK ROUTE → STYLE ROUTE → PRODUCTION ROUTE → LOAD
 → HIERARCHY → COMPOSITION → SUBJECT → TYPOGRAPHY
 → COLOR → MATERIAL → MOTION（按需）
-→ GENERATE → NEGATIVE → AUDIT → REPAIR → OUTPUT
+→ GENERATE → NEGATIVE（仅本任务必要约束） → AUDIT → REPAIR → OUTPUT
 ```
+
+上述步骤用于内部判断，不要求逐步展示或每轮输出负面词表；提示写法沿用 `references/Prompt_Framework.md`，简单任务直接给可用结果。
 
 创建、优化和诊断共享前半段。优化必须先列出保留项与修改项；诊断先分类失败，不得在未定位原因时直接重做。
 
