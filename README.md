@@ -87,6 +87,9 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 `Codex Design 同步GitHub` 会从脚本所在位置自动确定仓库。它只在 `main` 工作区干净、代理可用、本地仅落后 `origin/main` 时执行 `pull --ff-only`。检测到未提交修改、本地领先或分支分叉时只报告并停止，不会自动 reset、clean、stash、commit 或 force。
 
 `Codex Skills 与插件同步` 会先调用同一套安全 GitHub 同步流程，再按 `tools/config/codex_capabilities.json` 补装缺失的用户 Skills、Codex Design 本地插件和受管 OpenAI 插件，并刷新本机代理环境与中文界面。它不会覆盖已有 Skill、删除额外能力，也不会复制登录令牌、OAuth 状态或插件缓存。另一台电脑首次完成仓库克隆和本机部署后，日常只需双击该快捷方式。
+两台电脑的中英文显示名称统一由 `tools/config/codex_skills_zh-CN.json` 管理；同步安装后会重新应用名称，英文内部 ID 和调用名保持不变。新装能力需要登记到 `tools/config/codex_capabilities.json`，只修改本机缓存不会传到另一台电脑。办公室或家里修改清单与名称后，先检查并通过“Codex Design 发布GitHub”发布，再在另一台电脑双击“Codex Skills 与插件同步”；未提交、未推送的修改不会跨电脑传播。该流程补齐缺失能力，不保证两端已有第三方 Skill 的文件版本完全一致；账号授权仍由各电脑单独完成。
+
+Infinite Canvas 当前来自独立的本地插件市场，尚未纳入上述自动安装清单。另一台电脑需要先部署 Infinite Canvas 及其本地插件市场；安装后，上述同步入口会应用已登记的中英文名称。不要复制办公室电脑的绝对目录或插件缓存作为部署方式。
 
 
 `Codex Design 环境检查` 会检查 Windows、PowerShell、Git、Node.js、npm、Python、Codex、VS Code、Photoshop Beta、Illustrator Beta、MCP、Hooks 和插件配置概况，并在 `logs/` 中生成带时间的环境报告。报告不记录密钥、令牌或代理凭据。

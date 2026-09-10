@@ -1,5 +1,5 @@
 ﻿# ==============================================
-# Codex Skills and Plugins Chinese UI Localizer V1.1.0
+# Codex Skills and Plugins Chinese UI Localizer V1.1.1
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==============================================
 
@@ -109,7 +109,7 @@ function Get-CurrentSkillTargets {
     }
 
     if (Test-Path -LiteralPath $AgentsSkillsRoot -PathType Container) {
-        foreach ($Directory in Get-ChildItem -LiteralPath $AgentsSkillsRoot -Directory) {
+        foreach ($Directory in (Get-ChildItem -LiteralPath $AgentsSkillsRoot -Filter "SKILL.md" -File -Recurse | ForEach-Object { $_.Directory })) {
             $SkillName = Get-SkillName -SkillPath $Directory.FullName
 
             if ($null -ne $SkillName) {
@@ -130,7 +130,7 @@ function Get-CurrentSkillTargets {
             -Filter "SKILL.md" `
             -File `
             -Recurse |
-            Where-Object { $_.Directory.Parent.Name -eq "skills" }
+            Where-Object { $_.FullName -match '[\\/]skills[\\/]' }
 
         foreach ($SkillFile in $SkillFiles) {
             $Directory = $SkillFile.Directory
@@ -141,6 +141,14 @@ function Get-CurrentSkillTargets {
             }
 
             $PluginPath = $Directory.Parent.Parent.FullName
+            $Ancestor = $Directory.Parent
+            while ($null -ne $Ancestor -and $Ancestor.FullName -ne $PluginCacheRoot) {
+                if (Test-Path -LiteralPath (Join-Path $Ancestor.FullName ".codex-plugin\plugin.json") -PathType Leaf) {
+                    $PluginPath = $Ancestor.FullName
+                    break
+                }
+                $Ancestor = $Ancestor.Parent
+            }
             $PluginManifestPath = Join-Path `
                 $PluginPath `
                 ".codex-plugin\plugin.json"
@@ -564,7 +572,7 @@ try {
     )
 
     if ($MissingSkillKeys.Count -gt 0) {
-        throw "未找到以下已登记 Skill：$($MissingSkillKeys -join ', ')"
+        Write-Host "当前未安装，保留翻译供以后使用：$($MissingSkillKeys -join ', ')"
     }
 
     $PluginTranslations = @{}
@@ -595,7 +603,7 @@ try {
     )
 
     if ($MissingPluginNames.Count -gt 0) {
-        throw "未找到以下已登记插件：$($MissingPluginNames -join ', ')"
+        Write-Host "当前未安装，保留插件翻译供以后使用：$($MissingPluginNames -join ', ')"
     }
 
     $Updates = @()
