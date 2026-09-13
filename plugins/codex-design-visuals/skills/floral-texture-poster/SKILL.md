@@ -1,6 +1,6 @@
 ---
 name: floral-texture-poster
-description: 将花卉参考图或明确的花卉描述转译为平面几何、纸张颗粒和丝网印刷质感的静态素材，并为 Photoshop 或 Illustrator 完稿提供可编辑生产方案。适用于花卉素材转绘、静态 KV 与海报主视觉的创建、优化和诊断；不用于写实修图、植物学复原或动态视频。
+description: 创建、优化或诊断几何纸纹与丝印肌理花卉静态素材；按需提供 PS/AI 完稿方案，不用于写实修图或动态视频。
 metadata:
   status: initial-example
   source-experiment: experiments/floral-texture-visual-skills/实验记录.md
@@ -52,16 +52,18 @@ metadata:
 
 ## 路由 / Routes
 
-需求整理和提示写法使用 [提示编写指南](../../references/Prompt_Framework.md)，通用原则继承 [共享视觉规范](../../references/平面设计生图与动态视觉规范.md)。当前任务已读取时直接复用；以下只加载命中的详细规则：
+需要整理需求或编写提示时查阅 [提示编写指南](../../references/Prompt_Framework.md)，涉及跨任务原则或冲突时查阅 [共享视觉规范](../../references/平面设计生图与动态视觉规范.md)。当前任务已读取时直接复用；以下只加载命中的详细规则：
 
-1. 始终读取 [主体](../../references/shared/subject.md)、[层级](../../references/shared/hierarchy.md)、[构图](../../references/shared/composition.md)、[色彩](../../references/shared/color.md)、[肌理](../../references/shared/texture.md) 与 [共享审计](../../references/shared/audit.md)。
-2. 读取 [material_redraw](../../references/routes/task/material-redraw.md) 与 [texture_graphic](../../references/routes/style/texture-graphic.md)。
+1. 按问题读取：花型识别或结构变化用 [主体](../../references/shared/subject.md)，注意力分配用 [层级](../../references/shared/hierarchy.md)，布局或裁切用 [构图](../../references/shared/composition.md)，配色用 [色彩](../../references/shared/color.md)，材质用 [肌理](../../references/shared/texture.md)，结果验收用 [共享审计](../../references/shared/audit.md)。
+2. 转绘时读取 [material_redraw](../../references/routes/task/material-redraw.md)；建立或排查几何肌理风格时读取 [texture_graphic](../../references/routes/style/texture-graphic.md)。
 3. 生图时读取 [image_generation](../../references/routes/production/image-generation.md) 及 [花卉领域规则与 Prompt](references/花卉图片转肌理质感素材.md)。
 4. 选择 Photoshop 时只读 [photoshop](../../references/routes/production/photoshop.md)；选择 Illustrator 时只读 [illustrator](../../references/routes/production/illustrator.md)；两者都需要时才同时读取。
 5. 有准确文字时追加 [typography](../../references/shared/typography.md)；优化时追加 [optimization](../../references/routes/task/optimization.md)；诊断时追加 [diagnosis](../../references/routes/task/diagnosis.md)。
 6. 不读取任何 Motion Router。
 
 ## 工作流 / Workflow
+
+只执行当前模式所需步骤。诊断以现象、证据、根因和最小修复建议为完成标准，不自动生成或改文件；仅提示词任务以可用提示为完成标准。创建或已授权优化时才执行生成、修复及所需后期。
 
 1. 判断边界与创建/优化/诊断模式。
 2. 解析 Task / Content / Hierarchy / Composition / Typography / Color / Material / Output。
@@ -72,7 +74,7 @@ metadata:
 7. 生成候选素材；完整主体必须使用统一几何、叠印、纸张颗粒和丝印语言。
 8. 筛选并修复主体漂移、无授权换色、局部写实残留、假文字、脏底和纹理失控。
 9. 按目标选择 PS/AI 后期；无法实际控制软件时明确标记未执行，并交付可操作清单。
-10. 审计后输出；任何 `FAIL` 先修复再交付。
+10. 审计后输出；本次制作范围内的 `FAIL` 先修复再交付；诊断任务可报告原图的 `FAIL` 并完成诊断。生成修复若连续两轮未改善同一问题，保留当前结果、说明限制与下一步，不继续无效重试，也不标记制作验收通过。
 
 ## 输出 / Output
 
@@ -80,11 +82,11 @@ metadata:
 
 完整专业模式：按交付需要提供目标与约束、参数来源与状态、路由记录、视觉策略、主 Prompt 与必要约束、候选筛选、PS/AI 图层与制作清单、尺寸/色彩/格式、审计证据、版权与未验证项；不机械展示空章节。
 
-若只完成生图，状态写为“生成素材完成，后期未完成”。未实际执行 Photoshop/Illustrator 时不得声称成品已完成。
+用户只要求生成素材时，通过对应检查即为“生成素材完成”；只有任务包含后期制作时才报告“后期未完成”。未实际执行 Photoshop/Illustrator 时不得声称可编辑母版已完成。
 
 ## 审计 / Audit
 
-至少执行 Requirement、Lock、Hierarchy、Composition、Typography（有文字时）、Color、Texture、Style 与 Production Audit。
+始终核对 Requirement 与 Lock；按本次输出和改动执行相关的 Hierarchy、Composition、Typography（有文字时）、Color、Texture、Style 与 Production Audit。完整生产交付仍覆盖全部适用检查。
 
 - **PASS**：完整花卉身份、全部 `LOCKED`、几何统一性、可读性和生产规格通过。
 - **WARNING**：字体/素材授权、目标尺寸印刷、生成模型一致性或人工视觉确认待完成。

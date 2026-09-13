@@ -98,7 +98,7 @@ Task Router → Style Router → Production Router
 
 动态 Skill 继承静态视觉规则，但必须区分 H1/H2/H3 与 M1/M2/M3。元素运动不等于镜头运动；镜头运动只有在用户允许且具有明确叙事或空间目的时才启用。
 
-## 8. 固定工作流
+## 8. 按任务选择工作流
 
 ```text
 RECEIVE → BOUNDARY → PARSE → LOCK → CONFLICT
@@ -108,19 +108,19 @@ RECEIVE → BOUNDARY → PARSE → LOCK → CONFLICT
 → GENERATE → NEGATIVE（仅本任务必要约束） → AUDIT → REPAIR → OUTPUT
 ```
 
-上述步骤用于内部判断，不要求逐步展示或每轮输出负面词表；提示写法沿用 `references/Prompt_Framework.md`，简单任务直接给可用结果。
+上述步骤是可裁剪的内部判断参考，只执行当前任务需要的环节；仅诊断时交付证据和修复建议，仅提示词或方案任务不自动进入生成、制作和修复。不要求逐步展示或每轮输出负面词表；提示写法沿用 `references/Prompt_Framework.md`，简单任务直接给可用结果。
 
 创建、优化和诊断共享前半段。优化必须先列出保留项与修改项；诊断先分类失败，不得在未定位原因时直接重做。
 
 ## 9. 审计系统
 
-交付前至少执行：Requirement、Lock、Hierarchy、Composition、Typography、Color、Style、Production 八类审计；动态任务再执行 Motion Audit。
+交付前核对 Requirement 与 Lock，再按输出和改动选择 Hierarchy、Composition、Typography、Color、Style、Production；动态任务按需执行 Motion Audit。完整生产交付覆盖全部适用项，局部修改复核影响区域和保护区域，不机械补齐无关类别。
 
 - `PASS`：满足全部硬约束且无阻断问题。
 - `WARNING`：硬约束满足，但存在需人工确认或生产风险。
 - `FAIL`：任一 `LOCKED` 被改写、关键内容错误、路由错误或输出不可用于目标生产环境。
 
-发生 `FAIL` 时先修复失败项，再继续美化。审计结果应列出证据、影响和下一步。
+制作或已授权优化发生 `FAIL` 时先修复失败项，再继续美化；仅诊断时报告失败及建议，不自动修复。审计结果应列出证据、影响和下一步。
 
 ## 10. Failure Taxonomy
 

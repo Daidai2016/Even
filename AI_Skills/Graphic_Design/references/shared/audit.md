@@ -1,6 +1,6 @@
 # Audit｜共享视觉审计
 
-按顺序执行：Requirement → Lock → Hierarchy → Composition → Typography → Color → Style → Production。动态任务再追加 Motion Audit。
+核对 Requirement 与 Lock 后，按本次输出和改动选择 Hierarchy、Composition、Typography、Color、Style、Production；动态任务按需追加 Motion Audit。完整生产交付覆盖全部适用项，局部修改仍复核保护区域。
 
 ## 结论
 
@@ -10,4 +10,4 @@
 
 ## 输出记录
 
-每个问题写明：审计类别、证据、严重度、关联失败代码、修复动作、复核状态。`FAIL` 未修复前不得标记最终完成；软件未实际执行时必须明确写“未执行”，不能以操作清单冒充成品。
+每个问题写明：审计类别、证据、严重度、关联失败代码、修复动作、复核状态。制作范围内的 `FAIL` 未修复前不得标记制作验收通过；仅诊断时可报告原结果的 `FAIL` 并完成诊断；软件未实际执行时必须明确写“未执行”，不能以操作清单冒充成品。

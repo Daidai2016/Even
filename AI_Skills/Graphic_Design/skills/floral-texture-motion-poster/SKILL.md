@@ -1,6 +1,6 @@
 ---
 name: floral-texture-motion-poster
-description: 将已确认的肌理花卉静态母版延展为分层、可审计的短时动态海报方案，规划元素运动、节奏、转场、循环和 After Effects 生产。适用于几何纸纹与丝网印刷花卉海报的创建、优化和诊断；不用于无静态母版的自由视频生成、写实植物动画或默认镜头运镜。
+description: 基于已确认的几何肌理花卉静态母版创建、优化或诊断动态海报，按需规划 AE 制作；不用于无静态母版的自由视频生成。
 metadata:
   status: initial-example
   source-experiment: experiments/floral-texture-visual-skills/实验记录.md
@@ -27,7 +27,7 @@ metadata:
 ## 输入 / Input
 
 - 已确认的静态母版或分层资产；至少说明背景、花头、花茎、文字和品牌信息能否分离。
-- 静态父 Skill 的参数锁与审计结论；若静态母版未通过，先修复静态问题。
+- 静态父 Skill 的参数锁与审计结论；制作前若静态母版未通过，先处理阻断问题；仅诊断时记录问题，不自动修复。
 - 画幅、时长、帧率、节奏、循环、转场、首尾帧、镜头是否允许、输出格式与平台。
 - H1/H2/H3 与希望被首先感知的运动目标。
 - 准确文字、Logo、品牌色、音频策略、素材授权与字体授权。
@@ -57,12 +57,14 @@ metadata:
 只读取当前需要的文件：
 
 1. 先读取静态父 Skill [floral-texture-poster](../floral-texture-poster/SKILL.md)，继承已确认的静态边界和参数，不自动执行父 Skill 的全部生产路线。
-2. 读取 [主体](../../references/shared/subject.md)、[层级](../../references/shared/hierarchy.md)、[构图](../../references/shared/composition.md)、[色彩](../../references/shared/color.md)、[肌理](../../references/shared/texture.md)、[字体](../../references/shared/typography.md) 与 [共享审计](../../references/shared/audit.md)。
-3. 读取 [motion_poster](../../references/routes/task/motion-poster.md)、[texture_graphic](../../references/routes/style/texture-graphic.md) 与 [After Effects](../../references/routes/production/after-effects.md)。
-4. 只在动态任务中读取 [motion-hierarchy](../../references/routes/motion/motion-hierarchy.md)、[timing](../../references/routes/motion/timing.md)、[transition](../../references/routes/motion/transition.md)、[loop](../../references/routes/motion/loop.md)、[motion-audit](../../references/routes/motion/audit.md) 及 [花卉动态领域规则](references/floral-motion.md)。
+2. 仅对本次涉及的静态问题读取 [主体](../../references/shared/subject.md)、[层级](../../references/shared/hierarchy.md)、[构图](../../references/shared/composition.md)、[色彩](../../references/shared/color.md)、[肌理](../../references/shared/texture.md)、[字体](../../references/shared/typography.md)；验收时读取 [共享审计](../../references/shared/audit.md)。无文字任务不加载字体规则。
+3. 创建动态方案时读取 [motion_poster](../../references/routes/task/motion-poster.md)；风格问题读取 [texture_graphic](../../references/routes/style/texture-graphic.md)；规划或执行 AE 制作时才读取 [After Effects](../../references/routes/production/after-effects.md)。
+4. 运动层级问题读 [motion-hierarchy](../../references/routes/motion/motion-hierarchy.md)，节奏读 [timing](../../references/routes/motion/timing.md)，转场读 [transition](../../references/routes/motion/transition.md)，循环读 [loop](../../references/routes/motion/loop.md)，视频验收读 [motion-audit](../../references/routes/motion/audit.md)，花卉特有运动读 [花卉动态领域规则](references/floral-motion.md)。
 5. 优化时追加 [optimization](../../references/routes/task/optimization.md)；诊断时追加 [diagnosis](../../references/routes/task/diagnosis.md)。
 
 ## 工作流 / Workflow
+
+只执行当前模式所需步骤。仅诊断时交付证据、根因与最小修复建议，不自动制作；仅方案任务交付方案即可。创建或已授权优化时再执行制作和修复，沿用父 Skill 的无效重试停止条件。
 
 1. 判断边界与创建/优化/诊断模式，检查静态母版和资产分层。
 2. 继承并复核所有静态 `LOCKED`，再锁定动态参数与冲突。
@@ -71,7 +73,7 @@ metadata:
 5. 分别设计元素运动与镜头运动。默认固定镜头；只有 `camera_allowed = true` 才设计运镜。
 6. 把运动事件落实到秒数/帧、对象、方向、幅度、缓动、遮挡和停留。
 7. 在 After Effects 路线中规划图层、锚点、预合成、关键帧和输出；扁平素材明确近似方法与限制。
-8. 抽查关键帧、逐帧边缘、背景、文字阅读、首尾帧与循环；任何 `FAIL` 先修复。
+8. 抽查关键帧、逐帧边缘、背景、文字阅读、首尾帧与循环；制作范围内的 `FAIL` 先修复；诊断任务报告原结果的问题，不自动修复。
 
 ## H 与 M 层级
 
@@ -86,11 +88,11 @@ metadata:
 
 完整专业模式：静态母版门禁、资产分层表、全部参数来源与状态、H/M 映射、逐段时间轴、转场/循环/镜头说明、AE 图层与关键帧方案、输出编码、关键帧复核、风险与未验证项。
 
-未实际完成制作和视频检查时，只能写“动态方案完成，制作/渲染未执行”。
+仅要求方案时，方案符合需求即完成；任务包含制作时，未实际制作和检查视频应注明“制作/渲染未执行”，不得宣称动态母版完成。
 
 ## 审计 / Audit
 
-先执行共享 Audit，再执行 Motion Audit。
+先核对需求与静态/动态硬锁，再按本次输出和改动执行共享 Audit 与 Motion Audit 的相关项；完整视频交付覆盖全部适用检查。
 
 - **PASS**：静态 `LOCKED`、动态参数、H/M 层级、首尾帧、连续性、阅读与输出全部通过。
 - **WARNING**：扁平资产限制、字体/素材授权、平台编码或实机播放尚待确认。

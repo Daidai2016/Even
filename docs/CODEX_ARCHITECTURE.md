@@ -11,7 +11,7 @@
 | 个人安全基线 | 用户 Codex 配置与全局 `AGENTS.md` | 默认审批、沙箱和跨项目安全底线 |
 | 项目运行配置 | `.codex/config.toml` | 本仓库审批、沙箱、Hooks 和 Illustrator MCP |
 | 项目治理 | `AGENTS.md`、`CODING_RULES.md` | 仓库、生产、安全和交付规则 |
-| 自动门禁 | `.codex/hooks.json`、`.codex/hooks/` | 工具调用前阻止危险命令，变更后执行仓库验证 |
+| 自动门禁 | `.codex/hooks.json`、`.codex/hooks/` | 工具调用前阻止危险命令，相关文件内容变化后执行去重验证提示 |
 | Skill 源文件 | `AI_Skills/` | 按专业分类维护共享规范、具体 Skill 和初始版本 |
 | 能力封装 | `plugins/`、`.agents/plugins/` | 正式能力与已登记本地测试包；准入口径见 `docs/AIGC_CREATIVE_RULES.md` |
 | 创意证据 | `experiments/`、`prompts/`、`workflows/`、`assets/` | 实验、评审、正式能力和合法资源 |
@@ -25,7 +25,7 @@
   → AGENTS 与项目配置确定权限和边界
   → PreToolUse 检查危险命令与 GitHub 代理
   → skill / workflow / production script 执行
-  → PostToolUse 运行变更验证
+  → PostToolUse 按相关文件内容摘要去重运行变更验证（首次发现未提交变更时运行一次）
   → 人工创意或生产审核
   → Git 状态检查；只有明确授权后提交或发布
 ```
@@ -55,3 +55,9 @@
 - Git 同步与发布：`tools/git_sync.ps1`、`tools/git_publish.ps1`
 
 这些入口同时注册在 `.vscode/tasks.json`，日常操作不要求手工拼接命令。
+
+## 自动验证范围
+
+PostToolUse 使用 `.codex/hooks/post_tool_use_validate_v1.1.0.ps1`；原 V1.0.0 脚本保留。缓存位于 `work/hook-validation/`，只用于减少同一会话、同一内容的重复检查，不代表验收通过。失败提示不自动要求修复无关既存问题；安全 PreToolUse 保持原样。当前 matcher 沿用已配置工具名，其他宿主工具是否触发须由宿主验证，不把脚本测试等同于 Hook 已生效。
+
+交付前运行 `powershell.exe -NoProfile -File tools/validate_repository.ps1 -ChangedOnly -NoPause`。此模式仍包含全局插件一致性与敏感模式检查；有失败时根据本次差异判断归属。全仓验收移除 `-ChangedOnly`。

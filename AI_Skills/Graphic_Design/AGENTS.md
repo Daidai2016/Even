@@ -6,8 +6,8 @@
 
 处理本目录覆盖的平面视觉或动态视觉任务时：
 
-1. 先读取视觉任务与生图提示编写指南 `references/Prompt_Framework.md`，明确目标、参考用途与关键约束；简单任务直接组织提示，不强制展示角色或任务契约。
-2. 通过共享规范 `references/平面设计生图与动态视觉规范.md` 确认通用原则；已加载的内容不重复读取。
+1. 需要整理视觉需求或编写生图提示时读取 `references/Prompt_Framework.md` 的相关部分；简单任务直接组织提示，不强制展示角色或任务契约。
+2. 涉及跨任务视觉原则或规则冲突时查阅 `references/平面设计生图与动态视觉规范.md`；已加载且未变的内容不重复读取。
 3. 读取与任务匹配的 `skills/<skill-name>/SKILL.md`。
 4. 按该入口的路由读取必要 `references/`；不要无差别加载其他 Skill。
 5. 用户当前明确要求、真实品牌规范和已授权资产的优先级高于默认规则。
@@ -51,7 +51,7 @@ Graphic_Design/
 - 新方向先在仓库 `experiments/` 留下目标、输入、参数、正反样本、人工评价、授权状态和失败边界。
 - 没有代表性样本与人工视觉评审时，Skill 必须标记为初始示例或实验，不得宣称已验证或可直接作为品牌生产标准。
 - 通过多样例复测后，更新版本与实验记录；需要进入可安装插件时，再按仓库的插件市场与晋级流程封装。
-- 交付前运行 Skill 结构校验和仓库验证，并报告未完成的视觉、字体、版权、印刷或视频检查。
+- 新建或修改 Skill 及其依赖时运行结构校验和仓库验证；仅使用 Skill 不触发结构校验。仅报告本次交付范围内未完成的视觉、字体、版权、印刷或视频检查。
 
 ## 5. Visual Skill Architecture
 
@@ -59,4 +59,4 @@ Graphic_Design/
 - 冲突优先级固定为：用户显式参数 > 品牌/项目硬约束 > Skill 专属规则 > 当前命中的路由规则 > 共享规则 > 默认值。
 - 用户明确的主体、颜色、画幅、背景、材质、文字、Logo、字体、输出与动态参数必须标记为 `LOCKED`；任何低优先级规则不得擅自修改。
 - `SKILL.md` 只保留边界、触发、输入、参数、路由、工作流、输出和审计；详细规则按需读取 `references/shared/` 与 `references/routes/`，不得全量加载。
-- 新建或修改视觉 Skill 后运行 `python scripts/validate_skills.py`，并对每个 Skill 运行 `skill-creator` 的 `quick_validate.py`；脚本通过不等于人工视觉门禁通过。
+- 新建或修改视觉 Skill 后从仓库根运行 `python AI_Skills/Graphic_Design/scripts/validate_skills.py`，并仅对受影响的 Skill 运行 `skill-creator` 的 `quick_validate.py`；脚本通过不等于人工视觉门禁通过。

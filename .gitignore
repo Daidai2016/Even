@@ -70,3 +70,7 @@ logs/environment_check_*.txt
 
 # 工作区恢复工具自动生成的报告。
 logs/bootstrap_workspace_*.txt
+
+# Hook validation cache and isolated regression fixtures
+/work/hook-validation/
+/work/instruction-audit-tests/

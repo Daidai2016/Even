@@ -1,5 +1,5 @@
 interface:
   display_name: "花卉图片转肌理质感素材"
-  short_description: "默认保留原图配色，将整株花卉统一几何化并完成 PS/AI 后期。"
+  short_description: "默认保留原图配色，创建、优化或诊断花卉几何肌理素材，按需完稿。"
   brand_color: "#C85B52"
-  default_prompt: "使用 $floral-texture-poster，默认保留原图完整配色，只改变整株花卉的几何造型、纸张颗粒和丝网印刷质感；先确认生产规格，生成后在 Photoshop 或 Illustrator 中完成可交付母版。"
+  default_prompt: "使用 $floral-texture-poster，默认保留原图完整配色，只改变整株花卉的几何造型、纸张颗粒和丝网印刷质感；按我的目标交付提示词、素材或诊断，只有需要可编辑母版时才进入 Photoshop 或 Illustrator 后期。"
