@@ -71,7 +71,7 @@
 
 ### 3.1 图像提示词的训练与沉淀
 
-RCE 上层任务契约边界与 GPT Image 实际提示词写法继续维护在 `AI_Skills/Graphic_Design/references/Prompt_Framework.md`；执行和文件验收维护在 `AI_Skills/Graphic_Design/references/routes/production/image-generation.md`，以原文件登记的 OpenAI 官方指南为专业依据。本文件只补训练证据要求，不另建提示词规范或把六段组织方式称为已验证 Skill。
+视觉任务边界与 GPT Image 实际提示词写法继续维护在 `AI_Skills/Graphic_Design/references/Prompt_Framework.md`；执行和文件验收维护在 `AI_Skills/Graphic_Design/references/routes/production/image-generation.md`，以原文件登记的 OpenAI 官方指南为专业依据。本文件只补训练证据要求，不另建提示词规范或把六段组织方式称为已验证 Skill。
 
 在现有实验记录中保留：任务类型（新建/编辑/参考/合成）、原始契约、实际 Prompt、输入图角色与版本、实际工具/模型及可用参数、每轮变更变量、候选结果、保护项检查和人工结论。未知或不可获取的参数标为未提供，不补造种子或模型信息。
 

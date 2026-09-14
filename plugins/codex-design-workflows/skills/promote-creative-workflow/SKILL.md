@@ -1,24 +1,20 @@
 ---
 name: promote-creative-workflow
-description: 评审 Codex Design 的 AIGC 实验，并将证据充分的内容晋级为提示词、已验证工作流或可复用 Skill。适用于检查 experiments 下的实验、判断创意结果是否稳定、记录质量证据和封装可重复的创意生产方法；不得夸大验证状态。
+description: 用户明确要求评审 AIGC 实验的可复用性、判断晋级条件或执行能力沉淀时使用。支持只读评审及已授权的提示词、工作流或窄范围 Skill 晋级；不因查看 experiments 文件、一般视觉诊断或记录普通制作结果而触发。
 ---
 
 # 创意实验评审与能力晋级
 
-Keep experimental evidence separate from formal assets. Never describe a direction as validated without representative outputs and human visual review.
+实验与正式资产分开，证据不足时不宣称已验证。保留原始实验和来源，不移动或删除。
 
-## Process
+## 模式与读取
 
-1. Read the repository `AGENTS.md`, `docs/AIGC_CREATIVE_RULES.md`, and `workflows/creative_capability_promotion.md`.
-2. Confirm the experiment records its goal, inputs, model or tool, parameters, outputs, evaluation results, rights status, and known failure cases.
-3. Review representative positive and negative samples using the quality gates in `references/quality-gates.md`.
-4. Choose exactly one outcome:
-   - keep under `experiments/` when evidence is incomplete;
-   - promote only the reusable prompt to `prompts/`;
-   - promote a stable sequence to `workflows/`;
-   - package a narrow, repeatable, well-bounded method as a skill.
-5. Preserve source attribution and link the promoted artifact back to its experiment evidence.
-6. Run `scripts/validate-promotion.ps1` after creating or updating the formal prompt or workflow file selected for this promotion.
-7. Report what was promoted, evidence reviewed, remaining limitations, and manual visual checks still required.
+- **只读评审**：用户要求分析可复用性或是否达到晋级条件时，读取指定实验及代表性样本，按 [质量门禁](references/quality-gates.md)评审；涉及证据标准争议时再读仓库 `docs/AIGC_CREATIVE_RULES.md` 相关章节。输出结论、证据和缺口后结束，不回写记录、不创建资产、不运行晋级结构校验。
+- **已授权晋级**：用户明确要求整理为可复用资产或执行晋级时，复用已加载且未变的仓库规则，读取 `workflows/creative_capability_promotion.md`，按其中步骤和唯一验证分流执行。普通评审授权不等于写入授权。
+- 当前任务和已有授权已经涵盖的修改直接推进；新增范围、敏感操作或受保护成果的替换遵守仓库规则，不重复申请相同授权。
 
-Do not combine aesthetic, layout, typography, formal creativity, and tool automation into one unbounded skill. Do not move or delete source experiments during promotion.
+## 结果
+
+只读评审输出：建议保留实验 / 晋级提示词 / 晋级工作流 / 封装窄范围 Skill，以及支持证据、适用边界和缺口。建议本身不执行晋级。
+
+已授权晋级输出：实际变更资产、实验来源、验证结果与本次相关未完成项。只选择一个晋级层级；不把审美、版式、字体、形式创意和工具自动化打包成无边界 Skill。已有同版本同范围检查直接复用，不重复运行。

@@ -14,6 +14,8 @@
 
 ## 步骤
 
+以下仅用于已授权晋级；只读评审在结论与缺口清单处结束，不写文件或执行复测。已加载且未变的规范和证据直接复用。
+
 1. 按 `docs/AIGC_CREATIVE_RULES.md` 核对实验完整性。
 2. 使用 `prompts/creative_experiment_review.md` 生成结构化评审。
 3. 由设计师复核审美、版式、字体、形式创意和生产适用性。
@@ -21,7 +23,13 @@
 5. 在正式资产中写明实验来源、版本、依赖、边界和失败案例。
 6. 不移动、不覆盖、不删除原始实验。
 7. 对晋级资产进行一次正向复测和一次反向复测。
-8. 使用 `promote-creative-workflow` skill 的验证脚本检查目录和必需章节。
+8. 按下方验证分流检查一次；不要因 Skill 入口也引用本流程而重复调用。
+
+## 验证分流
+
+- 晋级 Prompt 或 Workflow：调用 `plugins/codex-design-workflows/skills/promote-creative-workflow/scripts/validate-promotion.ps1`，传入 `-ExperimentPath` 与本次所选的 `-PromptPath` 或 `-WorkflowPath`，检查目录和必需章节。
+- 晋级 Skill：运行 `skill-creator` 的 `quick_validate.py` 检查受影响 Skill；视觉 Skill 按分类规则追加视觉结构校验，最后按根规则执行仓库验证。不为通过 Prompt/Workflow 校验器而额外创建无关文件。
+- 结构校验不替代第 7 步正向、反向复测；已完成且内容版本、检查项和范围一致的验证证据可复用。
 
 ## 验收
 
@@ -33,4 +41,4 @@
 
 ## 失败处理
 
-任一关键门禁缺少证据时，停止晋级，将缺失项写回实验记录。不得通过移动文件或修改措辞把未验证结果伪装成正式成果。
+任一关键门禁缺少证据时停止晋级，输出缺失项；仅在本次授权包含维护实验记录时写回原记录。不得通过移动文件或修改措辞把未验证结果伪装成正式成果。
