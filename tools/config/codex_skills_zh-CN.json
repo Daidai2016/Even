@@ -178,8 +178,8 @@
     },
     {
       "name": "guizang-ppt-skill",
-      "displayName": "横向网页 PPT 生成 (guizang-ppt-skill)",
-      "shortDescription": "生成带 WebGL 背景、演讲者视图和多种页面模板的单文件网页 PPT。",
+      "displayName": "演讲者 PPT（归藏）",
+      "shortDescription": "制作适合现场演讲的网页 PPT，支持演讲者视图、讲稿备注和观众屏同步。",
       "defaultPrompt": "使用 $guizang-ppt-skill 制作这份横向翻页网页 PPT。"
     },
     {
@@ -932,13 +932,13 @@
     },
     {
       "name": "codex-ppt",
-      "displayName": "图片式演示文稿 (codex-ppt)",
+      "displayName": "Codex PPT 图片式演示文稿",
       "shortDescription": "将文章、报告或提纲生成风格统一的整页图片式 PPTX，并配套讲稿。",
       "defaultPrompt": "使用 $codex-ppt 完成当前任务：将文章、报告或提纲生成风格统一的整页图片式 PPTX，并配套讲稿。"
     },
     {
       "name": "dashi-ppt",
-      "displayName": "大狮演示文稿 (dashi-ppt)",
+      "displayName": "Dashi PPT 大狮演示文稿",
       "shortDescription": "基于视觉主题制作可离线浏览和在浏览器编辑的 HTML 演示文稿。",
       "defaultPrompt": "使用 $dashi-ppt 完成当前任务：基于视觉主题制作可离线浏览和在浏览器编辑的 HTML 演示文稿。"
     },
@@ -974,7 +974,7 @@
     },
     {
       "name": "html-ppt",
-      "displayName": "HTML 演示文稿工作室 (html-ppt)",
+      "displayName": "HTML PPT 演示文稿工作室",
       "shortDescription": "使用主题、版式和动画模板制作静态 HTML 幻灯片与多页图文。",
       "defaultPrompt": "使用 $html-ppt 完成当前任务：使用主题、版式和动画模板制作静态 HTML 幻灯片与多页图文。"
     },
@@ -1004,7 +1004,7 @@
     },
     {
       "name": "ppt-master",
-      "displayName": "可编辑演示文稿制作 (ppt-master)",
+      "displayName": "PPT Master 可编辑演示文稿制作",
       "shortDescription": "制作和优化可编辑 PPTX，支持模板填充、版式重建、动画与旁白。",
       "defaultPrompt": "使用 $ppt-master 完成当前任务：制作和优化可编辑 PPTX，支持模板填充、版式重建、动画与旁白。"
     },

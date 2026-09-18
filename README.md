@@ -87,7 +87,7 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 `Codex Design 同步GitHub` 会从脚本所在位置自动确定仓库。它只在 `main` 工作区干净、代理可用、本地仅落后 `origin/main` 时执行 `pull --ff-only`。检测到未提交修改、本地领先或分支分叉时只报告并停止，不会自动 reset、clean、stash、commit 或 force。
 
 `Codex Skills 与插件同步` 会先调用同一套安全 GitHub 同步流程，再按 `tools/config/codex_capabilities.json` 补装缺失的用户 Skills、Codex Design 本地插件和受管 OpenAI 插件，并刷新本机代理环境与中文界面。它不会覆盖已有 Skill、删除额外能力，也不会复制登录令牌、OAuth 状态或插件缓存。另一台电脑首次完成仓库克隆和本机部署后，日常只需双击该快捷方式。
-两台电脑的中英文显示名称统一由 `tools/config/codex_skills_zh-CN.json` 管理；同步安装后会重新应用名称，英文内部 ID 和调用名保持不变。新装能力需要登记到 `tools/config/codex_capabilities.json`，只修改本机缓存不会传到另一台电脑。办公室或家里修改清单与名称后，先检查并通过“Codex Design 发布GitHub”发布，再在另一台电脑双击“Codex Skills 与插件同步”；未提交、未推送的修改不会跨电脑传播。该流程补齐缺失能力，不保证两端已有第三方 Skill 的文件版本完全一致；账号授权仍由各电脑单独完成。
+两台电脑的中英文显示名称统一由 `tools/config/codex_skills_zh-CN.json` 管理；同步安装后会重新应用名称，英文内部 ID 和调用名保持不变。新装能力需要登记到 `tools/config/codex_capabilities.json`，只修改本机缓存不会传到另一台电脑。办公室或家里修改清单与名称后，先检查并通过“Codex Design 发布GitHub”发布，再在另一台电脑双击“Codex Skills 与插件同步”；未提交、未推送的修改不会跨电脑传播。该流程补齐缺失能力，不保证两端已有第三方 Skill 的文件版本完全一致；账号授权仍由各电脑单独完成。 PDF 统一通过官方插件提供，不再补装独立版；Frontend Slides 从上游独立 Skill 子目录安装，避免复制嵌套的同名插件。已在其他电脑存在的重复副本不会自动删除，需另行核对后清理。
 
 Infinite Canvas 已纳入自动安装清单：缺少插件及其市场时，同步入口会通过当前代理登记上游 GitHub 插件市场并安装；已有本地市场保持不变。仅登录同一账号不会安装本机 Skills，另一台电脑需先克隆仓库、完成本机部署，再双击「Codex Skills 与插件同步」。第三方账号授权和可选运行环境仍需在各电脑单独配置。
 
