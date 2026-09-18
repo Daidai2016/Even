@@ -1,5 +1,5 @@
 ﻿# ==================================================
-# Codex Skills and Plugins Reconciler V1.0.1
+# Codex Skills and Plugins Reconciler V1.1.0
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==================================================
 
@@ -385,7 +385,28 @@ function Sync-Plugins {
             -Arguments $Arguments
     }
 
+    # Register upstream marketplaces only when a dependent plugin is missing.
+    # Existing local marketplace registrations remain untouched.
     $InstalledIds = @(Get-InstalledPluginIds)
+    foreach ($Marketplace in @($Manifest.pluginMarketplaces)) {
+        if ($null -eq $Marketplace) { continue }
+        $MissingForMarketplace = @($Manifest.managedPlugins | Where-Object {
+            ([string]$_).EndsWith("@" + [string]$Marketplace.name) -and
+            $InstalledIds -notcontains [string]$_
+        })
+        if ($MissingForMarketplace.Count -eq 0 -or $CheckOnly) { continue }
+        . $ProxyGuardPath
+        $Guard = Test-GitHubProxyGuard -RepositoryRoot $ProjectPath
+        if (-not $Guard.Success) { throw $Guard.Message }
+        $MarketplaceData = (Invoke-Codex -Arguments @("plugin", "marketplace", "list", "--json") | Out-String) | ConvertFrom-Json
+        if (@($MarketplaceData.marketplaces | Where-Object { $_.name -eq $Marketplace.name }).Count -eq 0) {
+            $AddArguments = @("plugin", "marketplace", "add", [string]$Marketplace.source, "--json")
+            foreach ($SparsePath in @($Marketplace.sparse)) {
+                $AddArguments += @("--sparse", [string]$SparsePath)
+            }
+            [void](Invoke-Codex -Arguments $AddArguments)
+        }
+    }
 
     foreach ($PluginId in @($Manifest.managedPlugins)) {
         if ($InstalledIds -contains [string]$PluginId) {
@@ -397,6 +418,9 @@ function Sync-Plugins {
             throw "缺少插件：$PluginId"
         }
 
+        . $ProxyGuardPath
+        $Guard = Test-GitHubProxyGuard -RepositoryRoot $ProjectPath
+        if (-not $Guard.Success) { throw $Guard.Message }
         [void](Invoke-Codex -Arguments @(
             "plugin", "add", [string]$PluginId, "--json"
         ))

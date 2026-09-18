@@ -1,5 +1,5 @@
 ﻿# ==============================================
-# Codex Skills and Plugins Chinese UI Localizer V1.1.1
+# Codex Skills and Plugins Chinese UI Localizer V1.1.2
 # Windows PowerShell 5.1 / UTF-8 with BOM
 # ==============================================
 
@@ -89,8 +89,8 @@ function Get-CurrentSkillTargets {
     }
 
     if (Test-Path -LiteralPath $SkillsRoot -PathType Container) {
-        foreach ($Directory in Get-ChildItem -LiteralPath $SkillsRoot -Directory) {
-            if ($Directory.Name -eq ".system") {
+        foreach ($Directory in (Get-ChildItem -LiteralPath $SkillsRoot -Filter "SKILL.md" -File -Recurse | ForEach-Object { $_.Directory })) {
+            if ($Directory.FullName.StartsWith($SystemSkillsRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
                 continue
             }
 

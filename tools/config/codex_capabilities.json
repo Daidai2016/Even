@@ -33,7 +33,27 @@
     { "name": "video-gen", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/video-gen" },
     { "name": "voice", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/voice" },
     { "name": "widget-forms", "scope": "codex", "type": "github", "repository": "ChatCut-Inc/agent-plugin", "sourcePath": "codex/skills/widget-forms" },
-    { "name": "xianxia-visual-director", "scope": "codex", "type": "github", "repository": "liyue-aigc/xianxia-visual-director", "sourcePath": "xianxia-visual-director" }
+    { "name": "xianxia-visual-director", "scope": "codex", "type": "github", "repository": "liyue-aigc/xianxia-visual-director", "sourcePath": "xianxia-visual-director" },
+    { "name": "codex-ppt", "scope": "codex", "type": "github", "repository": "ningzimu/codex-ppt-skill", "sourcePath": "skills/codex-ppt" },
+    { "name": "dashi-ppt", "scope": "codex", "type": "github", "repository": "chuspeeism/dashi-ppt-skill", "sourcePath": "skills/dashi-ppt" },
+    { "name": "frontend-slides", "scope": "codex", "type": "github", "repository": "zarazhangrui/frontend-slides", "sourcePath": "." },
+    { "name": "grill-me", "scope": "codex", "type": "github", "repository": "mattpocock/skills", "sourcePath": "skills/productivity/grill-me" },
+    { "name": "grilling", "scope": "codex", "type": "github", "repository": "mattpocock/skills", "sourcePath": "skills/productivity/grilling" },
+    { "name": "html-ppt-skill", "scope": "codex", "type": "github", "repository": "lewislulu/html-ppt-skill", "sourcePath": "." },
+    { "name": "huashu-design", "scope": "codex", "type": "github", "repository": "alchaincyf/huashu-design", "sourcePath": "." },
+    { "name": "photo-story", "scope": "codex", "type": "github", "repository": "iotate/photo-story", "sourcePath": "." },
+    { "name": "ppt-master", "scope": "codex", "type": "github", "repository": "hugohe3/ppt-master", "sourcePath": "skills/ppt-master" },
+    { "name": "verysmallwoods-video", "scope": "codex", "type": "github", "repository": "sugarforever/boring-video-studio", "sourcePath": "skills/verysmallwoods-video" },
+    { "name": "writing-for-agents", "scope": "codex", "type": "github", "repository": "mattpocock/skills", "sourcePath": "skills/productivity/writing-for-agents" },
+    { "name": "gh-address-comments", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/gh-address-comments" },
+    { "name": "gh-fix-ci", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/gh-fix-ci" },
+    { "name": "migrate-to-codex", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/migrate-to-codex" },
+    { "name": "screenshot", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/screenshot" },
+    { "name": "security-best-practices", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/security-best-practices" },
+    { "name": "transcribe", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/transcribe" },
+    { "name": "vercel-deploy", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/vercel-deploy" },
+    { "name": "yeet", "scope": "codex", "type": "github", "repository": "openai/skills", "sourcePath": "skills/.curated/yeet" },
+    { "name": "image-prompt-reverse", "scope": "codex", "type": "snapshot", "sourcePath": "tools/capabilities/skill-snapshots/image-prompt-reverse" }
   ],
   "repositoryPlugins": [
     "codex-design-workflows",
@@ -58,22 +78,24 @@
     "app-6938a7d323f48191aeabaf579802bf45@openai-curated-remote",
     "openai-templates@openai-curated-remote",
     "hyperframes@openai-curated-remote",
-    "deep-research-work@openai-curated-remote",
     "documents@openai-primary-runtime",
     "pdf@openai-primary-runtime",
     "spreadsheets@openai-primary-runtime",
     "presentations@openai-primary-runtime",
     "template-creator@openai-primary-runtime",
     "codex-app-tools@openai-bundled",
-    "sites@openai-bundled",
     "browser@openai-bundled",
     "chrome@openai-bundled",
     "computer-use@openai-bundled",
-    "visualize@openai-bundled"
+    "visualize@openai-bundled",
+    "infinite-canvas@infinite-canvas-local"
   ],
   "optionalCommands": [
     "browser-use",
     "dws",
     "firecrawl"
+  ],
+  "pluginMarketplaces": [
+    { "name": "infinite-canvas-local", "source": "https://github.com/basketikun/infinite-canvas.git", "sparse": [ ".agents/plugins", "plugins/infinite-canvas" ] }
   ]
 }

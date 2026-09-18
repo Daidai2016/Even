@@ -929,6 +929,174 @@
       "displayName": "三大财务报表预测模板 (artifact-template-three-statement-forecast)",
       "shortDescription": "创建关联利润表、资产负债表和现金流量表的预测工作簿，包含假设与校验。",
       "defaultPrompt": "使用 $artifact-template-three-statement-forecast 模板完成当前任务。"
+    },
+    {
+      "name": "codex-ppt",
+      "displayName": "图片式演示文稿 (codex-ppt)",
+      "shortDescription": "将文章、报告或提纲生成风格统一的整页图片式 PPTX，并配套讲稿。",
+      "defaultPrompt": "使用 $codex-ppt 完成当前任务：将文章、报告或提纲生成风格统一的整页图片式 PPTX，并配套讲稿。"
+    },
+    {
+      "name": "dashi-ppt",
+      "displayName": "大狮演示文稿 (dashi-ppt)",
+      "shortDescription": "基于视觉主题制作可离线浏览和在浏览器编辑的 HTML 演示文稿。",
+      "defaultPrompt": "使用 $dashi-ppt 完成当前任务：基于视觉主题制作可离线浏览和在浏览器编辑的 HTML 演示文稿。"
+    },
+    {
+      "name": "frontend-slides",
+      "displayName": "动态网页演示文稿 (frontend-slides)",
+      "shortDescription": "创建带动画的 HTML 幻灯片，或将 PowerPoint 转换为网页演示。",
+      "defaultPrompt": "使用 $frontend-slides 完成当前任务：创建带动画的 HTML 幻灯片，或将 PowerPoint 转换为网页演示。"
+    },
+    {
+      "name": "gh-address-comments",
+      "displayName": "GitHub 评审意见处理 (gh-address-comments)",
+      "shortDescription": "读取当前分支的拉取请求评审意见，逐项修改并验证。",
+      "defaultPrompt": "使用 $gh-address-comments 完成当前任务：读取当前分支的拉取请求评审意见，逐项修改并验证。"
+    },
+    {
+      "name": "gh-fix-ci",
+      "displayName": "GitHub 自动检查修复 (gh-fix-ci)",
+      "shortDescription": "分析 GitHub Actions 失败日志，定位并修复持续集成问题。",
+      "defaultPrompt": "使用 $gh-fix-ci 完成当前任务：分析 GitHub Actions 失败日志，定位并修复持续集成问题。"
+    },
+    {
+      "name": "grill-me",
+      "displayName": "方案深度追问 (grill-me)",
+      "shortDescription": "手动启动多轮访谈，澄清计划、设计与关键决策，调用 grilling 执行。",
+      "defaultPrompt": "使用 $grill-me 完成当前任务：手动启动多轮访谈，澄清计划、设计与关键决策，调用 grilling 执行。"
+    },
+    {
+      "name": "grilling",
+      "displayName": "需求与决策澄清 (grilling)",
+      "shortDescription": "通过分轮提问和建议检验想法，明确决策依赖，形成共同理解。",
+      "defaultPrompt": "使用 $grilling 完成当前任务：通过分轮提问和建议检验想法，明确决策依赖，形成共同理解。"
+    },
+    {
+      "name": "html-ppt",
+      "displayName": "HTML 演示文稿工作室 (html-ppt)",
+      "shortDescription": "使用主题、版式和动画模板制作静态 HTML 幻灯片与多页图文。",
+      "defaultPrompt": "使用 $html-ppt 完成当前任务：使用主题、版式和动画模板制作静态 HTML 幻灯片与多页图文。"
+    },
+    {
+      "name": "huashu-design",
+      "displayName": "花叔设计 (huashu-design)",
+      "shortDescription": "用 HTML 制作高保真原型、幻灯片、动画与可视化，提供设计方向和评审。",
+      "defaultPrompt": "使用 $huashu-design 完成当前任务：用 HTML 制作高保真原型、幻灯片、动画与可视化，提供设计方向和评审。"
+    },
+    {
+      "name": "image-prompt-reverse",
+      "displayName": "图片提示词反推 (image-prompt-reverse)",
+      "shortDescription": "分析参考图的主体、构图、风格与质感，生成可复用的绘图提示词。",
+      "defaultPrompt": "使用 $image-prompt-reverse 完成当前任务：分析参考图的主体、构图、风格与质感，生成可复用的绘图提示词。"
+    },
+    {
+      "name": "migrate-to-codex",
+      "displayName": "Codex 配置迁移 (migrate-to-codex)",
+      "shortDescription": "将其他工具的指令、技能、代理与 MCP 配置迁移为 Codex 支持的形式。",
+      "defaultPrompt": "使用 $migrate-to-codex 完成当前任务：将其他工具的指令、技能、代理与 MCP 配置迁移为 Codex 支持的形式。"
+    },
+    {
+      "name": "photo-story",
+      "displayName": "照片故事化转换 (photo-story)",
+      "shortDescription": "保留照片主体和布局，将照片转换为水彩、铅笔画等叙事视觉风格。",
+      "defaultPrompt": "使用 $photo-story 完成当前任务：保留照片主体和布局，将照片转换为水彩、铅笔画等叙事视觉风格。"
+    },
+    {
+      "name": "ppt-master",
+      "displayName": "可编辑演示文稿制作 (ppt-master)",
+      "shortDescription": "制作和优化可编辑 PPTX，支持模板填充、版式重建、动画与旁白。",
+      "defaultPrompt": "使用 $ppt-master 完成当前任务：制作和优化可编辑 PPTX，支持模板填充、版式重建、动画与旁白。"
+    },
+    {
+      "name": "screenshot",
+      "displayName": "桌面截图 (screenshot)",
+      "shortDescription": "按要求截取整个屏幕、指定窗口或屏幕区域，用于检查和记录。",
+      "defaultPrompt": "使用 $screenshot 完成当前任务：按要求截取整个屏幕、指定窗口或屏幕区域，用于检查和记录。"
+    },
+    {
+      "name": "security-best-practices",
+      "displayName": "代码安全实践审查 (security-best-practices)",
+      "shortDescription": "检查支持语言与框架的安全实践，给出具体风险和改进建议。",
+      "defaultPrompt": "使用 $security-best-practices 完成当前任务：检查支持语言与框架的安全实践，给出具体风险和改进建议。"
+    },
+    {
+      "name": "transcribe",
+      "displayName": "音频文字转写 (transcribe)",
+      "shortDescription": "将音频转成文字，可区分说话人并使用已知说话人信息。",
+      "defaultPrompt": "使用 $transcribe 完成当前任务：将音频转成文字，可区分说话人并使用已知说话人信息。"
+    },
+    {
+      "name": "vercel-deploy",
+      "displayName": "Vercel 网站部署 (vercel-deploy)",
+      "shortDescription": "将应用或网站部署到 Vercel，按要求生成预览或正式发布地址。",
+      "defaultPrompt": "使用 $vercel-deploy 完成当前任务：将应用或网站部署到 Vercel，按要求生成预览或正式发布地址。"
+    },
+    {
+      "name": "verysmallwoods-video",
+      "displayName": "小木头视频制作流水线 (verysmallwoods-video)",
+      "shortDescription": "通过 HyperFrames 制作讲解视频，并生成多比例封面、平台文案、博客和推文。",
+      "defaultPrompt": "使用 $verysmallwoods-video 完成当前任务：通过 HyperFrames 制作讲解视频，并生成多比例封面、平台文案、博客和推文。"
+    },
+    {
+      "name": "writing-for-agents",
+      "displayName": "AI 指令文档编写 (writing-for-agents)",
+      "shortDescription": "编写和优化 Skill、代理规则及提示文档，明确流程和验收标准，精简无效指令。",
+      "defaultPrompt": "使用 $writing-for-agents 完成当前任务：编写和优化 Skill、代理规则及提示文档，明确流程和验收标准，精简无效指令。"
+    },
+    {
+      "name": "yeet",
+      "displayName": "GitHub 提交与拉取请求 (yeet)",
+      "shortDescription": "在明确授权后，完成暂存、提交、推送并创建 GitHub 拉取请求。",
+      "defaultPrompt": "使用 $yeet 完成当前任务：在明确授权后，完成暂存、提交、推送并创建 GitHub 拉取请求。"
+    },
+    {
+      "name": "sites-preview-troubleshooting",
+      "displayName": "网站预览故障排查 (sites-preview-troubleshooting)",
+      "shortDescription": "排查 Sites 预览加载、显示和运行问题，定位故障并验证修复。",
+      "defaultPrompt": "使用 $sites-preview-troubleshooting 完成当前任务：排查 Sites 预览加载、显示和运行问题，定位故障并验证修复。"
+    },
+    {
+      "name": "agents",
+      "displayName": "OpenAI 智能体开发 (agents)",
+      "shortDescription": "使用 Agents API 或 Agents SDK 构建带工具调用和工作流的智能体应用。",
+      "defaultPrompt": "使用 $agents 完成当前任务：使用 Agents API 或 Agents SDK 构建带工具调用和工作流的智能体应用。"
+    },
+    {
+      "name": "figma-generative-plugins",
+      "displayName": "Figma 生成式插件 (figma-generative-plugins)",
+      "shortDescription": "在 Figma 中创建并运行生成式设计插件。",
+      "defaultPrompt": "使用 $figma-generative-plugins 完成当前任务：在 Figma 中创建并运行生成式设计插件。"
+    },
+    {
+      "name": "figma-shaders",
+      "displayName": "Figma 着色器效果 (figma-shaders)",
+      "shortDescription": "在 Figma 中创建和调整着色器视觉效果。",
+      "defaultPrompt": "使用 $figma-shaders 完成当前任务：在 Figma 中创建和调整着色器视觉效果。"
+    },
+    {
+      "name": "convert-to-doc",
+      "displayName": "分析成果转文档 (convert-to-doc)",
+      "shortDescription": "将分析成果转换为可分享和编辑的文档。",
+      "defaultPrompt": "使用 $convert-to-doc 完成当前任务：将分析成果转换为可分享和编辑的文档。"
+    },
+    {
+      "name": "convert-to-slides",
+      "displayName": "分析成果转演示文稿 (convert-to-slides)",
+      "shortDescription": "将分析成果组织为适合汇报的幻灯片。",
+      "defaultPrompt": "使用 $convert-to-slides 完成当前任务：将分析成果组织为适合汇报的幻灯片。"
+    },
+    {
+      "name": "schedule-refresh-jobs",
+      "displayName": "数据定时刷新 (schedule-refresh-jobs)",
+      "shortDescription": "为数据成果安排定时刷新任务，保持报告和仪表盘更新。",
+      "defaultPrompt": "使用 $schedule-refresh-jobs 完成当前任务：为数据成果安排定时刷新任务，保持报告和仪表盘更新。"
+    },
+    {
+      "name": "share-artifact-summary",
+      "displayName": "分析成果摘要分享 (share-artifact-summary)",
+      "shortDescription": "整理分析成果的关键信息，并按授权分享摘要。",
+      "defaultPrompt": "使用 $share-artifact-summary 完成当前任务：整理分析成果的关键信息，并按授权分享摘要。"
     }
   ],
   "plugins": [

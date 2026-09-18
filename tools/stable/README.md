@@ -14,3 +14,8 @@
 - `validate_repository_v1.1.0.ps1`
 
 - `validate_repository_v1.2.1.ps1`：加入视觉源文件与插件一致性检查前的验证器，仅供回退比对。
+
+本轮 Skills 同步补齐前归档：
+
+- `localize_codex_skills_v1.1.1.ps1`：递归发现用户嵌套 Skill 前的中文化工具。
+- `sync_codex_capabilities_v1.0.1.ps1`：增加外部插件市场恢复前的同步工具。
