@@ -6,7 +6,13 @@ app.bringToFront();
 
 
 // ==================================================
-// 大画面批量输出助手 V28.0.0
+// 大画面批量输出助手 V30.0.0
+//
+// V30更新：TIFF只保存单图层可见合成图、LZW无损压缩并保留透明；
+// JPG继续按源格式输出，品质12、基线标准。
+//
+// V29更新：修复写入检查及报告异常清理中对File.opened的依赖；
+// 输出目录失败时显示具体环节与系统原因，保留V28生产参数。
 //
 // 兼容范围：
 // 1. Adobe Photoshop 2022-2026（23.x-27.x）
@@ -4450,18 +4456,26 @@ function v27PrepareOpenDocuments() {
 }
 
 
-function v27CheckWritableFolder(folder) {
-    var probe = new File(
-        v28JoinPath(
-            folder,
-            "_even_v28_write_test_" + new Date().getTime() + ".tmp"
-        )
-    );
+function v27CheckWritableFolder(folder, diagnostic) {
+    var probe;
+    var probeName = "_even_v29_write_test_" + new Date().getTime();
+    var suffix = 0;
+    // 避开已有文件；清理时只处理本次检查创建的文件。
+    do {
+        probe = new File(v28JoinPath(folder, probeName + "_" + suffix + ".tmp"));
+        suffix++;
+    } while (probe.exists);
 
     var opened = false;
     var wrote = false;
     var closed = true;
     var removed = true;
+    var errors = [];
+    var stage = "创建测试文件";
+
+    if (diagnostic) {
+        diagnostic.errorText = "";
+    }
 
     try {
         probe.encoding = "UTF-8";
@@ -4469,28 +4483,49 @@ function v27CheckWritableFolder(folder) {
         opened = probe.open("w");
 
         if (opened) {
+            stage = "写入测试内容";
             wrote = probe.write("write-test") !== false;
+            if (!wrote) {
+                errors.push(stage + "失败：" + (probe.error || "未返回具体原因"));
+            }
+        } else {
+            errors.push(stage + "失败：" + (probe.error || "未返回具体原因"));
         }
     } catch (e) {
         wrote = false;
+        errors.push(stage + "失败：" + v27ErrorText(e));
     } finally {
         try {
-            if (probe.opened) {
+            // ExtendScript File没有opened属性，必须使用open()的返回值。
+            if (opened) {
                 closed = probe.close() !== false;
+                if (!closed) {
+                    errors.push("关闭测试文件失败：" + (probe.error || "未返回具体原因"));
+                }
             }
-        } catch (ignore) {
+        } catch (closeError) {
             closed = false;
+            errors.push("关闭测试文件失败：" + v27ErrorText(closeError));
         }
 
         try {
-            if (probe.exists) {
+            if (opened && probe.exists) {
                 removed = probe.remove() !== false && !probe.exists;
+                if (!removed) {
+                    errors.push("清理测试文件失败：" + (probe.error || "未返回具体原因") +
+                        "\n测试文件：" + probe.fsName);
+                }
             }
-        } catch (ignoreRemove) {
+        } catch (removeError) {
             removed = false;
+            errors.push("清理测试文件失败：" + v27ErrorText(removeError) +
+                "\n测试文件：" + probe.fsName);
         }
     }
 
+    if (diagnostic) {
+        diagnostic.errorText = errors.join("\n");
+    }
     return opened && wrote && closed && removed && !probe.exists;
 }
 
@@ -4603,6 +4638,9 @@ function v27SaveProductionFile(doc, outputFile, extension) {
             var tifOptions = new TiffSaveOptions();
             tifOptions.imageCompression = TIFFEncoding.TIFFLZW;
             tifOptions.embedColorProfile = true;
+            // 不展平源文档；保存合成图并保留透明。
+            tifOptions.layers = false;
+            tifOptions.transparency = true;
             // 固定为Windows既有字节序，避免macOS使用不同默认值。
             tifOptions.byteOrder = ByteOrder.IBM;
 
@@ -4676,7 +4714,7 @@ function v27SafeWriteUTF8(file, text) {
         var cleanupErrorText = "";
 
         try {
-            if (opened && file.opened) {
+            if (opened) {
                 if (file.close() === false) {
                     cleanupErrorText = "关闭失败";
                 }
@@ -4710,7 +4748,7 @@ function v27SafeWriteUTF8(file, text) {
         throw writeError;
     } finally {
         try {
-            if (opened && file.opened) {
+            if (opened) {
                 file.close();
             }
         } catch (finalCloseError) {
@@ -5226,12 +5264,16 @@ function runV27() {
     );
 
     if (!outputFolder.exists && !outputFolder.create()) {
-        alert("无法创建输出文件夹：\n" + outputFolder.fsName);
+        alert("无法创建输出文件夹：\n" + outputFolder.fsName +
+            "\n\n原因：" + (outputFolder.error || "系统未返回具体原因，请检查所选位置是否可用及文件夹创建权限。"));
         return;
     }
 
-    if (!v27CheckWritableFolder(outputFolder)) {
-        alert("输出文件夹无法写入：\n" + outputFolder.fsName);
+    var outputDiagnostic = {};
+    if (!v27CheckWritableFolder(outputFolder, outputDiagnostic)) {
+        alert("输出文件夹检查未通过：\n" + outputFolder.fsName +
+            "\n\n原因：" + (outputDiagnostic.errorText || "无法完成文件写入检查") +
+            "\n\n批处理尚未开始。请确认该位置可用后重新运行并选择输出位置。");
         return;
     }
 
