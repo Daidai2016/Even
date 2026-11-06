@@ -1,7 +1,7 @@
 ﻿# =============================================
 # Even Codex Design Desktop Workspace Generator
 #
-# Version: 2.3.3
+# Version: 2.3.4
 #
 # 功能：
 # 1. 自动识别当前项目根目录
@@ -33,7 +33,7 @@ $ErrorActionPreference = "Stop"
 
 . (Join-Path $PSScriptRoot "lib\adobe_installation.ps1")
 
-$ToolVersion = "2.3.3"
+$ToolVersion = "2.3.4"
 
 
 # =============================================
@@ -1678,9 +1678,22 @@ foreach ($ShortcutConfigItem in $ShortcutItems) {
                 -ShortcutName $ShortcutName `
                 -ScriptFile $CodexEnvScript `
                 -IconFileName $ShortcutIcon `
-                -Description $ShortcutDescription `
-                -AdditionalArguments "-Force"
+                -Description $ShortcutDescription
 
+
+            break
+        }
+
+
+        "codex_env_restore" {
+
+            New-PowerShellScriptShortcut `
+                -ShortcutFolder $ShortcutFolder `
+                -ShortcutName $ShortcutName `
+                -ScriptFile $CodexEnvScript `
+                -IconFileName $ShortcutIcon `
+                -Description $ShortcutDescription `
+                -AdditionalArguments "-Restore"
 
             break
         }

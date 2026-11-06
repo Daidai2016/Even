@@ -19,3 +19,8 @@
 
 - `localize_codex_skills_v1.1.1.ps1`：递归发现用户嵌套 Skill 前的中文化工具。
 - `sync_codex_capabilities_v1.0.1.ps1`：增加外部插件市场恢复前的同步工具。
+
+本轮代理环境强化前归档：
+
+- `create_codex_env_v1.0.0.ps1`：原代理环境生成器，仅供比对；旧版直接覆盖且不备份，不建议恢复为日常入口。
+- `create_desktop_shortcuts_v2.3.3.ps1`：加入代理环境恢复入口前的快捷方式生成器。

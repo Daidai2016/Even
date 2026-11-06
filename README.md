@@ -86,7 +86,7 @@ Codex Design Workspace 是 AI 辅助创意工作流开发与生产平台。目�
 
 `Codex Design 同步GitHub` 会从脚本所在位置自动确定仓库。它只在 `main` 工作区干净、代理可用、本地仅落后 `origin/main` 时执行 `pull --ff-only`。检测到未提交修改、本地领先或分支分叉时只报告并停止，不会自动 reset、clean、stash、commit 或 force。
 
-`Codex Skills 与插件同步` 会先调用同一套安全 GitHub 同步流程，再按 `tools/config/codex_capabilities.json` 补装缺失的用户 Skills、Codex Design 本地插件和受管 OpenAI 插件，并刷新本机代理环境与中文界面。它不会覆盖已有 Skill、删除额外能力，也不会复制登录令牌、OAuth 状态或插件缓存。另一台电脑首次完成仓库克隆和本机部署后，日常只需双击该快捷方式。
+`Codex Skills 与插件同步` 会先调用同一套安全 GitHub 同步流程，再按 `tools/config/codex_capabilities.json` 补装缺失的用户 Skills、Codex Design 本地插件和受管 OpenAI 插件，检查本机代理环境并刷新中文界面。代理环境如需更新，只显示预览，请另行双击「Codex 代理环境配置」确认写入。它不会覆盖已有 Skill、删除额外能力，也不会复制登录令牌、OAuth 状态或插件缓存。另一台电脑首次完成仓库克隆和本机部署后，日常只需双击该快捷方式。
 两台电脑的中英文显示名称统一由 `tools/config/codex_skills_zh-CN.json` 管理；同步安装后会重新应用名称，英文内部 ID 和调用名保持不变。新装能力需要登记到 `tools/config/codex_capabilities.json`，只修改本机缓存不会传到另一台电脑。办公室或家里修改清单与名称后，先检查并通过“Codex Design 发布GitHub”发布，再在另一台电脑双击“Codex Skills 与插件同步”；未提交、未推送的修改不会跨电脑传播。该流程补齐缺失能力，不保证两端已有第三方 Skill 的文件版本完全一致；账号授权仍由各电脑单独完成。 PDF 统一通过官方插件提供，不再补装独立版；Frontend Slides 从上游独立 Skill 子目录安装，避免复制嵌套的同名插件。已在其他电脑存在的重复副本不会自动删除，需另行核对后清理。
 
 Infinite Canvas 已纳入自动安装清单：缺少插件及其市场时，同步入口会通过当前代理登记上游 GitHub 插件市场并安装；已有本地市场保持不变。仅登录同一账号不会安装本机 Skills，另一台电脑需先克隆仓库、完成本机部署，再双击「Codex Skills 与插件同步」。第三方账号授权和可选运行环境仍需在各电脑单独配置。
@@ -95,6 +95,8 @@ Infinite Canvas 已纳入自动安装清单：缺少插件及其市场时，同�
 
 
 `Codex Design 环境检查` 会检查 Windows、PowerShell、Git、Node.js、npm、Python、Codex、VS Code、Photoshop Beta、Illustrator Beta、MCP、Hooks 和插件配置概况，并在 `logs/` 中生成带时间的环境报告。报告不记录密钥、令牌或代理凭据。
+
+`Codex 代理环境配置` 会检测本机代理监听端口，验证 HTTPS 隧道与证书，显示 `.env` 代理修改预览；输入“确认”后才备份和写入。`Codex 代理环境恢复` 可选择历史备份，确认后恢复。两者均不修改系统或 Git 代理。重启和故障排查见 [Codex 代理环境说明](tools/docs/CODEX_PROXY.md)。
 
 
 VS Code 任务还提供仓库级 Git 换行配置、仓库验证、个人 Codex 配置加固和本地工作流插件安装入口。每台电脑首次克隆后运行一次“配置本仓库 Git 规范”，会设置当前仓库的 `core.autocrlf=false`、`core.eol=lf` 和 `core.safecrlf=true`，不修改系统或其他项目。配置加固会先保存时间戳备份；插件安装使用仓库内 `.agents/plugins/marketplace.json`，不依赖远程市场。
